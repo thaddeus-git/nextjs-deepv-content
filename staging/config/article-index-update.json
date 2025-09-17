@@ -1,0 +1,100 @@
+{
+  "lastUpdated": "2025-09-17T19:24:36.726036",
+  "totalArticles": 4,
+  "categories": [
+    "system-devops",
+    "web-frontend"
+  ],
+  "technologies": [
+    "RPM/Linux",
+    "JavaScript"
+  ],
+  "articles": [
+    {
+      "id": "3749489f",
+      "title": "Parse query string in JavaScript: Complete Guide with 6 Solutions",
+      "slug": "parse-query-string-in-javascript",
+      "category": "web-frontend",
+      "subcategory": "javascript",
+      "difficulty": "intermediate",
+      "technology": "JavaScript",
+      "readTime": 35,
+      "publishedAt": "2025-09-17",
+      "featured": true,
+      "description": "For a fast, modern, and reliable way to parse query strings, especially when dealing with the current page's URL, the URLSearchParams API is the recommended ...",
+      "tags": [
+        "javascript",
+        "parsing",
+        "query-string"
+      ],
+      "filename": "parse-query-string-in-javascript-3749489f.mdx",
+      "lastUpdated": "2025-09-17T19:24:36.725869"
+    },
+    {
+      "id": "d0cc8ebb",
+      "title": "Why does my JavaScript code receive a \\\"No 'Access-Control-Allow-Origin' header is present on the requested resource\\\" error, while Postman does not?: Complete Guide with 6 Solutions",
+      "slug": "why-does-my-javascript-code-receive-a-no-access-control",
+      "category": "web-frontend",
+      "subcategory": "javascript",
+      "difficulty": "beginner",
+      "technology": "JavaScript",
+      "readTime": 16,
+      "publishedAt": "2025-09-17",
+      "featured": true,
+      "description": "The \\\"No 'Access-Control-Allow-Origin' header is present on the requested resource\\\" error occurs in browsers due to the Same-Origin Policy (SOP), a fundamenta...",
+      "tags": [
+        "javascript",
+        "jquery",
+        "cors",
+        "postman",
+        "same-origin-policy"
+      ],
+      "filename": "why-does-my-javascript-code-receive-a-no-access-control-d0cc8ebb.mdx",
+      "lastUpdated": "2025-09-17T19:24:36.725911"
+    },
+    {
+      "id": "debc8982",
+      "title": "Dependency Resolution Fails on Installed Library: Complete Guide with 5 Solutions",
+      "slug": "dependency-resolution-fails-on-installed-library",
+      "category": "system-devops",
+      "subcategory": "package-management",
+      "difficulty": "intermediate",
+      "technology": "RPM/Linux",
+      "readTime": 30,
+      "publishedAt": "2025-09-17",
+      "featured": false,
+      "description": "Problem: You're trying to install an RPM package (e.g., geramer-server.x8664) and it fails with a dependency error like Requires: libcrypto.so.10(libcrypto.s...",
+      "tags": [
+        "rpm",
+        "linux",
+        "dependency-resolution",
+        "package-management",
+        "troubleshooting"
+      ],
+      "filename": "dependency-resolution-fails-on-installed-library-debc8982.mdx",
+      "lastUpdated": "2025-09-17T19:24:36.725945"
+    },
+    {
+      "id": "171c50c3",
+      "title": "How to do word counts for a mixture of English and Chinese in Javascript: 3 Methods + Performance Guide",
+      "slug": "how-to-do-word-counts-for-a-mixture-of-english-and-chinese",
+      "category": "web-frontend",
+      "subcategory": "javascript",
+      "difficulty": "beginner",
+      "technology": "JavaScript",
+      "readTime": 22,
+      "publishedAt": "2025-09-17",
+      "featured": false,
+      "description": "(Persona: Speed Seeker, Problem Solver, Output Focused)",
+      "tags": [
+        "javascript",
+        "jquery",
+        "character",
+        "counter",
+        "word-count"
+      ],
+      "filename": "how-to-do-word-counts-for-a-mixture-of-english-and-chinese-171c50c3.mdx",
+      "lastUpdated": "2025-09-17T19:24:36.726031"
+    }
+  ]
+}
