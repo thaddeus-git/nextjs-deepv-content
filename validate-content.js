@@ -5,7 +5,7 @@
  * Validates MDX files and frontmatter against schema before production deployment
  * 
  * Usage: node validate-content.js [staging-directory] [schema-file]
- * Example: node validate-content.js ../nextjs-deepv-content/staging/guides ../nextjs-deepv-docs/config/content-schema.json
+ * Example: node validate-content.js staging/guides content-schema.json
  */
 
 const fs = require('fs');
@@ -243,7 +243,7 @@ function main() {
   
   if (args.length < 2) {
     log('red', 'Usage: node validate-content.js <staging-directory> <schema-file>');
-    log('yellow', 'Example: node validate-content.js ../nextjs-deepv-content/staging/guides ../nextjs-deepv-docs/config/content-schema.json');
+    log('yellow', 'Example: node validate-content.js staging/guides content-schema.json');
     process.exit(1);
   }
 

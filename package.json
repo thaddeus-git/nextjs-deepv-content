@@ -1,0 +1,12 @@
+{
+  "name": "nextjs-deepv-content",
+  "version": "1.0.0",
+  "description": "Content repository for DeepV Code technical articles",
+  "scripts": {
+    "validate": "node validate-content.js staging/guides content-schema.json"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,55 @@
+{
+  "_metadata": {
+    "version": "1.0.0",
+    "source": "nextjs-deepv-docs/config/content-schema.json",
+    "lastUpdated": "2024-09-18",
+    "description": "Authoritative content schema for DeepV Code articles"
+  },
+  "article_schema": {
+    "filename_format": "{descriptive-title}-{uniqueId}.mdx",
+    "frontmatter_required": [
+      "title",
+      "slug", 
+      "category",
+      "subcategory",
+      "description",
+      "tags",
+      "difficulty",
+      "readTime",
+      "lastUpdated"
+    ],
+    "frontmatter_optional": [
+      "featured",
+      "filename"
+    ],
+    "frontmatter_types": {
+      "title": "string",
+      "slug": "string",
+      "category": "string", 
+      "subcategory": "string",
+      "description": "string (for SEO)",
+      "tags": "string[] | string",
+      "difficulty": "'beginner' | 'intermediate' | 'advanced'",
+      "readTime": "number",
+      "lastUpdated": "ISO date string",
+      "featured": "boolean",
+      "filename": "string"
+    }
+  },
+  "workflow_paths": {
+    "staging": {
+      "articles": "/nextjs-deepv-content/staging/guides/",
+      "index": "/nextjs-deepv-content/staging/config/article-index-update.json"
+    },
+    "production": {
+      "articles": "/nextjs-deepv-content/guides/",
+      "index": "/nextjs-deepv-content/config/article-index.json"
+    }
+  },
+  "validation_rules": {
+    "unique_id": "deterministic from Stack Overflow ID",
+    "slug_format": "kebab-case",
+    "category_validation": "must exist in categories.json",
+    "description_seo": "essential for search engines"
+  }
+}
