@@ -141,13 +141,20 @@ staging/guides/new-article-abc12345.mdx
 staging/config/article-index-update.json
 ```
 
-### **2. Validation**
+### **2. Validation (Optional)**
 Before promoting to production, validate the content:
 ```bash
 npm run validate
 ```
 
 ### **3. Promotion to Production**
+
+#### **Option A: Validate + Promote (Recommended)**
+```bash
+npm run promote  # Validates, promotes, and pushes to GitHub
+```
+
+#### **Option B: Manual Steps**
 Move validated content from staging to production:
 ```bash
 # Manual promotion
@@ -172,6 +179,7 @@ The main website ([deepvcode.com](https://deepvcode.com)) automatically:
 ```bash
 npm install          # Install validation dependencies
 npm run validate     # Validate staging content against schema
+npm run promote      # Validate + promote + commit to GitHub
 ```
 
 ## 🔧 **Troubleshooting**

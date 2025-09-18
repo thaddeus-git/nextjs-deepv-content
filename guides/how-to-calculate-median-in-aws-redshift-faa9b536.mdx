@@ -1,0 +1,624 @@
+---
+title: "How to calculate median in AWS Redshift?: 3 Methods + Performance Guide"
+slug: "how-to-calculate-median-in-aws-redshift"
+category: "programming"
+subcategory: "general"
+description: "Calculating the median in AWS Redshift can be achieved efficiently using several methods, primarily leveraging window functions. The most direct and recommen..."
+difficulty: "intermediate"
+readTime: 18
+publishedAt: "2025-09-18"
+featured: false
+technology: "Amazon-Redshift"
+tags:
+  - "amazon-redshift"
+---
+
+# How to calculate median in AWS Redshift?: 3 Methods + Performance Guide
+
+# # Quick Answer
+Calculating the median in AWS Redshift can be achieved efficiently using several methods, primarily leveraging window functions. The most direct and recommended approach for modern Redshift versions is the `MEDIAN()` window function. For scenarios requiring more control or compatibility with older Redshift versions, `PERCENTILE_CONT()` or `NTILE()` offer robust alternatives.
+
+Here are immediate copy-paste solutions for common scenarios:
+
+**Scenario 1: Simple Median of a Column**
+To find the median of a single numeric column in your entire dataset.
+
+```sql
+-- Speed Seeker, Problem Solver
+-- Calculates the median of the 'value_column' across the entire table.
+-- The DISTINCT keyword is crucial to avoid duplicate median values for each row.
+SELECT DISTINCT MEDIAN(value_column) OVER () AS overall_median
+FROM your_table;
+```
+
+**Scenario 2: Median Grouped by a Category**
+To calculate the median for each distinct category within your data.
+
+```sql
+-- Speed Seeker, Problem Solver, Architecture Builder
+-- Calculates the median of 'value_column' for each 'category_column'.
+SELECT DISTINCT category_column, MEDIAN(value_column) OVER (PARTITION BY category_column) AS category_median
+FROM your_table
+ORDER BY category_column;
+```
+
+**Scenario 3: Median using PERCENTILE_CONT (for continuous data)**
+When you need a percentile-based median, especially for continuous data where interpolation is desired.
+
+```sql
+-- Learning Explorer, Architecture Builder
+-- Calculates the 50th percentile (median) of 'value_column' across the entire table.
+-- PERCENTILE_CONT interpolates between values if the median falls between two data points.
+SELECT DISTINCT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY value_column) OVER () AS overall_median_cont
+FROM your_table;
+```
+
+**Scenario 4: Median using PERCENTILE_DISC (for discrete data)**
+When you need a percentile-based median that picks an actual data point.
+
+```sql
+-- Learning Explorer, Architecture Builder
+-- Calculates the 50th percentile (median) of 'value_column' across the entire table.
+-- PERCENTILE_DISC picks an actual value from the dataset.
+SELECT DISTINCT PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY value_column) OVER () AS overall_median_disc
+FROM your_table;
+```
+
+**Scenario 5: Median using NTILE (approximation for large datasets)**
+An approximation method, useful for very large datasets or older Redshift versions where other functions might not be available or perform optimally.
+
+```sql
+-- Legacy Maintainer, Problem Solver (for specific edge cases)
+-- Approximates the median by dividing data into two groups and finding the minimum of the first group.
+-- This method is less precise for small datasets but can be performant for very large ones.
+WITH RankedData AS (
+    SELECT
+        value_column,
+        NTILE(2) OVER (ORDER BY value_column DESC) AS ntile_group
+    FROM your_table
+)
+SELECT MIN(value_column) AS approximate_median
+FROM RankedData
+WHERE ntile_group = 1;
+```
+
+# # Choose Your Method
+```mermaid
+flowchart TD
+    A[Your Situation] --> B{Performance Critical?}
+    B -->|Yes| C[Method 1: MEDIAN() Window Function]
+    B -->|No| D{Learning Focus?}
+    D -->|Yes| E[Method 2: PERCENTILE_CONT/DISC()]
+    D -->|No| F[Method 3: NTILE() Approximation]
+```
+
+# # Table of Contents
+1.  Quick Answer
+2.  Choose Your Method
+3.  Table of Contents
+4.  Ready-to-Use Code
+5.  Method Sections
+    *   Method 1: Using the `MEDIAN()` Window Function [Speed Seeker, Problem Solver, Architecture Builder]
+    *   Method 2: Using `PERCENTILE_CONT()` and `PERCENTILE_DISC()` Window Functions [Learning Explorer, Architecture Builder, Legacy Maintainer]
+    *   Method 3: Approximating with `NTILE()` Window Function [Legacy Maintainer, Problem Solver (for specific edge cases)]
+6.  Performance Comparison
+7.  Amazon-Redshift Version Support
+8.  Common Problems & Solutions
+9.  Real-World Examples
+10. Related Amazon-Redshift Functions
+11. Summary
+12. Frequently Asked Questions
+13. Test Your Code
+
+# # Ready-to-Use Code
+
+Here's a collection of practical, copy-paste ready code snippets for various median calculation scenarios in Redshift. We'll use a sample `sales_data` table for demonstration.
+
+First, let's create a sample table and insert some data:
+
+```sql
+-- Create sample table
+CREATE TABLE sales_data (
+    sale_id INT IDENTITY(1,1),
+    product_category VARCHAR(50),
+    sale_amount DECIMAL(10, 2),
+    sale_date DATE
+);
+
+-- Insert sample data
+INSERT INTO sales_data (product_category, sale_amount, sale_date) VALUES
+('Electronics', 150.00, '2024-01-01'),
+('Electronics', 200.00, '2024-01-02'),
+('Electronics', 120.00, '2024-01-03'),
+('Electronics', 300.00, '2024-01-04'),
+('Electronics', 180.00, '2024-01-05'),
+('Clothing', 50.00, '2024-01-01'),
+('Clothing', 75.00, '2024-01-02'),
+('Clothing', 60.00, '2024-01-03'),
+('Clothing', 100.00, '2024-01-04'),
+('Books', 25.00, '2024-01-01'),
+('Books', 30.00, '2024-01-02'),
+('Books', 40.00, '2024-01-03'),
+('Books', 35.00, '2024-01-04'),
+('Home Goods', 80.00, '2024-01-01'),
+('Home Goods', 90.00, '2024-01-02'),
+('Home Goods', 110.00, '2024-01-03'),
+('Home Goods', 100.00, '2024-01-04'),
+('Electronics', 220.00, '2024-01-06'),
+('Clothing', 85.00, '2024-01-05'),
+('Books', 28.00, '2024-01-05'),
+('Electronics', 190.00, '2024-01-07');
+```
+
+**1. Overall Median of `sale_amount` using `MEDIAN()`**
+
+```sql
+-- Calculates the median sale amount for all sales.
+SELECT DISTINCT MEDIAN(sale_amount) OVER () AS overall_median_sale_amount
+FROM sales_data;
+```
+
+**2. Median `sale_amount` per `product_category` using `MEDIAN()`**
+
+```sql
+-- Calculates the median sale amount for each product category.
+SELECT DISTINCT
+    product_category,
+    MEDIAN(sale_amount) OVER (PARTITION BY product_category) AS category_median_sale_amount
+FROM sales_data
+ORDER BY product_category;
+```
+
+**3. Overall Median of `sale_amount` using `PERCENTILE_CONT()`**
+
+```sql
+-- Calculates the 50th percentile (median) of sale amounts, interpolating if necessary.
+SELECT DISTINCT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY sale_amount) OVER () AS overall_median_cont
+FROM sales_data;
+```
+
+**4. Median `sale_amount` per `product_category` using `PERCENTILE_CONT()`**
+
+```sql
+-- Calculates the 50th percentile (median) of sale amounts for each category, interpolating.
+SELECT DISTINCT
+    product_category,
+    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY sale_amount) OVER (PARTITION BY product_category) AS category_median_cont
+FROM sales_data
+ORDER BY product_category;
+```
+
+**5. Overall Median of `sale_amount` using `PERCENTILE_DISC()`**
+
+```sql
+-- Calculates the 50th percentile (median) of sale amounts, picking an actual value.
+SELECT DISTINCT PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY sale_amount) OVER () AS overall_median_disc
+FROM sales_data;
+```
+
+**6. Median `sale_amount` per `product_category` using `PERCENTILE_DISC()`**
+
+```sql
+-- Calculates the 50th percentile (median) of sale amounts for each category, picking an actual value.
+SELECT DISTINCT
+    product_category,
+    PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY sale_amount) OVER (PARTITION BY product_category) AS category_median_disc
+FROM sales_data
+ORDER BY product_category;
+```
+
+**7. Approximate Overall Median using `NTILE()`**
+
+```sql
+-- Approximates the median sale amount for all sales using NTILE.
+WITH RankedSales AS (
+    SELECT
+        sale_amount,
+        NTILE(2) OVER (ORDER BY sale_amount DESC) AS ntile_group
+    FROM sales_data
+)
+SELECT MIN(sale_amount) AS approximate_overall_median
+FROM RankedSales
+WHERE ntile_group = 1;
+```
+
+**8. Approximate Median `sale_amount` per `product_category` using `NTILE()`**
+
+```sql
+-- Approximates the median sale amount for each product category using NTILE.
+WITH RankedCategorySales AS (
+    SELECT
+        product_category,
+        sale_amount,
+        NTILE(2) OVER (PARTITION BY product_category ORDER BY sale_amount DESC) AS ntile_group
+    FROM sales_data
+)
+SELECT
+    product_category,
+    MIN(sale_amount) AS approximate_category_median
+FROM RankedCategorySales
+WHERE ntile_group = 1
+GROUP BY product_category
+ORDER BY product_category;
+```
+
+**9. Median with Filtering (e.g., sales after a specific date)**
+
+```sql
+-- Calculates the median sale amount for sales made after '2024-01-03'.
+SELECT DISTINCT MEDIAN(sale_amount) OVER () AS median_after_date
+FROM sales_data
+WHERE sale_date > '2024-01-03';
+```
+
+**10. Median with Multiple Partitioning Columns**
+
+```sql
+-- Calculates the median sale amount for each product category per month.
+-- (Assuming sale_date is granular enough to extract month)
+SELECT DISTINCT
+    product_category,
+    EXTRACT(MONTH FROM sale_date) AS sale_month,
+    MEDIAN(sale_amount) OVER (PARTITION BY product_category, EXTRACT(MONTH FROM sale_date)) AS monthly_category_median
+FROM sales_data
+ORDER BY product_category, sale_month;
+```
+
+**11. Median of a derived value (e.g., `sale_amount` / `quantity`)**
+
+```sql
+-- Assuming a 'quantity' column exists, calculate median unit price.
+-- For demonstration, let's assume quantity is always 1 for simplicity, or add it to the table.
+-- Let's add a quantity column for a more realistic example.
+ALTER TABLE sales_data ADD COLUMN quantity INT DEFAULT 1;
+UPDATE sales_data SET quantity = FLOOR(RANDOM() * 5) + 1; -- Random quantities between 1 and 5
+
+SELECT DISTINCT MEDIAN(sale_amount / quantity) OVER () AS median_unit_price
+FROM sales_data
+WHERE quantity > 0; -- Avoid division by zero
+```
+
+**12. Median with NULL values handling**
+
+Redshift's `MEDIAN`, `PERCENTILE_CONT`, and `PERCENTILE_DISC` functions, like most aggregate and window functions, ignore `NULL` values by default. This example demonstrates this behavior.
+
+```sql
+-- Create a table with NULLs
+CREATE TABLE sales_with_nulls (
+    id INT,
+    value DECIMAL(10,2)
+);
+
+INSERT INTO sales_with_nulls (id, value) VALUES
+(1, 10.00),
+(2, 20.00),
+(3, NULL),
+(4, 30.00),
+(5, 40.00),
+(6, NULL),
+(7, 50.00);
+
+-- Calculate median, NULLs are ignored
+SELECT DISTINCT MEDIAN(value) OVER () AS median_ignoring_nulls
+FROM sales_with_nulls;
+
+-- If you wanted to treat NULLs as 0 (or another value), you'd use COALESCE
+SELECT DISTINCT MEDIAN(COALESCE(value, 0)) OVER () AS median_treating_nulls_as_zero
+FROM sales_with_nulls;
+```
+
+# # Method Sections
+
+## # Method 1: Using the `MEDIAN()` Window Function
+**[Speed Seeker, Problem Solver, Architecture Builder]**
+
+The `MEDIAN()` window function is the most straightforward and generally recommended way to calculate the median in AWS Redshift. It was introduced in Redshift around October 2014, making it available in most modern Redshift clusters. This function directly computes the median value within a specified window (or the entire dataset if no `PARTITION BY` clause is used).
+
+**Technical Deep Dive:**
+The `MEDIAN()` function is an ordered-set aggregate function, but in Redshift, it's implemented as a window function. This means it operates on a set of rows defined by the `OVER()` clause. When used without `PARTITION BY`, it treats the entire result set as a single window. When `PARTITION BY` is included, it calculates the median independently for each partition.
+
+The `MEDIAN()` function handles both odd and even numbers of elements in a set. For an odd number of elements, it returns the middle value. For an even number of elements, it calculates the average of the two middle values. This behavior aligns with the standard definition of a median for continuous data. `NULL` values are ignored in the calculation.
+
+**Best Practices:**
+*   **Use `DISTINCT` with `OVER()`:** When calculating a median over the entire dataset (`OVER ()`), the `MEDIAN()` window function will return the same median value for *every* row in your table. To get a single result, always wrap it in a `SELECT DISTINCT` or an outer aggregate function like `MIN()` or `MAX()`. `SELECT DISTINCT` is generally preferred for clarity.
+*   **Partitioning:** Leverage `PARTITION BY` to calculate medians for subgroups (e.g., median sales per product category, median age per demographic). This is highly efficient as it processes partitions in parallel.
+*   **Performance:** For very large datasets, `MEDIAN()` is optimized within Redshift and generally performs well. However, complex `PARTITION BY` clauses on high-cardinality columns can impact performance due to data redistribution.
+
+**Working Examples:**
+
+**Example 1.1: Overall Median of a Numeric Column**
+Find the median `sale_amount` for all sales in the `sales_data` table.
+
+```sql
+-- Method 1.1: Overall Median
+SELECT DISTINCT MEDIAN(sale_amount) OVER () AS overall_median_sale_amount
+FROM sales_data;
+```
+
+**Example 1.2: Median per Category**
+Calculate the median `sale_amount` for each `product_category`.
+
+```sql
+-- Method 1.2: Median per Category
+SELECT DISTINCT
+    product_category,
+    MEDIAN(sale_amount) OVER (PARTITION BY product_category) AS category_median_sale_amount
+FROM sales_data
+ORDER BY product_category;
+```
+
+**Example 1.3: Median with Multiple Partitioning Keys**
+Find the median `sale_amount` for each `product_category` per `sale_date`.
+
+```sql
+-- Method 1.3: Median with Multiple Partitioning Keys
+SELECT DISTINCT
+    product_category,
+    sale_date,
+    MEDIAN(sale_amount) OVER (PARTITION BY product_category, sale_date) AS daily_category_median
+FROM sales_data
+ORDER BY product_category, sale_date;
+```
+
+**Example 1.4: Median of a Derived Value**
+Calculate the median of `sale_amount` divided by `quantity` (median unit price).
+
+```sql
+-- Method 1.4: Median of a Derived Value
+SELECT DISTINCT MEDIAN(sale_amount / quantity) OVER () AS median_unit_price
+FROM sales_data
+WHERE quantity > 0; -- Ensure no division by zero
+```
+
+**Example 1.5: Median with Filtering**
+Calculate the median `sale_amount` only for sales made in 'Electronics' category.
+
+```sql
+-- Method 1.5: Median with Filtering
+SELECT DISTINCT MEDIAN(sale_amount) OVER () AS median_electronics_sales
+FROM sales_data
+WHERE product_category = 'Electronics';
+```
+
+**Example 1.6: Median with Ordering within Partition (though not strictly needed for MEDIAN)**
+While `MEDIAN()` doesn't explicitly require an `ORDER BY` within its `OVER()` clause (it orders internally), it's good to understand how `ORDER BY` works with window functions. For `MEDIAN()`, `ORDER BY` within `OVER()` is ignored.
+
+```sql
+-- Method 1.6: Median with Ordering (ORDER BY within OVER() is ignored for MEDIAN)
+-- This query will produce the same result as Example 1.2
+SELECT DISTINCT
+    product_category,
+    MEDIAN(sale_amount) OVER (PARTITION BY product_category ORDER BY sale_amount) AS category_median_sale_amount_ordered
+FROM sales_data
+ORDER BY product_category;
+```
+
+## # Method 2: Using `PERCENTILE_CONT()` and `PERCENTILE_DISC()` Window Functions
+**[Learning Explorer, Architecture Builder, Legacy Maintainer]**
+
+`PERCENTILE_CONT()` (continuous percentile) and `PERCENTILE_DISC()` (discrete percentile) are powerful window functions that can calculate any percentile, including the median (which is the 50th percentile, or `0.5`). These functions were available in Redshift prior to the introduction of the dedicated `MEDIAN()` function (from 2014-06-30 version onwards), making them useful for legacy systems or when more granular percentile analysis is needed.
+
+**Technical Deep Dive:**
+Both `PERCENTILE_CONT()` and `PERCENTILE_DISC()` require an `ORDER BY` clause within their `WITHIN GROUP` specification to define the order of values for percentile calculation.
+
+*   **`PERCENTILE_CONT(percentile_value) WITHIN GROUP (ORDER BY sort_expression)`**: This function calculates a percentile by interpolating between adjacent values. For the median (0.5), if there's an even number of values, it will average the two middle values. If there's an odd number, it returns the middle value. This is generally preferred for continuous data where interpolation makes sense.
+*   **`PERCENTILE_DISC(percentile_value) WITHIN GROUP (ORDER BY sort_expression)`**: This function calculates a percentile by picking an actual value from the dataset. For the median (0.5), if there's an even number of values, it will pick one of the two middle values based on the ordering and the exact percentile calculation logic (typically the lower one for 0.5). This is often preferred for discrete data or when you need a value that exists in the dataset.
+
+Like `MEDIAN()`, these are window functions and will return the percentile value for every row in the window. You'll need `DISTINCT` or an outer aggregate to get a single result per window/partition. `NULL` values are ignored.
+
+**Best Practices:**
+*   **Choose `CONT` vs. `DISC` wisely:** `PERCENTILE_CONT` is suitable for continuous data (e.g., temperatures, prices) where interpolation is meaningful. `PERCENTILE_DISC` is better for discrete data (e.g., number of items, ranks) where you want an actual data point. For median, `PERCENTILE_CONT` often matches the behavior of `MEDIAN()`.
+*   **`WITHIN GROUP (ORDER BY ...)` is mandatory:** Always specify the ordering for percentile calculation.
+*   **Partitioning:** Use `PARTITION BY` in the `OVER()` clause to calculate percentiles for subgroups.
+
+**Working Examples:**
+
+**Example 2.1: Overall Median using `PERCENTILE_CONT()`**
+Find the median `sale_amount` for all sales, interpolating if necessary.
+
+```sql
+-- Method 2.1: Overall Median using PERCENTILE_CONT
+SELECT DISTINCT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY sale_amount) OVER () AS overall_median_cont
+FROM sales_data;
+```
+
+**Example 2.2: Median per Category using `PERCENTILE_CONT()`**
+Calculate the median `sale_amount` for each `product_category` using `PERCENTILE_CONT()`.
+
+```sql
+-- Method 2.2: Median per Category using PERCENTILE_CONT
+SELECT DISTINCT
+    product_category,
+    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY sale_amount) OVER (PARTITION BY product_category) AS category_median_cont
+FROM sales_data
+ORDER BY product_category;
+```
+
+**Example 2.3: Overall Median using `PERCENTILE_DISC()`**
+Find the median `sale_amount` for all sales, picking an actual value from the dataset.
+
+```sql
+-- Method 2.3: Overall Median using PERCENTILE_DISC
+SELECT DISTINCT PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY sale_amount) OVER () AS overall_median_disc
+FROM sales_data;
+```
+
+**Example 2.4: Median per Category using `PERCENTILE_DISC()`**
+Calculate the median `sale_amount` for each `product_category` using `PERCENTILE_DISC()`.
+
+```sql
+-- Method 2.4: Median per Category using PERCENTILE_DISC
+SELECT DISTINCT
+    product_category,
+    PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY sale_amount) OVER (PARTITION BY product_category) AS category_median_disc
+FROM sales_data
+ORDER BY product_category;
+```
+
+**Example 2.5: Calculating other percentiles (e.g., 25th and 75th)**
+Demonstrate the flexibility of these functions to calculate quartiles.
+
+```sql
+-- Method 2.5: Calculating Quartiles using PERCENTILE_CONT
+SELECT DISTINCT
+    product_category,
+    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY sale_amount) OVER (PARTITION BY product_category) AS q1_sale_amount,
+    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY sale_amount) OVER (PARTITION BY product_category) AS median_sale_amount,
+    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY sale_amount) OVER (PARTITION BY product_category) AS q3_sale_amount
+FROM sales_data
+ORDER BY product_category;
+```
+
+**Example 2.6: Median with Filtering using `PERCENTILE_CONT()`**
+Calculate the median `sale_amount` for sales made in 'Books' category using `PERCENTILE_CONT()`.
+
+```sql
+-- Method 2.6: Median with Filtering using PERCENTILE_CONT
+SELECT DISTINCT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY sale_amount) OVER () AS median_books_sales_cont
+FROM sales_data
+WHERE product_category = 'Books';
+```
+
+## # Method 3: Approximating with `NTILE()` Window Function
+**[Legacy Maintainer, Problem Solver (for specific edge cases)]**
+
+The `NTILE()` function divides an ordered set of rows into a specified number of groups (tiles) and assigns a tile number to each row. While not a direct median function, it can be used to approximate the median, especially in older Redshift versions where `MEDIAN()` or `PERCENTILE_CONT/DISC()` might not have been available, or for very large datasets where a precise median is less critical than performance.
+
+**Technical Deep Dive:**
+`NTILE(N) OVER (ORDER BY sort_expression)` divides the rows into `N` groups. To approximate the median, we divide the data into 2 groups (`NTILE(2)`). The median will be the minimum value in the first group (the "upper half" when ordered descending) or the maximum value in the first group (the "lower half" when ordered ascending).
+
+The approximation works best for large datasets. For small datasets, especially those with an odd number of elements, `NTILE(2)` will put one more element in the first group than the second. If you order `DESC`, the median will be the `MIN()` of the first group. If you order `ASC`, the median will be the `MAX()` of the first group. This method is less precise than `MEDIAN()` or `PERCENTILE_CONT()` because it doesn't interpolate and might not pick the exact middle value for even-sized sets.
+
+**Best Practices:**
+*   **Use with caution:** This is an approximation. Only use it if precision is not paramount or if other methods are unavailable/too slow for your specific Redshift version/dataset size.
+*   **Ordering is critical:** The `ORDER BY` clause within `OVER()` determines how the data is divided. For median, ordering by the value itself is necessary.
+*   **Subquery/CTE:** Typically requires a subquery or CTE to first assign the `NTILE` group, then filter and aggregate.
+
+**Working Examples:**
+
+**Example 3.1: Approximate Overall Median using `NTILE(2)` (Descending Order)**
+Find the approximate median `sale_amount` for all sales. We order descending and take the minimum of the first group.
+
+```sql
+-- Method 3.1: Approximate Overall Median (NTILE DESC)
+WITH RankedSales AS (
+    SELECT
+        sale_amount,
+        NTILE(2) OVER (ORDER BY sale_amount DESC) AS ntile_group
+    FROM sales_data
+)
+SELECT MIN(sale_amount) AS approximate_overall_median
+FROM RankedSales
+WHERE ntile_group = 1;
+```
+
+**Example 3.2: Approximate Overall Median using `NTILE(2)` (Ascending Order)**
+Find the approximate median `sale_amount` for all sales. We order ascending and take the maximum of the first group. This can yield a slightly different approximation depending on data distribution.
+
+```sql
+-- Method 3.2: Approximate Overall Median (NTILE ASC)
+WITH RankedSalesAsc AS (
+    SELECT
+        sale_amount,
+        NTILE(2) OVER (ORDER BY sale_amount ASC) AS ntile_group
+    FROM sales_data
+)
+SELECT MAX(sale_amount) AS approximate_overall_median_asc
+FROM RankedSalesAsc
+WHERE ntile_group = 1;
+```
+
+**Example 3.3: Approximate Median per Category using `NTILE(2)`**
+Calculate the approximate median `sale_amount` for each `product_category`.
+
+```sql
+-- Method 3.3: Approximate Median per Category (NTILE DESC)
+WITH RankedCategorySales AS (
+    SELECT
+        product_category,
+        sale_amount,
+        NTILE(2) OVER (PARTITION BY product_category ORDER BY sale_amount DESC) AS ntile_group
+    FROM sales_data
+)
+SELECT
+    product_category,
+    MIN(sale_amount) AS approximate_category_median
+FROM RankedCategorySales
+WHERE ntile_group = 1
+GROUP BY product_category
+ORDER BY product_category;
+```
+
+**Example 3.4: Approximate Median with Filtering using `NTILE(2)`**
+Calculate the approximate median `sale_amount` for sales made after '2024-01-03'.
+
+```sql
+-- Method 3.4: Approximate Median with Filtering (NTILE DESC)
+WITH FilteredRankedSales AS (
+    SELECT
+        sale_amount,
+        NTILE(2) OVER (ORDER BY sale_amount DESC) AS ntile_group
+    FROM sales_data
+    WHERE sale_date > '2024-01-03'
+)
+SELECT MIN(sale_amount) AS approximate_median_after_date
+FROM FilteredRankedSales
+WHERE ntile_group = 1;
+```
+
+**Example 3.5: Understanding NTILE distribution with an odd number of rows**
+Let's use a small dataset to illustrate how `NTILE(2)` distributes rows.
+
+```sql
+-- Method 3.5: NTILE distribution with odd rows
+CREATE TEMPORARY TABLE temp_odd_data (num INT);
+INSERT INTO temp_odd_data VALUES (1), (2), (3), (4), (5);
+
+SELECT
+    num,
+    NTILE(2) OVER (ORDER BY num DESC) AS ntile_desc,
+    NTILE(2) OVER (ORDER BY num ASC) AS ntile_asc
+FROM temp_odd_data;
+
+-- Result:
+-- num | ntile_desc | ntile_asc
+-- ----+------------+-----------
+--   5 |          1 |         2
+--   4 |          1 |         2
+--   3 |          1 |         1  <-- Middle value
+--   2 |          2 |         1
+--   1 |          2 |         1
+
+-- MIN of ntile_desc=1 is 3
+SELECT MIN(num) FROM (SELECT num, NTILE(2) OVER (ORDER BY num DESC) AS ntile_group FROM temp_odd_data) WHERE ntile_group = 1; -- Result: 3
+
+-- MAX of ntile_asc=1 is 3
+SELECT MAX(num) FROM (SELECT num, NTILE(2) OVER (ORDER BY num ASC) AS ntile_group FROM temp_odd_data) WHERE ntile_group = 1; -- Result: 3
+```
+
+# # Performance Comparison
+
+| Feature / Method        | `MEDIAN()` Window Function                               | `PERCENTILE_CONT()` / `PERCENTILE_DISC()` Window Functions | `NTILE()` Approximation                                  |
+| :---------------------- | :------------------------------------------------------- | :--------------------------------------------------------- | :------------------------------------------------------- |
+| **Precision**           | High (exact median)                                      | High (exact percentile, `CONT` interpolates, `DISC` picks) | Low (approximation, especially for small datasets)       |
+| **Performance**         | Generally excellent for modern Redshift. Optimized.      | Good. Can be slightly slower than `MEDIAN()` for median.   | Good for very large datasets where approximation is acceptable. May be faster if data redistribution is less. |
+| **Complexity**          | Low (simple syntax)                                      | Medium (requires `WITHIN GROUP (ORDER BY ...)`)            | Medium (requires CTE/subquery and `MIN`/`MAX` aggregation) |
+| **Redshift Version**    | Supported from Oct 2014 onwards                          | Supported from June 2014 onwards                           | Widely supported (older function)                        |
+| **Use Case**            | Standard median calculation, grouped medians             | Any percentile calculation, precise median (CONT/DISC choice) | Very large datasets, legacy systems, quick estimates     |
+| **NULL Handling**       | Ignores NULLs                                            | Ignores NULLs                                              | Ignores NULLs                                            |
+| **Data Redistribution** | Requires data redistribution for `PARTITION BY` clauses. | Requires data redistribution for `PARTITION BY` clauses.   | Requires data redistribution for `PARTITION BY` clauses. |
+| **Result Type**         | Numeric (DECIMAL, FLOAT)                                 | Numeric (DECIMAL, FLOAT)                                   | Numeric (DECIMAL, FLOAT)                                 |
+
+**Key Takeaways:**
+
+*   For most modern Redshift users, `MEDIAN()` is the go-to choice due to its simplicity and optimized performance for its specific task.
+*   `PERCENTILE_CONT()` is a strong alternative, especially if you need to calculate other percentiles alongside the median, or if you prefer its explicit interpolation behavior. It often yields the same result as `MEDIAN()` for continuous data.
+*   `NTILE()` should be considered a last resort for median calculation, primarily for very large datasets where an approximation is acceptable, or if you are constrained by an extremely old Redshift version. Its precision is lower.
+
+All window functions in Redshift, when used with `PARTITION BY`, involve data redistribution across compute nodes. The efficiency of this redistribution depends on your cluster configuration, data distribution, and the cardinality of your partitioning keys. High-cardinality partitioning keys can lead to more data movement and potentially slower queries.
+
+# # Amazon-Redshift Version Support
+
+AWS Redshift continuously updates its SQL engine. Here's a general overview of when these functions became available:
+
+| Function                | Initial Redshift Version Support | Notes

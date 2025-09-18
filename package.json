@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Content repository for DeepV Code technical articles",
   "scripts": {
-    "validate": "node validate-content.js staging/guides content-schema.json"
+    "validate": "node validate-content.js staging/guides content-schema.json",
+    "promote": "node promote.js"
   },
   "dependencies": {
     "gray-matter": "^4.0.3"
