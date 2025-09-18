@@ -1,15 +1,40 @@
 {
-  "lastUpdated": "2025-09-17T19:24:36.726036",
-  "totalArticles": 4,
+  "lastUpdated": "2025-09-18T07:31:17.000Z",
+  "totalArticles": 12,
   "categories": [
+    "databases",
+    "programming-languages",
     "system-devops",
     "web-frontend"
   ],
   "technologies": [
-    "RPM/Linux",
-    "JavaScript"
+    "Database",
+    "DevOps",
+    "JavaScript",
+    "Python"
   ],
   "articles": [
+    {
+      "id": "faa9b536",
+      "title": "How to calculate median in AWS Redshift?: 3 Methods + Performance...",
+      "slug": "how-to-calculate-median-in-aws-redshift",
+      "category": "system-devops",
+      "subcategory": "cloud",
+      "difficulty": "intermediate",
+      "technology": "DevOps",
+      "readTime": 18,
+      "publishedAt": "2025-09-18",
+      "featured": false,
+      "description": "Calculating the median in AWS Redshift can be achieved efficiently using several methods, primarily leveraging window functions. The most direct and recommen...",
+      "tags": [
+        "amazon-redshift",
+        "devops",
+        "system",
+        "cloud"
+      ],
+      "filename": "how-to-calculate-median-in-aws-redshift-faa9b536.mdx",
+      "lastUpdated": "2025-09-18T07:29:53.000Z"
+    },
     {
       "id": "3749489f",
       "title": "Parse query string in JavaScript: Complete Guide with 6 Solutions",
@@ -19,49 +44,140 @@
       "difficulty": "intermediate",
       "technology": "JavaScript",
       "readTime": 35,
-      "publishedAt": "2025-09-17",
+      "publishedAt": "2025-09-18",
       "featured": true,
       "description": "For a fast, modern, and reliable way to parse query strings, especially when dealing with the current page's URL, the URLSearchParams API is the recommended ...",
       "tags": [
         "javascript",
         "parsing",
-        "query-string"
+        "query-string",
+        "frontend",
+        "web",
+        "js"
       ],
       "filename": "parse-query-string-in-javascript-3749489f.mdx",
-      "lastUpdated": "2025-09-17T19:24:36.725869"
+      "lastUpdated": "2025-09-18T07:29:53.000Z"
+    },
+    {
+      "id": "abc12345",
+      "title": "Test Article for Workflow Validation",
+      "slug": "test-article-workflow-validation",
+      "category": "web-frontend",
+      "subcategory": "javascript",
+      "difficulty": "beginner",
+      "technology": "JavaScript",
+      "readTime": 5,
+      "publishedAt": "2024-09-18",
+      "featured": false,
+      "description": "This is a test article to verify the validation and promotion workflow is working correctly.",
+      "tags": [
+        "test",
+        "workflow",
+        "javascript"
+      ],
+      "filename": "test-article-workflow-abc12345.mdx",
+      "lastUpdated": "2024-09-18T12:30:00.000Z"
+    },
+    {
+      "id": "dc385f3c",
+      "title": "Representational state transfer (REST) and Simple Object Access...",
+      "slug": "representational-state-transfer-rest-and-simple-object",
+      "category": "programming-languages",
+      "subcategory": "python",
+      "difficulty": "intermediate",
+      "technology": "Python",
+      "readTime": 29,
+      "publishedAt": "2025-09-18",
+      "featured": true,
+      "description": "For modern web service development, REST (Representational State Transfer) is generally preferred due to its simplicity, lightweight nature, and direct use o...",
+      "tags": [
+        "rest",
+        "soap",
+        "programming",
+        "python"
+      ],
+      "filename": "representational-state-transfer-rest-and-simple-object-dc385f3c.mdx",
+      "lastUpdated": "2025-09-18T07:29:53.000Z"
+    },
+    {
+      "id": "bbd1fbd5",
+      "title": "logit regression and singular Matrix error in Python: Complete...",
+      "slug": "logit-regression-and-singular-matrix-error-in-python",
+      "category": "system-devops",
+      "subcategory": "version-control",
+      "difficulty": "intermediate",
+      "technology": "DevOps",
+      "readTime": 27,
+      "publishedAt": "2025-09-18",
+      "featured": false,
+      "description": "The most common cause of a Singular Matrix Error in statsmodels.Logit in Python, especially with the German Credit Data, is an incorrectly formatted depend...",
+      "tags": [
+        "python-2.7",
+        "regression",
+        "statsmodels",
+        "devops",
+        "system",
+        "git"
+      ],
+      "filename": "logit-regression-and-singular-matrix-error-in-python-bbd1fbd5.mdx",
+      "lastUpdated": "2025-09-18T07:29:53.000Z"
+    },
+    {
+      "id": "ae1d627b",
+      "title": "How can Apache Camel be used to monitor file changes?: 5 Methods +...",
+      "slug": "how-can-apache-camel-be-used-to-monitor-file-changes",
+      "category": "programming-languages",
+      "subcategory": "python",
+      "difficulty": "intermediate",
+      "technology": "Python",
+      "readTime": 27,
+      "publishedAt": "2025-09-18",
+      "featured": false,
+      "description": "For the fastest and most straightforward way to monitor file changes in Apache Camel without consuming or deleting the files, especially for modern Camel ver...",
+      "tags": [
+        "file",
+        "apache-camel",
+        "programming",
+        "python"
+      ],
+      "filename": "how-can-apache-camel-be-used-to-monitor-file-changes-ae1d627b.mdx",
+      "lastUpdated": "2025-09-18T07:29:53.000Z"
     },
     {
       "id": "d0cc8ebb",
-      "title": "Why does my JavaScript code receive a \\\"No 'Access-Control-Allow-Origin' header is present on the requested resource\\\" error, while Postman does not?: Complete Guide with 6 Solutions",
+      "title": "Why does my JavaScript code receive a \"No...",
       "slug": "why-does-my-javascript-code-receive-a-no-access-control",
       "category": "web-frontend",
       "subcategory": "javascript",
       "difficulty": "beginner",
       "technology": "JavaScript",
       "readTime": 16,
-      "publishedAt": "2025-09-17",
+      "publishedAt": "2025-09-18",
       "featured": true,
-      "description": "The \\\"No 'Access-Control-Allow-Origin' header is present on the requested resource\\\" error occurs in browsers due to the Same-Origin Policy (SOP), a fundamenta...",
+      "description": "The \"No 'Access-Control-Allow-Origin' header is present on the requested resource\" error occurs in browsers due to the Same-Origin Policy (SOP), a fundamenta...",
       "tags": [
         "javascript",
         "jquery",
         "cors",
         "postman",
-        "same-origin-policy"
+        "same-origin-policy",
+        "frontend",
+        "web",
+        "js"
       ],
       "filename": "why-does-my-javascript-code-receive-a-no-access-control-d0cc8ebb.mdx",
-      "lastUpdated": "2025-09-17T19:24:36.725911"
+      "lastUpdated": "2025-09-18T07:29:53.000Z"
     },
     {
       "id": "debc8982",
-      "title": "Dependency Resolution Fails on Installed Library: Complete Guide with 5 Solutions",
+      "title": "Dependency Resolution Fails on Installed Library: Complete Guide...",
       "slug": "dependency-resolution-fails-on-installed-library",
       "category": "system-devops",
       "subcategory": "package-management",
       "difficulty": "intermediate",
-      "technology": "RPM/Linux",
+      "technology": "DevOps",
       "readTime": 30,
-      "publishedAt": "2025-09-17",
+      "publishedAt": "2025-09-18",
       "featured": false,
       "description": "Problem: You're trying to install an RPM package (e.g., geramer-server.x8664) and it fails with a dependency error like Requires: libcrypto.so.10(libcrypto.s...",
       "tags": [
@@ -69,21 +185,89 @@
         "linux",
         "dependency-resolution",
         "package-management",
-        "troubleshooting"
+        "troubleshooting",
+        "devops",
+        "system",
+        "package"
       ],
       "filename": "dependency-resolution-fails-on-installed-library-debc8982.mdx",
-      "lastUpdated": "2025-09-17T19:24:36.725945"
+      "lastUpdated": "2025-09-18T07:29:53.000Z"
+    },
+    {
+      "id": "c335a59c",
+      "title": "Retrieve data from stored procedure which has multiple result...",
+      "slug": "retrieve-data-from-stored-procedure-which-has-multiple",
+      "category": "databases",
+      "subcategory": "mysql",
+      "difficulty": "intermediate",
+      "technology": "Database",
+      "readTime": 30,
+      "publishedAt": "2025-09-18",
+      "featured": false,
+      "description": "For immediate T-SQL consumption of multiple result sets, the most direct and recommended approach is to refactor the stored procedure into smaller, single-pu...",
+      "tags": [
+        "sql-server",
+        "stored-procedures",
+        "database",
+        "mysql",
+        "sql"
+      ],
+      "filename": "retrieve-data-from-stored-procedure-which-has-multiple-c335a59c.mdx",
+      "lastUpdated": "2025-09-18T07:29:53.000Z"
+    },
+    {
+      "id": "30e24d02",
+      "title": "size of NumPy array: Complete Guide with 3 Solutions",
+      "slug": "size-of-numpy-array",
+      "category": "programming-languages",
+      "subcategory": "python",
+      "difficulty": "intermediate",
+      "technology": "Python",
+      "readTime": 13,
+      "publishedAt": "2025-09-18",
+      "featured": false,
+      "description": "In NumPy, the equivalent of MATLAB's size() command is primarily achieved through the .shape attribute for dimensions and the .size attribute for the total n...",
+      "tags": [
+        "python",
+        "arrays",
+        "numpy",
+        "size",
+        "programming"
+      ],
+      "filename": "size-of-numpy-array-30e24d02.mdx",
+      "lastUpdated": "2025-09-18T07:29:53.000Z"
+    },
+    {
+      "id": "5eb2a04f",
+      "title": "How to change font and size of buttons and frame in tkinter using...",
+      "slug": "how-to-change-font-and-size-of-buttons-and-frame-in-tkinter",
+      "category": "programming-languages",
+      "subcategory": "python",
+      "difficulty": "beginner",
+      "technology": "Python",
+      "readTime": 24,
+      "publishedAt": "2025-09-18",
+      "featured": false,
+      "description": "For a modern, Python 3-compatible approach to changing button font and size, the most direct method involves creating a tkinter.font.Font object and assignin...",
+      "tags": [
+        "python",
+        "tkinter",
+        "tk-toolkit",
+        "programming"
+      ],
+      "filename": "how-to-change-font-and-size-of-buttons-and-frame-in-tkinter-5eb2a04f.mdx",
+      "lastUpdated": "2025-09-18T07:29:53.000Z"
     },
     {
       "id": "171c50c3",
-      "title": "How to do word counts for a mixture of English and Chinese in Javascript: 3 Methods + Performance Guide",
+      "title": "How to do word counts for a mixture of English and Chinese in...",
       "slug": "how-to-do-word-counts-for-a-mixture-of-english-and-chinese",
       "category": "web-frontend",
       "subcategory": "javascript",
       "difficulty": "beginner",
       "technology": "JavaScript",
       "readTime": 22,
-      "publishedAt": "2025-09-17",
+      "publishedAt": "2025-09-18",
       "featured": false,
       "description": "(Persona: Speed Seeker, Problem Solver, Output Focused)",
       "tags": [
@@ -91,10 +275,13 @@
         "jquery",
         "character",
         "counter",
-        "word-count"
+        "word-count",
+        "frontend",
+        "web",
+        "js"
       ],
       "filename": "how-to-do-word-counts-for-a-mixture-of-english-and-chinese-171c50c3.mdx",
-      "lastUpdated": "2025-09-17T19:24:36.726031"
+      "lastUpdated": "2025-09-18T07:29:53.000Z"
     }
   ]
 }

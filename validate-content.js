@@ -70,8 +70,8 @@ class ContentValidator {
     if (frontmatter.title && typeof frontmatter.title !== 'string') {
       errors.push('title must be a string');
     }
-    if (frontmatter.title && (frontmatter.title.length < 5 || frontmatter.title.length > 100)) {
-      errors.push('title must be 5-100 characters');
+    if (frontmatter.title && (frontmatter.title.length < 5 || frontmatter.title.length > 70)) {
+      errors.push('title must be 5-70 characters (SEO optimized)');
     }
 
     if (frontmatter.slug && !/^[a-z0-9-]+$/.test(frontmatter.slug)) {

@@ -6,6 +6,18 @@
 
 This repository contains all articles and content for the [DeepV Code](https://deepvcode.com) technical documentation website. It operates independently from the main application using a decoupled architecture.
 
+
+
+
+## Repository Roles & Ownership
+
+| Repository                            | Role                  | Authority                    | Responsibility                                  |
+|---------------------------------------|-----------------------|------------------------------|-------------------------------------------------|
+| `nextjs-deepv-docs`                   | 🏛️ Schema Authority   | Defines content requirements | Application needs, validation rules, categories |
+| `nextjs-deepv-content`                | 📦 Content Storage    | Stores validated content     | Production content, article index               |
+| `deepv-stackoverflow-workflow-complete` | 🤖 Content Generator | Follows schema requirements  | Generates compliant content                     |
+
+
 ## 🏗️ **Repository Structure**
 
 ```

@@ -23,7 +23,7 @@
       "filename"
     ],
     "frontmatter_types": {
-      "title": "string",
+      "title": "string (5-70 characters)",
       "slug": "string",
       "category": "string", 
       "subcategory": "string",
