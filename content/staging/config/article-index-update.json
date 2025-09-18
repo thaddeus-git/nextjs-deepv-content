@@ -1,22 +1,22 @@
 {
-  "lastUpdated": "2025-09-18T15:06:40.241605",
+  "lastUpdated": "2025-09-18T10:44:38.000Z",
   "totalArticles": 11,
   "categories": [
-    "programming-languages",
-    "web-frontend",
+    "system-devops",
     "programming",
-    "system-devops"
+    "programming-languages",
+    "web-frontend"
   ],
   "technologies": [
-    "File",
-    "Sql-Server",
+    "JavaScript",
+    "Python",
     "RPM/Linux",
     "Python-2.7",
-    "Programming",
-    "Amazon-Redshift",
-    "JavaScript",
     "Rest",
-    "Python"
+    "Amazon-Redshift",
+    "File",
+    "Programming",
+    "Sql-Server"
   ],
   "articles": [
     {
@@ -35,7 +35,7 @@
         "amazon-redshift"
       ],
       "filename": "how-to-calculate-median-in-aws-redshift-faa9b536.mdx",
-      "lastUpdated": "2025-09-18T15:06:40.241030"
+      "lastUpdated": "2025-09-18T10:44:38.000Z"
     },
     {
       "id": "dc385f3c",
@@ -54,7 +54,7 @@
         "soap"
       ],
       "filename": "representational-state-transfer-rest-and-simple-object-dc385f3c.mdx",
-      "lastUpdated": "2025-09-18T15:06:40.241196"
+      "lastUpdated": "2025-09-18T10:44:38.000Z"
     },
     {
       "id": "bbd1fbd5",
@@ -74,7 +74,7 @@
         "statsmodels"
       ],
       "filename": "logit-regression-and-singular-matrix-error-in-python-bbd1fbd5.mdx",
-      "lastUpdated": "2025-09-18T15:06:40.241251"
+      "lastUpdated": "2025-09-18T10:44:38.000Z"
     },
     {
       "id": "ae1d627b",
@@ -93,11 +93,11 @@
         "apache-camel"
       ],
       "filename": "how-can-apache-camel-be-used-to-monitor-file-changes-ae1d627b.mdx",
-      "lastUpdated": "2025-09-18T15:06:40.241307"
+      "lastUpdated": "2025-09-18T10:44:38.000Z"
     },
     {
       "id": "d0cc8ebb",
-      "title": "Why does my JavaScript code receive a \\\"No 'Access-Control-Allow-Origin' header is present on the requested resource\\\" error, while Postman does not?: Complete Guide with 6 Solutions",
+      "title": "Why does my JavaScript code receive a \\\"No 'Access-Control-Allow-Ori...",
       "slug": "why-does-my-javascript-code-receive-a-no-access-control",
       "category": "web-frontend",
       "subcategory": "javascript",
@@ -118,7 +118,7 @@
         "js"
       ],
       "filename": "why-does-my-javascript-code-receive-a-no-access-control-d0cc8ebb.mdx",
-      "lastUpdated": "2025-09-18T15:06:40.241350"
+      "lastUpdated": "2025-09-18T10:44:38.000Z"
     },
     {
       "id": "c335a59c",
@@ -137,7 +137,7 @@
         "stored-procedures"
       ],
       "filename": "retrieve-data-from-stored-procedure-which-has-multiple-c335a59c.mdx",
-      "lastUpdated": "2025-09-18T15:06:40.241431"
+      "lastUpdated": "2025-09-18T10:44:38.000Z"
     },
     {
       "id": "30e24d02",
@@ -158,7 +158,7 @@
         "size"
       ],
       "filename": "size-of-numpy-array-30e24d02.mdx",
-      "lastUpdated": "2025-09-18T15:06:40.241459"
+      "lastUpdated": "2025-09-18T10:44:38.000Z"
     },
     {
       "id": "5eb2a04f",
@@ -178,7 +178,7 @@
         "tk-toolkit"
       ],
       "filename": "how-to-change-font-and-size-of-buttons-and-frame-in-tkinter-5eb2a04f.mdx",
-      "lastUpdated": "2025-09-18T15:06:40.241500"
+      "lastUpdated": "2025-09-18T10:44:38.000Z"
     },
     {
       "id": "3749489f",
@@ -198,7 +198,7 @@
         "query-string"
       ],
       "filename": "parse-query-string-in-javascript-3749489f.mdx",
-      "lastUpdated": "2025-09-18T15:06:40.241099"
+      "lastUpdated": "2025-09-18T10:44:38.000Z"
     },
     {
       "id": "debc8982",
@@ -220,7 +220,7 @@
         "troubleshooting"
       ],
       "filename": "dependency-resolution-fails-on-installed-library-debc8982.mdx",
-      "lastUpdated": "2025-09-18T15:06:40.241389"
+      "lastUpdated": "2025-09-18T10:44:38.000Z"
     },
     {
       "id": "171c50c3",
@@ -242,7 +242,7 @@
         "word-count"
       ],
       "filename": "how-to-do-word-counts-for-a-mixture-of-english-and-chinese-171c50c3.mdx",
-      "lastUpdated": "2025-09-18T15:06:40.241596"
+      "lastUpdated": "2025-09-18T10:44:38.000Z"
     }
   ]
 }

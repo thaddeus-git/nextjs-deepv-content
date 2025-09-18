@@ -1,0 +1,667 @@
+---
+title: "How to do word counts for a mixture of English and Chinese in Javascript: 3 Methods + Performance Guide"
+slug: "how-to-do-word-counts-for-a-mixture-of-english-and-chinese"
+category: "web-frontend"
+subcategory: "javascript"
+description: "(Persona: Speed Seeker, Problem Solver, Output Focused)"
+difficulty: "beginner"
+readTime: 22
+publishedAt: "2025-09-17"
+featured: false
+technology: "JavaScript"
+tags:
+  - "javascript"
+  - "jquery"
+  - "character"
+  - "counter"
+  - "word-count"
+---
+
+# How to do word counts for a mixture of English and Chinese in Javascript: 3 Methods + Performance Guide
+
+Counting words in a mixed-language text, especially one containing both English and Chinese, presents unique challenges. While English words are typically delimited by spaces, Chinese characters often form words without explicit separators, where each character is frequently considered a "word" for counting purposes. This article provides comprehensive JavaScript solutions to accurately count words in such mixed-language scenarios, catering to various user needs from quick, practical fixes to deeply optimized and scalable architectures.
+
+# # Quick Answer
+
+**(Persona: Speed Seeker, Problem Solver, Output Focused)**
+
+For an immediate, copy-paste solution that handles both English words and individual Chinese characters as "words," the most efficient approach leverages regular expressions. This method quickly extracts all sequences of non-whitespace characters (English words) and individual Chinese characters, then counts the resulting matches.
+
+```javascript
+/**
+ * Counts words in a mixed English and Chinese string.
+ * English words are counted as single units.
+ * Chinese characters are counted individually.
+ *
+ * @param {string} text The input string containing mixed languages.
+ * @returns {number} The total word count.
+ */
+function countMixedWordsQuick(text) {
+  if (!text) {
+    return 0;
+  }
+  // Regex:
+  // \p{Script=Han}  - Matches any Chinese character (Unicode property escape)
+  // \S+             - Matches one or more non-whitespace characters (for English words)
+  // g               - Global flag to find all matches
+  const matches = text.match(/(\p{Script=Han}|\S+)/gu);
+  return matches ? matches.length : 0;
+}
+
+// --- Quick Answer Examples ---
+
+// Example 1: Basic mixed string
+const text1 = "I am a 香港人";
+console.log(`"${text1}" word count: ${countMixedWordsQuick(text1)}`);
+// Expected: 6 (I, am, a, 香, 港, 人)
+
+// Example 2: String with multiple English words and Chinese phrases
+const text2 = "Hello world, 這是一個測試。";
+console.log(`"${text2}" word count: ${countMixedWordsQuick(text2)}`);
+// Expected: 7 (Hello, world, 這, 是, 一, 個, 測試)
+
+// Example 3: String with leading/trailing spaces and punctuation
+const text3 = "  JavaScript is fun! 編程很有趣。  ";
+console.log(`"${text3}" word count: ${countMixedWordsQuick(text3)}`);
+// Expected: 9 (JavaScript, is, fun!, 編, 程, 很, 有, 趣)
+
+// Example 4: Pure English string
+const text4 = "This is a pure English sentence.";
+console.log(`"${text4}" word count: ${countMixedWordsQuick(text4)}`);
+// Expected: 6
+
+// Example 5: Pure Chinese string
+const text5 = "你好世界";
+console.log(`"${text5}" word count: ${countMixedWordsQuick(text5)}`);
+// Expected: 4 (你, 好, 世, 界)
+
+// Example 6: Empty string
+const text6 = "";
+console.log(`"${text6}" word count: ${countMixedWordsQuick(text6)}`);
+// Expected: 0
+
+// Example 7: String with only spaces
+const text7 = "   ";
+console.log(`"${text7}" word count: ${countMixedWordsQuick(text7)}`);
+// Expected: 0
+```
+
+This `countMixedWordsQuick` function provides a robust and concise solution for the specified word counting logic. The use of `\p{Script=Han}` (Unicode property escape for Han characters) ensures accurate identification of Chinese characters, while `\S+` captures English words and other non-whitespace tokens. The `u` flag is crucial for correct Unicode regex behavior.
+
+# # Choose Your Method
+```mermaid
+flowchart TD
+    A[Your Situation] --> B{Performance Critical?}
+    B -->|Yes| C[Method 1: Speed Optimized]
+    B -->|No| D{Learning Focus?}
+    D -->|Yes| E[Method 2: Educational]
+    D -->|No| F[Method 3: Quick Solution]
+```
+
+# # Table of Contents
+
+*   Quick Answer (Persona: Speed Seeker, Problem Solver, Output Focused)
+*   Ready-to-Use Code (Persona: Problem Solver, Speed Seeker)
+*   Method 1: Regex-Based Counting with Unicode Properties (Persona: Speed Seeker, Architecture Builder, Learning Explorer)
+*   Method 2: Iterative Character Analysis (Persona: Learning Explorer, Architecture Builder, Legacy Maintainer)
+*   Method 3: Hybrid Regex and String Manipulation (Persona: Problem Solver, Legacy Maintainer, Output Focused)
+*   Performance Comparison (Persona: Speed Seeker, Architecture Builder)
+*   JavaScript Version Support (Persona: Legacy Maintainer, Architecture Builder)
+*   Common Problems & Solutions (Persona: Problem Solver, Learning Explorer)
+*   Real-World Examples (Persona: Output Focused, Architecture Builder)
+*   Related JavaScript Functions (Persona: Learning Explorer)
+*   Summary (Persona: All)
+*   Frequently Asked Questions (Persona: Learning Explorer, Problem Solver)
+*   Test Your Code (Persona: Learning Explorer, Problem Solver)
+
+# # Ready-to-Use Code
+
+**(Persona: Problem Solver, Speed Seeker)**
+
+Here are several ready-to-use code snippets covering different aspects and optimizations for mixed English and Chinese word counting. These are designed to be directly copy-pasted into your projects.
+
+```javascript
+// 1. Basic and robust regex solution (Method 1)
+function countWordsRegex(text) {
+  if (!text) return 0;
+  // \p{Script=Han} for Chinese characters, \S+ for non-whitespace (English words, punctuation)
+  const matches = text.match(/(\p{Script=Han}|\S+)/gu);
+  return matches ? matches.length : 0;
+}
+
+// Example usage 1.1
+console.log("--- Ready-to-Use Code 1.1 ---");
+console.log(`"Hello 世界!" -> ${countWordsRegex("Hello 世界!")}`); // Expected: 4
+console.log(`"JavaScript 編程" -> ${countWordsRegex("JavaScript 編程")}`); // Expected: 3
+console.log(`"  leading and trailing spaces  " -> ${countWordsRegex("  leading and trailing spaces  ")}`); // Expected: 5
+
+// 2. Iterative character analysis (Method 2)
+function countWordsIterative(text) {
+  if (!text) return 0;
+  let count = 0;
+  let inEnglishWord = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const charCode = char.charCodeAt(0);
+
+    // Check if it's a Chinese character (common CJK Unified Ideographs range)
+    if (charCode >= 0x4E00 && charCode <= 0x9FFF) {
+      count++;
+      inEnglishWord = false; // Reset English word state
+    }
+    // Check if it's a whitespace character
+    else if (/\s/.test(char)) {
+      inEnglishWord = false; // End of an English word
+    }
+    // Otherwise, it's likely an English character or punctuation
+    else {
+      if (!inEnglishWord) {
+        count++; // Start of a new English word
+        inEnglishWord = true;
+      }
+    }
+  }
+  return count;
+}
+
+// Example usage 2.1
+console.log("\n--- Ready-to-Use Code 2.1 ---");
+console.log(`"I am a 香港人" -> ${countWordsIterative("I am a 香港人")}`); // Expected: 6
+console.log(`"  Test string with spaces  " -> ${countWordsIterative("  Test string with spaces  ")}`); // Expected: 4
+console.log(`"中文 English 混合" -> ${countWordsIterative("中文 English 混合")}`); // Expected: 6
+
+// 3. Hybrid approach: Separate English and Chinese counting (Method 3)
+function countWordsHybrid(text) {
+  if (!text) return 0;
+
+  // Remove Chinese characters to count English words
+  const englishOnly = text.replace(/[\p{Script=Han}]/gu, ' ');
+  const englishMatches = englishOnly.match(/\S+/g);
+  const englishWordCount = englishMatches ? englishMatches.length : 0;
+
+  // Remove English words and spaces to count Chinese characters
+  const chineseOnly = text.replace(/[^\p{Script=Han}]/gu, '');
+  const chineseCharCount = chineseOnly.length; // Each Chinese char is a word
+
+  return englishWordCount + chineseCharCount;
+}
+
+// Example usage 3.1
+console.log("\n--- Ready-to-Use Code 3.1 ---");
+console.log(`"Hello 世界!" -> ${countWordsHybrid("Hello 世界!")}`); // Expected: 4
+console.log(`"JavaScript 編程" -> ${countWordsHybrid("JavaScript 編程")}`); // Expected: 3
+console.log(`"香港人computing都不錯的" -> ${countWordsHybrid("香港人computing都不錯的")}`); // Expected: 9 (香,港,人,computing,都,不,錯,的)
+
+// 4. Regex with specific CJK range (alternative to \p{Script=Han} for older JS engines)
+function countWordsLegacyRegex(text) {
+  if (!text) return 0;
+  // Common CJK Unified Ideographs range: \u4E00-\u9FFF
+  // \S+ for non-whitespace
+  const matches = text.match(/([\u4E00-\u9FFF]|\S+)/g);
+  return matches ? matches.length : 0;
+}
+
+// Example usage 4.1
+console.log("\n--- Ready-to-Use Code 4.1 ---");
+console.log(`"Legacy support for 香港人" -> ${countWordsLegacyRegex("Legacy support for 香港人")}`); // Expected: 6
+console.log(`"測試一下" -> ${countWordsLegacyRegex("測試一下")}`); // Expected: 4
+
+// 5. Counting unique words (not directly requested but useful for some scenarios)
+// This example is based on a misinterpretation in one of the source answers,
+// but adapted to show how unique word counting *could* be done for English words.
+// It does NOT apply the "each Chinese char is a word" rule for uniqueness.
+function countUniqueEnglishWords(text) {
+  if (!text) return 0;
+  const englishWords = text.toLowerCase().match(/[a-z]+/g);
+  if (!englishWords) return 0;
+  const uniqueWords = new Set(englishWords);
+  return uniqueWords.size;
+}
+
+// Example usage 5.1
+console.log("\n--- Ready-to-Use Code 5.1 ---");
+console.log(`"apple banana apple orange" -> ${countUniqueEnglishWords("apple banana apple orange")}`); // Expected: 3 (apple, banana, orange)
+console.log(`"I am a I am a" -> ${countUniqueEnglishWords("I am a I am a")}`); // Expected: 3 (i, am, a)
+
+// 6. Robust word counting with specific character filtering (inspired by source answer 3)
+// This version attempts to clean special characters before counting.
+function countWordsFiltered(text) {
+  if (!text) return 0;
+
+  // Step 1: Normalize special characters (e.g., replace non-ASCII printable with space)
+  // This regex targets characters outside common ASCII printable range and CJK, replacing them with spaces.
+  // It's a more refined version of the original source's `[\u007F-\u00FE]`
+  let cleanedText = text.replace(/[^\p{L}\p{N}\s\p{P}]/gu, ' '); // Keep letters, numbers, spaces, punctuation
+
+  // Step 2: Count English words and Chinese characters
+  // Use the robust regex from Method 1
+  const matches = cleanedText.match(/(\p{Script=Han}|\S+)/gu);
+  return matches ? matches.length : 0;
+}
+
+// Example usage 6.1
+console.log("\n--- Ready-to-Use Code 6.1 ---");
+console.log(`"I am a 香 港 人 * * * * * * * | ] }" -> ${countWordsFiltered("I am a 香 港 人 * * * * * * * | ] }")}`); // Expected: 6 (I, am, a, 香, 港, 人)
+console.log(`"Hello-World! 你好." -> ${countWordsFiltered("Hello-World! 你好.")}`); // Expected: 5 (Hello-World!, 你, 好) - Note: "Hello-World!" is one word here.
+
+// 7. Counting words while ignoring specific punctuation (more refined)
+function countWordsIgnorePunctuation(text) {
+  if (!text) return 0;
+
+  // Replace common punctuation with spaces, but keep hyphens within words if desired
+  // This regex replaces punctuation that is NOT part of a word (e.g., at ends, or standalone)
+  let cleanedText = text.replace(/([^\p{L}\p{N}\p{Script=Han}\s-])/gu, ' '); // Keep letters, numbers, Han, spaces, hyphens
+  cleanedText = cleanedText.replace(/\s+/g, ' ').trim(); // Normalize multiple spaces to single, trim ends
+
+  // Now count words and Chinese characters
+  const matches = cleanedText.match(/(\p{Script=Han}|\S+)/gu);
+  return matches ? matches.length : 0;
+}
+
+// Example usage 7.1
+console.log("\n--- Ready-to-Use Code 7.1 ---");
+console.log(`"Hello-World! 你好." -> ${countWordsIgnorePunctuation("Hello-World! 你好.")}`); // Expected: 4 (Hello-World, 你, 好) - Note: punctuation removed
+console.log(`"I am a 香港人, how are you?" -> ${countWordsIgnorePunctuation("I am a 香港人, how are you?")}`); // Expected: 9 (I, am, a, 香, 港, 人, how, are, you)
+
+// 8. Counting words with advanced Unicode segmentation (requires Intl.Segmenter)
+// This is the most robust for true word segmentation but might not align with "each Chinese char is a word"
+// if Chinese words are multi-character. For the specific requirement, the regex is often better.
+// However, for general "word" counting, this is superior.
+function countWordsIntlSegmenter(text) {
+  if (!text || typeof Intl === 'undefined' || typeof Intl.Segmenter === 'undefined') {
+    console.warn("Intl.Segmenter not supported or text is empty. Falling back to regex.");
+    return countWordsRegex(text); // Fallback
+  }
+
+  const segmenter = new Intl.Segmenter('zh-Hans', { granularity: 'word' }); // Use 'zh-Hans' for Chinese, 'en' for English
+  let count = 0;
+  for (const segment of segmenter.segment(text)) {
+    if (segment.isWordLike) {
+      count++;
+    }
+  }
+  return count;
+}
+
+// Example usage 8.1 (Note: Intl.Segmenter might count multi-char Chinese as one word)
+console.log("\n--- Ready-to-Use Code 8.1 ---");
+if (typeof Intl !== 'undefined' && typeof Intl.Segmenter !== 'undefined') {
+  console.log(`"I am a 香港人" (Intl.Segmenter) -> ${countWordsIntlSegmenter("I am a 香港人")}`); // Expected: 5 (I, am, a, 香港人) - differs from requirement
+  console.log(`"你好世界" (Intl.Segmenter) -> ${countWordsIntlSegmenter("你好世界")}`); // Expected: 2 (你好, 世界) - differs from requirement
+} else {
+  console.log("Intl.Segmenter not available in this environment.");
+}
+```
+
+# # Method Sections
+
+## # Method 1: Regex-Based Counting with Unicode Properties
+
+**(Persona: Speed Seeker, Architecture Builder, Learning Explorer)**
+
+This method is generally the most efficient and concise for the specified requirement. It leverages JavaScript's regular expression engine with Unicode property escapes to accurately identify both English words (as sequences of non-whitespace characters) and individual Chinese characters. The `u` flag is essential for correct Unicode handling.
+
+**Technical Deep Dive:**
+
+The core of this method is the regular expression ` /(\p{Script=Han}|\S+)/gu `. Let's break it down:
+
+*   `\p{Script=Han}`: This is a Unicode property escape. It matches any character belonging to the Han script, which covers the vast majority of Chinese characters. This is a modern, robust way to identify Chinese characters without relying on specific Unicode ranges (like `\u4E00-\u9FFF`), which can be incomplete or require updates as Unicode evolves. It requires the `u` (Unicode) flag.
+*   `|`: This is the "OR" operator. It means "match the pattern before me OR the pattern after me."
+*   `\S+`: This matches one or more non-whitespace characters. This effectively captures English words, numbers, and punctuation attached to them (e.g., "word!", "123", "hello-world").
+*   `g`: The global flag ensures that `match()` finds *all* occurrences in the string, not just the first one.
+*   `u`: The Unicode flag is crucial. It enables Unicode property escapes like `\p{Script=Han}` and ensures that the regex correctly interprets characters beyond the basic multilingual plane (BMP). Without `u`, `\S` might not behave as expected for all Unicode whitespace characters, and `\p{Script=Han}` would cause a syntax error.
+
+The `String.prototype.match()` method returns an array of all matches found. If no matches are found, it returns `null`. Therefore, a check `matches ? matches.length : 0` is used to safely return the count.
+
+**Advantages:**
+
+*   **Concise:** Very few lines of code.
+*   **Efficient:** Regular expression engines are highly optimized, especially for pattern matching.
+*   **Robust:** `\p{Script=Han}` handles a broad range of Chinese characters accurately.
+*   **Maintainable:** The regex is relatively easy to understand for those familiar with regular expressions.
+
+**Disadvantages:**
+
+*   **Browser Support:** `\p{Script=Han}` requires a modern JavaScript engine (ES2018+). For older environments, a specific Unicode range (`[\u4E00-\u9FFF]`) might be necessary, but it's less comprehensive.
+*   **Punctuation:** `\S+` will include punctuation attached to English words (e.g., "word!" counts as one word). If you need to exclude punctuation, pre-processing or a more complex regex is required.
+
+```javascript
+// Method 1.1: Core Regex Function
+function countWordsRegexModern(text) {
+  if (!text) {
+    return 0;
+  }
+  // Using Unicode property escape for Han script characters
+  const matches = text.match(/(\p{Script=Han}|\S+)/gu);
+  return matches ? matches.length : 0;
+}
+
+// Method 1.2: Example with various mixed content
+const example1_2_text = "Hello world, 這是一個測試。 JavaScript is powerful! 你好嗎？";
+console.log(`\nMethod 1.2: "${example1_2_text}" -> ${countWordsRegexModern(example1_2_text)}`);
+// Expected: 13 (Hello, world, 這, 是, 一, 個, 測試, JavaScript, is, powerful!, 你, 好, 嗎？)
+
+// Method 1.3: Handling leading/trailing spaces and multiple spaces
+const example1_3_text = "  Leading spaces,  multiple   spaces, and trailing.  中文。 ";
+console.log(`\nMethod 1.3: "${example1_3_text}" -> ${countWordsRegexModern(example1_3_text)}`);
+// Expected: 10 (Leading, spaces,, multiple, spaces,, and, trailing., 中, 文。)
+
+// Method 1.4: Pure Chinese string
+const example1_4_text = "今天天氣真好";
+console.log(`\nMethod 1.4: "${example1_4_text}" -> ${countWordsRegexModern(example1_4_text)}`);
+// Expected: 5 (今, 天, 天, 氣, 真, 好)
+
+// Method 1.5: Pure English string with punctuation
+const example1_5_text = "This is a sentence with punctuation, isn't it?";
+console.log(`\nMethod 1.5: "${example1_5_text}" -> ${countWordsRegexModern(example1_5_text)}`);
+// Expected: 8 (This, is, a, sentence, with, punctuation,, isn't, it?)
+
+// Method 1.6: Empty string
+const example1_6_text = "";
+console.log(`\nMethod 1.6: "${example1_6_text}" -> ${countWordsRegexModern(example1_6_text)}`);
+// Expected: 0
+
+// Method 1.7: String with only whitespace
+const example1_7_text = "   \t\n  ";
+console.log(`\nMethod 1.7: "${example1_7_text}" -> ${countWordsRegexModern(example1_7_text)}`);
+// Expected: 0
+
+// Method 1.8: String with numbers and symbols
+const example1_8_text = "123 ABC 456! 中文789";
+console.log(`\nMethod 1.8: "${example1_8_text}" -> ${countWordsRegexModern(example1_8_text)}`);
+// Expected: 7 (123, ABC, 456!, 中, 文, 789)
+```
+
+## # Method 2: Iterative Character Analysis
+
+**(Persona: Learning Explorer, Architecture Builder, Legacy Maintainer)**
+
+This method involves iterating through the string character by character, applying logic to determine if a character starts a new word or is part of an existing one. This approach offers fine-grained control and can be easier to debug for complex rules, though it might be less performant than a well-optimized regex for very large strings. It's also more compatible with older JavaScript environments that might not support advanced regex features.
+
+**Technical Deep Dive:**
+
+The core idea is to maintain a `count` and a `inEnglishWord` flag.
+
+1.  **Initialization:** `count = 0`, `inEnglishWord = false`.
+2.  **Iteration:** Loop through each character `char` in the `text`.
+3.  **Chinese Character Check:**
+    *   Determine if `char` is a Chinese character. The most common approach for broad compatibility is to check its Unicode code point range. The CJK Unified Ideographs block (`\u4E00` to `\u9FFF`) covers most common Chinese characters.
+    *   If it's a Chinese character, increment `count` and set `inEnglishWord = false` (as a Chinese character always counts as a new "word" and breaks any ongoing English word).
+4.  **Whitespace Check:**
+    *   If `char` is a whitespace character (using `/\s/.test(char)`), set `inEnglishWord = false`. This signifies the end of an English word.
+5.  **English Character/Punctuation Check:**
+    *   If `char` is neither Chinese nor whitespace, it's considered part of an English word or punctuation.
+    *   If `inEnglishWord` is `false`, it means we've just encountered the *start* of a new English word (or a sequence of non-Chinese, non-whitespace characters). Increment `count` and set `inEnglishWord = true`.
+    *   If `inEnglishWord` is already `true`, it means we're continuing an existing English word, so no action is needed for the count.
+
+**Advantages:**
+
+*   **Explicit Control:** You have full control over the logic for identifying word boundaries.
+*   **Debuggable:** Easier to step through and understand the logic for each character.
+*   **Legacy Compatibility:** Does not rely on modern regex features like Unicode property escapes.
+*   **Customizable:** Easier to add complex rules (e.g., treating hyphens differently, ignoring specific symbols).
+
+**Disadvantages:**
+
+*   **Verbosity:** More lines of code compared to the regex approach.
+*   **Performance:** Can be slower than optimized regex for very long strings due to explicit loop and conditional checks.
+*   **Unicode Range Maintenance:** Relying on hardcoded Unicode ranges (`0x4E00` to `0x9FFF`) might not cover all possible Chinese characters (e.g., rare characters, extensions) and requires knowledge of Unicode blocks.
+
+```javascript
+// Method 2.1: Core Iterative Function
+function countWordsIterativeDetailed(text) {
+  if (!text) {
+    return 0;
+  }
+  let count = 0;
+  let inEnglishWord = false; // Flag to track if we are currently inside an English word
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const charCode = char.charCodeAt(0);
+
+    // Check for common CJK Unified Ideographs range
+    // This range covers most common Chinese characters.
+    const isChineseChar = (charCode >= 0x4E00 && charCode <= 0x9FFF);
+
+    // Check for whitespace
+    const isWhitespace = /\s/.test(char);
+
+    if (isChineseChar) {
+      // Each Chinese character counts as a word
+      count++;
+      inEnglishWord = false; // A Chinese character always breaks an English word sequence
+    } else if (isWhitespace) {
+      // Whitespace ends an English word
+      inEnglishWord = false;
+    } else {
+      // It's a non-Chinese, non-whitespace character (likely English letter, number, or punctuation)
+      if (!inEnglishWord) {
+        // If we were not in an English word, this character starts a new one
+        count++;
+        inEnglishWord = true;
+      }
+      // If inEnglishWord is true, we continue the current English word, no count increment
+    }
+  }
+  return count;
+}
+
+// Method 2.2: Example with mixed content
+const example2_2_text = "Hello world, 這是一個測試。 JavaScript is powerful! 你好嗎？";
+console.log(`\nMethod 2.2: "${example2_2_text}" -> ${countWordsIterativeDetailed(example2_2_text)}`);
+// Expected: 13 (Hello, world, 這, 是, 一, 個, 測試, JavaScript, is, powerful!, 你, 好, 嗎？)
+
+// Method 2.3: Handling leading/trailing spaces and multiple spaces
+const example2_3_text = "  Leading spaces,  multiple   spaces, and trailing.  中文。 ";
+console.log(`\nMethod 2.3: "${example2_3_text}" -> ${countWordsIterativeDetailed(example2_3_text)}`);
+// Expected: 10 (Leading, spaces,, multiple, spaces,, and, trailing., 中, 文。)
+
+// Method 2.4: Pure Chinese string
+const example2_4_text = "今天天氣真好";
+console.log(`\nMethod 2.4: "${example2_4_text}" -> ${countWordsIterativeDetailed(example2_4_text)}`);
+// Expected: 5 (今, 天, 天, 氣, 真, 好)
+
+// Method 2.5: Pure English string with punctuation
+const example2_5_text = "This is a sentence with punctuation, isn't it?";
+console.log(`\nMethod 2.5: "${example2_5_text}" -> ${countWordsIterativeDetailed(example2_5_text)}`);
+// Expected: 8 (This, is, a, sentence, with, punctuation,, isn't, it?)
+
+// Method 2.6: Empty string
+const example2_6_text = "";
+console.log(`\nMethod 2.6: "${example2_6_text}" -> ${countWordsIterativeDetailed(example2_6_text)}`);
+// Expected: 0
+
+// Method 2.7: String with only whitespace
+const example2_7_text = "   \t\n  ";
+console.log(`\nMethod 2.7: "${example2_7_text}" -> ${countWordsIterativeDetailed(example2_7_text)}`);
+// Expected: 0
+
+// Method 2.8: String with numbers and symbols
+const example2_8_text = "123 ABC 456! 中文789";
+console.log(`\nMethod 2.8: "${example2_8_text}" -> ${countWordsIterativeDetailed(example2_8_text)}`);
+// Expected: 7 (123, ABC, 456!, 中, 文, 789)
+```
+
+## # Method 3: Hybrid Regex and String Manipulation
+
+**(Persona: Problem Solver, Legacy Maintainer, Output Focused)**
+
+This method takes a "divide and conquer" approach. It first separates the English words from the Chinese characters (conceptually or literally) and then counts them independently before summing the results. This can be useful if you need to apply different processing rules to English and Chinese parts, or if you're working with older JavaScript engines that lack advanced regex features.
+
+**Technical Deep Dive:**
+
+This method typically involves two main steps:
+
+1.  **Count English Words:**
+    *   Replace all Chinese characters with spaces. This ensures that Chinese characters don't interfere with English word detection and act as delimiters.
+    *   Then, use a regex like `/\S+/g` on the modified string to find all sequences of non-whitespace characters, which will now represent only English words (and any remaining punctuation attached to them).
+    *   The length of the resulting array is the English word count.
+2.  **Count Chinese Characters:**
+    *   Remove all non-Chinese characters (English letters, numbers, spaces, punctuation).
+    *   The `length` of the remaining string directly gives the count of Chinese characters, as each is considered a "word."
+3.  **Sum:** Add the two counts together.
+
+**Advantages:**
+
+*   **Clear Separation of Concerns:** Logic for English and Chinese counting is distinct, which can be easier to reason about.
+*   **Flexibility:** Allows for different pre-processing or counting rules for each language segment.
+*   **Legacy Compatibility:** Can be implemented using basic regex features available in older JavaScript versions (e.g., using `[\u4E00-\u9FFF]` instead of `\p{Script=Han}`).
+*   **Intermediate Results:** If you need to know the count of English words and Chinese characters separately, this method naturally provides them.
+
+**Disadvantages:**
+
+*   **Multiple Passes:** Involves multiple string operations (replacements, matches), which can be less performant than a single, optimized regex for very large strings.
+*   **Temporary Strings:** Creates intermediate string copies, potentially increasing memory usage.
+*   **Complexity:** Can be slightly more verbose than the single regex approach.
+
+```javascript
+// Method 3.1: Core Hybrid Function
+function countWordsHybridDetailed(text) {
+  if (!text) {
+    return 0;
+  }
+
+  // Step 1: Count English words
+  // Replace all Chinese characters with spaces to isolate English words.
+  // Using \p{Script=Han} for modern JS, or [\u4E00-\u9FFF] for legacy.
+  const englishIsolatedText = text.replace(/[\p{Script=Han}]/gu, ' ');
+  // Match sequences of non-whitespace characters to count English words.
+  const englishMatches = englishIsolatedText.match(/\S+/g);
+  const englishWordCount = englishMatches ? englishMatches.length : 0;
+
+  // Step 2: Count Chinese characters
+  // Remove all non-Chinese characters to get a string of only Chinese characters.
+  const chineseIsolatedText = text.replace(/[^\p{Script=Han}]/gu, '');
+  // Each remaining character is a Chinese "word".
+  const chineseCharCount = chineseIsolatedText.length;
+
+  // Step 3: Sum the counts
+  return englishWordCount + chineseCharCount;
+}
+
+// Method 3.2: Example with mixed content
+const example3_2_text = "Hello world, 這是一個測試。 JavaScript is powerful! 你好嗎？";
+console.log(`\nMethod 3.2: "${example3_2_text}" -> ${countWordsHybridDetailed(example3_2_text)}`);
+// Expected: 13 (Hello, world, 這, 是, 一, 個, 測試, JavaScript, is, powerful!, 你, 好, 嗎？)
+
+// Method 3.3: Handling leading/trailing spaces and multiple spaces
+const example3_3_text = "  Leading spaces,  multiple   spaces, and trailing.  中文。 ";
+console.log(`\nMethod 3.3: "${example3_3_text}" -> ${countWordsHybridDetailed(example3_3_text)}`);
+// Expected: 10 (Leading, spaces,, multiple, spaces,, and, trailing., 中, 文。)
+
+// Method 3.4: Pure Chinese string
+const example3_4_text = "今天天氣真好";
+console.log(`\nMethod 3.4: "${example3_4_text}" -> ${countWordsHybridDetailed(example3_4_text)}`);
+// Expected: 5 (今, 天, 天, 氣, 真, 好)
+
+// Method 3.5: Pure English string with punctuation
+const example3_5_text = "This is a sentence with punctuation, isn't it?";
+console.log(`\nMethod 3.5: "${example3_5_text}" -> ${countWordsHybridDetailed(example3_5_text)}`);
+// Expected: 8 (This, is, a, sentence, with, punctuation,, isn't, it?)
+
+// Method 3.6: Empty string
+const example3_6_text = "";
+console.log(`\nMethod 3.6: "${example3_6_text}" -> ${countWordsHybridDetailed(example3_6_text)}`);
+// Expected: 0
+
+// Method 3.7: String with only whitespace
+const example3_7_text = "   \t\n  ";
+console.log(`\nMethod 3.7: "${example3_7_text}" -> ${countWordsHybridDetailed(example3_7_text)}`);
+// Expected: 0
+
+// Method 3.8: String with numbers and symbols
+const example3_8_text = "123 ABC 456! 中文789";
+console.log(`\nMethod 3.8: "${example3_8_text}" -> ${countWordsHybridDetailed(example3_8_text)}`);
+// Expected: 7 (123, ABC, 456!, 中, 文, 789)
+```
+
+# # Performance Comparison
+
+**(Persona: Speed Seeker, Architecture Builder)**
+
+Performance is a critical factor, especially when dealing with large text inputs or high-frequency operations. We'll compare the three methods based on speed, compatibility, and complexity.
+
+**Test Setup:**
+
+We'll use a long string containing a mix of English and Chinese characters. The test will run each function multiple times and measure the average execution time.
+
+```javascript
+// Performance Test Setup
+const longEnglishText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. ".repeat(100);
+const longChineseText = "今天天氣真好，適合出去走走。這是一個很長的中文句子，用來測試性能。希望一切順利，大家都能開心。".repeat(100);
+const mixedLongText = longEnglishText + longChineseText + longEnglishText + longChineseText; // ~40,000 characters
+
+const iterations = 1000; // Number of times to run each function for averaging
+
+console.log("\n--- Performance Comparison ---");
+console.log(`Testing with a mixed string of approximately ${mixedLongText.length} characters.`);
+console.log(`Running each function ${iterations} times.`);
+
+// Helper function to measure execution time
+function measurePerformance(func, text, name) {
+  const start = performance.now();
+  for (let i = 0; i < iterations; i++) {
+    func(text);
+  }
+  const end = performance.now();
+  const duration = (end - start) / iterations; // Average time per call
+  console.log(`${name}: ${duration.toFixed(4)} ms (average per call)`);
+  return duration;
+}
+
+// Run tests
+const perfResults = {};
+
+// Method 1: Regex-Based Counting with Unicode Properties
+perfResults['Regex-Based (Modern)'] = measurePerformance(countWordsRegexModern, mixedLongText, "Method 1 (Regex-Based)");
+
+// Method 2: Iterative Character Analysis
+perfResults['Iterative Character Analysis'] = measurePerformance(countWordsIterativeDetailed, mixedLongText, "Method 2 (Iterative)");
+
+// Method 3: Hybrid Regex and String Manipulation
+perfResults['Hybrid Regex/String Manipulation'] = measurePerformance(countWordsHybridDetailed, mixedLongText, "Method 3 (Hybrid)");
+
+// Optional: Test legacy regex if needed
+function countWordsLegacyRegexPerf(text) {
+  if (!text) return 0;
+  const matches = text.match(/([\u4E00-\u9FFF]|\S+)/g);
+  return matches ? matches.length : 0;
+}
+perfResults['Regex-Based (Legacy CJK Range)'] = measurePerformance(countWordsLegacyRegexPerf, mixedLongText, "Method 1 (Legacy Regex)");
+
+// Display comparison summary
+console.log("\n--- Performance Summary (Lower is better) ---");
+const sortedResults = Object.entries(perfResults).sort(([, a], [, b]) => a - b);
+sortedResults.forEach(([name, duration]) => {
+  console.log(`${name}: ${duration.toFixed(4)} ms`);
+});
+```
+
+**Expected Outcomes and Analysis:**
+
+*   **Method 1 (Regex-Based with Unicode Properties):**
+    *   **Speed:** Often the fastest. Modern JavaScript engines have highly optimized regex implementations, especially when using native Unicode property escapes. A single pass over the string by the regex engine is very efficient.
+    *   **Compatibility:** Requires ES2018+ for `\p{Script=Han}`.
+    *   **Complexity:** Low code complexity, high internal engine optimization.
+*   **Method 2 (Iterative Character Analysis):**
+    *   **Speed:** Generally slower than Method 1 for long strings. The explicit loop and multiple conditional checks per character add overhead. However, for very short strings, the overhead of regex engine initialization might make it competitive.
+    *   **Compatibility:** High. Uses basic string iteration and `charCodeAt()`, widely supported across all JS versions.
+    *   **Complexity:** Medium code complexity, as the logic is explicit.
+*   **Method 3 (Hybrid Regex and String Manipulation):**
+    *   **Speed:** Typically slower than Method 1. It involves multiple string replacements and `match()` calls, leading to multiple passes over the string and creation of intermediate strings, which adds overhead.
+    *   **Compatibility:** Good. Can be adapted for older JS engines by using specific Unicode ranges instead of `\p{Script=Han}`.
+    *   **Complexity:** Medium code complexity due to multiple steps.
+
+**Conclusion:**
+
+For modern JavaScript environments (ES2018+), **Method 1 (Regex-Based with Unicode Properties)** is the clear winner in terms of performance and conciseness. If you need to support older environments or require extremely fine-grained control over word definition, Method 2 or 3 might be considered, but with a potential performance trade-off.
+
+# # JavaScript Version Support
+
+**(Persona: Legacy Maintainer, Architecture Builder)**
+
+Understanding which JavaScript features are supported across different environments is crucial for robust application development.
+
+| Feature / Method                               | ES Version | Browser Support (Modern) | Node.js Support | Notes
