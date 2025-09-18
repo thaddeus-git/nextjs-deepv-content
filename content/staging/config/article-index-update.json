@@ -1,21 +1,21 @@
 {
-  "lastUpdated": "2025-09-18T12:44:48.190384",
+  "lastUpdated": "2025-09-18T13:44:56.549334",
   "totalArticles": 11,
   "categories": [
     "programming-languages",
+    "programming",
     "system-devops",
-    "web-frontend",
-    "programming"
+    "web-frontend"
   ],
   "technologies": [
+    "File",
+    "JavaScript",
     "RPM/Linux",
     "Amazon-Redshift",
-    "Python-2.7",
     "Python",
     "Sql-Server",
-    "File",
-    "Rest",
-    "JavaScript"
+    "Python-2.7",
+    "Rest"
   ],
   "articles": [
     {
@@ -34,7 +34,7 @@
         "amazon-redshift"
       ],
       "filename": "how-to-calculate-median-in-aws-redshift-faa9b536.mdx",
-      "lastUpdated": "2025-09-18T12:44:48.189839"
+      "lastUpdated": "2025-09-18T13:44:56.548843"
     },
     {
       "id": "dc385f3c",
@@ -53,7 +53,7 @@
         "soap"
       ],
       "filename": "representational-state-transfer-rest-and-simple-object-dc385f3c.mdx",
-      "lastUpdated": "2025-09-18T12:44:48.189992"
+      "lastUpdated": "2025-09-18T13:44:56.548973"
     },
     {
       "id": "bbd1fbd5",
@@ -73,7 +73,7 @@
         "statsmodels"
       ],
       "filename": "logit-regression-and-singular-matrix-error-in-python-bbd1fbd5.mdx",
-      "lastUpdated": "2025-09-18T12:44:48.190046"
+      "lastUpdated": "2025-09-18T13:44:56.549020"
     },
     {
       "id": "ae1d627b",
@@ -92,7 +92,7 @@
         "apache-camel"
       ],
       "filename": "how-can-apache-camel-be-used-to-monitor-file-changes-ae1d627b.mdx",
-      "lastUpdated": "2025-09-18T12:44:48.190093"
+      "lastUpdated": "2025-09-18T13:44:56.549061"
     },
     {
       "id": "c335a59c",
@@ -111,7 +111,7 @@
         "stored-procedures"
       ],
       "filename": "retrieve-data-from-stored-procedure-which-has-multiple-c335a59c.mdx",
-      "lastUpdated": "2025-09-18T12:44:48.190209"
+      "lastUpdated": "2025-09-18T13:44:56.549164"
     },
     {
       "id": "30e24d02",
@@ -132,7 +132,7 @@
         "size"
       ],
       "filename": "size-of-numpy-array-30e24d02.mdx",
-      "lastUpdated": "2025-09-18T12:44:48.190245"
+      "lastUpdated": "2025-09-18T13:44:56.549193"
     },
     {
       "id": "5eb2a04f",
@@ -152,7 +152,7 @@
         "tk-toolkit"
       ],
       "filename": "how-to-change-font-and-size-of-buttons-and-frame-in-tkinter-5eb2a04f.mdx",
-      "lastUpdated": "2025-09-18T12:44:48.190286"
+      "lastUpdated": "2025-09-18T13:44:56.549235"
     },
     {
       "id": "3749489f",
@@ -172,7 +172,7 @@
         "query-string"
       ],
       "filename": "parse-query-string-in-javascript-3749489f.mdx",
-      "lastUpdated": "2025-09-18T12:44:48.189898"
+      "lastUpdated": "2025-09-18T13:44:56.548890"
     },
     {
       "id": "d0cc8ebb",
@@ -194,7 +194,7 @@
         "same-origin-policy"
       ],
       "filename": "why-does-my-javascript-code-receive-a-no-access-control-d0cc8ebb.mdx",
-      "lastUpdated": "2025-09-18T12:44:48.190130"
+      "lastUpdated": "2025-09-18T13:44:56.549091"
     },
     {
       "id": "debc8982",
@@ -216,7 +216,7 @@
         "troubleshooting"
       ],
       "filename": "dependency-resolution-fails-on-installed-library-debc8982.mdx",
-      "lastUpdated": "2025-09-18T12:44:48.190167"
+      "lastUpdated": "2025-09-18T13:44:56.549123"
     },
     {
       "id": "171c50c3",
@@ -238,7 +238,7 @@
         "word-count"
       ],
       "filename": "how-to-do-word-counts-for-a-mixture-of-english-and-chinese-171c50c3.mdx",
-      "lastUpdated": "2025-09-18T12:44:48.190376"
+      "lastUpdated": "2025-09-18T13:44:56.549325"
     }
   ]
 }
