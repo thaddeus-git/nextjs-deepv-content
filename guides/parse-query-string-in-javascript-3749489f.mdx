@@ -3,1240 +3,859 @@ title: "Parse query string in JavaScript: Complete Guide with 6 Solutions"
 slug: "parse-query-string-in-javascript"
 category: "web-frontend"
 subcategory: "javascript"
-description: "For a fast, modern, and reliable way to parse query strings, especially when dealing with the current page's URL, the URLSearchParams API is the recommended ..."
+description: "For modern browsers and a robust, built-in solution, use URLSearchParams. It provides a clean, object-oriented way to access and manipulate query parameters."
+tags: ["javascript","parsing","query-string"]
 difficulty: "intermediate"
-readTime: 35
-lastUpdated: "2025-09-18T07:29:53.000Z"
-tags:
-  - "javascript"
-  - "parsing"
-  - "query-string"
-  - "frontend"
-  - "web"
-  - "js"
+readTime: 25
+lastUpdated: "2025-09-18T13:50:35.680Z"
 featured: true
 ---
 
 # Parse query string in JavaScript: Complete Guide with 6 Solutions
 
-Query strings are a fundamental part of web development, allowing data to be passed between pages or to a server. Parsing these strings in JavaScript is a common task, whether you're building single-page applications, handling redirects, or integrating with third-party services. This comprehensive guide explores various methods for extracting information from query strings, catering to different needs and skill levels.
+## Quick Answer
 
-# # Quick Answer
-
-For a fast, modern, and reliable way to parse query strings, especially when dealing with the current page's URL, the `URLSearchParams` API is the recommended approach. It's built-in, handles encoding/decoding automatically, and provides a clean interface.
+For modern browsers and a robust, built-in solution, use `URLSearchParams`. It provides a clean, object-oriented way to access and manipulate query parameters.
 
 ```javascript
-// Example 1: Get a single parameter from the current URL
-// Assume current URL is: https://example.com/page?name=Alice&age=30
+// Assuming the current URL is: https://www.example.com/page?dest=aboutus.aspx&id=123
 const urlParams = new URLSearchParams(window.location.search);
-const name = urlParams.get('name');
-console.log(`Name: ${name}`); // Output: Name: Alice
+const destination = urlParams.get('dest'); // Returns "aboutus.aspx"
+const id = urlParams.get('id');           // Returns "123"
+const nonExistent = urlParams.get('foo'); // Returns null
 
-// Example 2: Get all parameters as an object
-// Assume current URL is: https://example.com/page?product=laptop&color=silver&price=1200
-const paramsObject = Object.fromEntries(urlParams.entries());
-console.log('All parameters:', paramsObject);
-// Output: All parameters: { product: 'laptop', color: 'silver', price: '1200' }
+console.log(`Destination: ${destination}`);
+console.log(`ID: ${id}`);
 
-// Example 3: Iterate over parameters
-// Assume current URL is: https://example.com/page?tag=js&tag=web&category=dev
+// To iterate over all parameters:
 for (const [key, value] of urlParams.entries()) {
     console.log(`${key}: ${value}`);
 }
-// Output:
-// tag: js
-// tag: web
-// category: dev
-
-// Example 4: Get all values for a specific parameter (e.g., multiple 'tag' parameters)
-// Assume current URL is: https://example.com/page?tag=js&tag=web&category=dev
-const tags = urlParams.getAll('tag');
-console.log('Tags:', tags); // Output: Tags: ['js', 'web']
-
-// Example 5: Parse a custom query string (not from current URL)
-const customQueryString = '?city=London&country=UK&population=9000000';
-const customParams = new URLSearchParams(customQueryString);
-const city = customParams.get('city');
-console.log(`City from custom string: ${city}`); // Output: City from custom string: London
 ```
 
-# # Choose Your Method
+## Choose Your Method
+
+Deciding the best way to parse a query string in JavaScript depends on your specific needs, target environment, and desired level of control. Use the following decision tree to guide your choice.
+
 ```mermaid
-flowchart TD
-    A[Your Situation] --> B{Performance Critical?}
-    B -->|Yes| C[Method 1: Speed Optimized]
-    B -->|No| D{Learning Focus?}
-    D -->|Yes| E[Method 2: Educational]
-    D -->|No| F[Method 3: Quick Solution]
+graph TD
+    A[Start: Need to parse query string?] --> B{Target Browser Support?};
+
+    B -- Modern Browsers (ES6+) --> C{Need simple key-value access or full object?};
+    B -- Older Browsers (IE11, Legacy) --> D{Need a custom, lightweight solution?};
+    B -- Cross-browser compatibility is critical --> E{Using a library already?};
+
+    C -- Simple key-value access --> F[Use `URLSearchParams`];
+    C -- Full object, handle duplicates/arrays --> G[Use `URLSearchParams` + custom object conversion];
+
+    D -- Minimal code, specific parameter --> H[Custom function: `getQueryVariable` (Answer 1)];
+    D -- Full object, basic parsing --> I[Custom function: `parseQuery` (Answer 2)];
+    D -- Full object, advanced (duplicates, no value) --> J[Custom function: `parseQuery` (Answer 6)];
+    D -- Very specific, single parameter --> K[Regex-based `location.search.replace` (Answer 7)];
+
+    E -- Yes, e.g., URI.js, jQuery --> L[Use library's built-in parsing (e.g., `URI().query(true)`)];
+    E -- No, prefer vanilla JS --> B;
+
+    F --> M[**🚀 Speed Seeker, 📚 Learning Explorer, 🔧 Problem Solver**];
+    G --> N[**🏗️ Architecture Builder, 🎨 Output Focused**];
+    H --> O[**🚀 Speed Seeker, ⚡ Legacy Maintainer**];
+    I --> P[**🔧 Problem Solver, ⚡ Legacy Maintainer**];
+    J --> Q[**🏗️ Architecture Builder, ⚡ Legacy Maintainer**];
+    K --> R[**🚀 Speed Seeker, 🔧 Problem Solver** (for very specific cases)];
+    L --> S[**🏗️ Architecture Builder, ⚡ Legacy Maintainer** (if library is already present)];
+
+    M[**🚀 Speed Seeker, 📚 Learning Explorer, 🔧 Problem Solver**] --> End;
+    N[**🏗️ Architecture Builder, 🎨 Output Focused**] --> End;
+    O[**🚀 Speed Seeker, ⚡ Legacy Maintainer**] --> End;
+    P[**🔧 Problem Solver, ⚡ Legacy Maintainer**] --> End;
+    Q[**🏗️ Architecture Builder, ⚡ Legacy Maintainer**] --> End;
+    R[**🚀 Speed Seeker, 🔧 Problem Solver** (for very specific cases)] --> End;
+    S[**🏗️ Architecture Builder, ⚡ Legacy Maintainer** (if library is already present)] --> End;
 ```
 
-# # Table of Contents
-*   Ready-to-Use Code
-*   Method 1: Using `URLSearchParams` (Modern & Robust) - *Speed Seeker, Problem Solver, Architecture Builder, Learning Explorer*
-*   Method 2: Manual Parsing with String Methods (Educational & Legacy Compatible) - *Learning Explorer, Legacy Maintainer*
-*   Method 3: Manual Parsing into an Object (Problem Solver & Architecture Builder) - *Problem Solver, Architecture Builder, Legacy Maintainer*
-*   Method 4: Regular Expressions (Advanced & Concise) - *Speed Seeker, Architecture Builder*
-*   Method 5: External Libraries (URI.js) (Architecture Builder & Output Focused) - *Architecture Builder, Output Focused*
-*   Method 6: Simplified Regex for Single Parameter (Speed Seeker & Legacy Maintainer) - *Speed Seeker, Legacy Maintainer*
-*   Performance Comparison
-*   JavaScript Version Support
-*   Common Problems & Solutions
-*   Real-World Examples
-*   Related JavaScript Functions
-*   Summary
-*   Frequently Asked Questions
-*   Test Your Code
+## Table of Contents
+- [Quick Answer](#quick-answer)
+- [Choose Your Method](#choose-your-method)
+- [Ready-to-Use Code](#ready-to-use-code)
+- [Method 1: Using `URLSearchParams` (Modern & Recommended)](#method-1-using-urlsearchparams-modern--recommended)
+- [Method 2: Custom Function for Single Parameter (`getQueryVariable`)](#method-2-custom-function-for-single-parameter-getqueryvariable)
+- [Method 3: Custom Function for Object Parsing (`parseQuery` - Basic)](#method-3-custom-function-for-object-parsing-parsequery---basic)
+- [Method 4: Custom Function for Object Parsing (`parseQuery` - Advanced)](#method-4-custom-function-for-object-parsing-parsequery---advanced)
+- [Method 5: Using External Libraries (e.g., URI.js)](#method-5-using-external-libraries-e.g.-urijs)
+- [Method 6: Regex for Specific Single Parameter](#method-6-regex-for-specific-single-parameter)
+- [Performance Comparison](#performance-comparison)
+- [JavaScript Version Support](#javascript-version-support)
+- [Common Problems & Solutions](#common-problems--solutions)
+- [Real-World Use Cases](#real-world-use-cases)
+- [Related: Other JavaScript Operations](#related-other-javascript-operations)
+- [Summary](#summary)
+- [Frequently Asked Questions](#frequently-asked-questions)
+- [Tools & Resources](#tools--resources)
 
-# # Ready-to-Use Code
+## Ready-to-Use Code
 
-Here's a collection of practical, copy-paste-ready code snippets covering the most common query string parsing scenarios.
+Here are the most common and robust solutions for quick integration into your projects.
+
+### 1. Modern Browsers: `URLSearchParams`
+
+**Persona:** 🚀 Speed Seeker, 🔧 Problem Solver, 📚 Learning Explorer
+
+This is the most recommended approach for contemporary web development due to its native support, robustness, and ease of use.
 
 ```javascript
-// Scenario 1: Get a specific parameter from the current URL using URLSearchParams
-// URL: https://example.com/search?query=javascript+tutorial&page=2
-const currentUrlParams = new URLSearchParams(window.location.search);
-const searchQuery = currentUrlParams.get('query');
-console.log(`Search Query: ${searchQuery}`); // Output: Search Query: javascript tutorial
-
-// Scenario 2: Parse a custom query string into an object
-// Query: ?user=John%20Doe&id=123&active=true
-function parseCustomQueryString(queryString) {
-    const params = new URLSearchParams(queryString);
-    return Object.fromEntries(params.entries());
+/**
+ * Parses the query string of the current URL using URLSearchParams.
+ * @returns {URLSearchParams} An object providing methods to access query parameters.
+ */
+function getUrlParams() {
+    return new URLSearchParams(window.location.search);
 }
-const customParamsObj = parseCustomQueryString('?user=John%20Doe&id=123&active=true');
-console.log('Custom Params Object:', customParamsObj);
-// Output: Custom Params Object: { user: 'John Doe', id: '123', active: 'true' }
 
-// Scenario 3: Handle multiple parameters with the same name
-// URL: https://example.com/products?category=electronics&category=books&sort=price
-const multiValueParams = new URLSearchParams('?category=electronics&category=books&sort=price');
-const categories = multiValueParams.getAll('category');
-console.log('Categories:', categories); // Output: Categories: ['electronics', 'books']
+// Example usage:
+const params = getUrlParams();
+const dest = params.get('dest');
+const id = params.get('id');
+const category = params.get('category'); // If 'category' is not present, returns null
 
-// Scenario 4: Manual parsing for older browsers (ES5 compatible)
-// Query: ?product=widget&color=blue
-function getQueryVariableLegacy(variable) {
-    const query = window.location.search.substring(1);
-    const vars = query.split('&');
-    for (let i = 0; i < vars.length; i++) {
-        const pair = vars[i].split('=');
-        if (decodeURIComponent(pair[0]) === variable) {
-            return decodeURIComponent(pair[1] || '');
-        }
-    }
-    return undefined; // Or null, or throw an error
-}
-// To test, imagine URL is: https://example.com/item?product=widget&color=blue
-// console.log(`Legacy Product: ${getQueryVariableLegacy('product')}`); // Output: Legacy Product: widget
+console.log(`Destination: ${dest}`); // e.g., "aboutus.aspx"
+console.log(`ID: ${id}`);           // e.g., "123"
+console.log(`Category: ${category}`); // e.g., null or "electronics"
 
-// Scenario 5: Check if a parameter exists
-// URL: https://example.com/settings?darkMode=true
-const settingsParams = new URLSearchParams('?darkMode=true&notifications');
-const hasDarkMode = settingsParams.has('darkMode');
-const hasNotifications = settingsParams.has('notifications');
-console.log(`Has Dark Mode: ${hasDarkMode}`);     // Output: Has Dark Mode: true
-console.log(`Has Notifications: ${hasNotifications}`); // Output: Has Notifications: true
-
-// Scenario 6: Get a parameter that might not exist, with a default value
-// URL: https://example.com/profile?id=user123
-const profileParams = new URLSearchParams('?id=user123');
-const userId = profileParams.get('id') || 'guest';
-const theme = profileParams.get('theme') || 'light';
-console.log(`User ID: ${userId}`);   // Output: User ID: user123
-console.log(`Theme: ${theme}`);     // Output: Theme: light
-
-// Scenario 7: Using a regular expression for a single known parameter
-// Query: ?item=apple&quantity=5
-function getSingleParamWithRegex(paramName, queryString) {
-    const match = new RegExp(`[?&]${paramName}=([^&]*)`).exec(queryString);
-    return match ? decodeURIComponent(match[1].replace(/\+/g, ' ')) : null;
-}
-const item = getSingleParamWithRegex('item', '?item=apple&quantity=5');
-console.log(`Item (Regex): ${item}`); // Output: Item (Regex): apple
-
-// Scenario 8: Building a query string from an object
-const newParams = new URLSearchParams();
-newParams.set('name', 'Jane Doe');
-newParams.set('age', '28');
-newParams.append('interests', 'coding');
-newParams.append('interests', 'reading');
-console.log(`New Query String: ${newParams.toString()}`);
-// Output: New Query String: name=Jane+Doe&age=28&interests=coding&interests=reading
+// To get all values for a potentially repeated parameter:
+// URL: ?item=apple&item=banana
+// const items = params.getAll('item'); // Returns ["apple", "banana"]
 ```
 
-# # Method 1: Using `URLSearchParams` (Modern & Robust)
+### 2. Legacy Browsers / Custom Control: `getQueryVariable`
 
-**User Personas:** *Speed Seeker, Problem Solver, Architecture Builder, Learning Explorer*
+**Persona:** ⚡ Legacy Maintainer, 🔧 Problem Solver
 
-The `URLSearchParams` interface provides a powerful and standardized way to work with URL query strings. It's part of the Web APIs and is widely supported in modern browsers and Node.js environments. This is the **recommended approach** for most use cases due to its clarity, robustness, and automatic handling of URL encoding/decoding.
-
-## # How it Works
-
-You create an instance of `URLSearchParams` by passing it a query string (including or excluding the leading `?`). It then provides methods to `get()`, `getAll()`, `set()`, `append()`, `delete()`, `has()`, and iterate over parameters.
-
-## # Advantages
-
-*   **Standardized:** Part of the Web API, ensuring consistent behavior.
-*   **Automatic Encoding/Decoding:** Handles `decodeURIComponent` and `encodeURIComponent` automatically.
-*   **Handles Multiple Values:** `getAll()` easily retrieves all values for parameters with the same name (e.g., `?tag=js&tag=web`).
-*   **Mutable:** You can modify the parameters and then convert them back to a string.
-*   **Readability:** The API is intuitive and easy to understand.
-*   **Performance:** Generally optimized for common use cases.
-
-## # Disadvantages
-
-*   **Browser Support:** While widely supported, it might require a polyfill for very old browsers (e.g., IE11).
-
-## # Code Examples
+A classic, lightweight custom function that works across almost all JavaScript environments, ideal for extracting a single, known parameter.
 
 ```javascript
-// Example 1.1: Get a single parameter from the current URL
-// Assume current URL is: https://example.com/products?id=123&category=electronics
-const currentParams = new URLSearchParams(window.location.search);
-const productId = currentParams.get('id');
-console.log(`Product ID: ${productId}`); // Output: Product ID: 123
-
-// Example 1.2: Get a parameter from a custom query string
-const customQuery = 'name=Alice%20Smith&age=30&city=New%20York';
-const customSearchParams = new URLSearchParams(customQuery);
-const userName = customSearchParams.get('name');
-console.log(`User Name: ${userName}`); // Output: User Name: Alice Smith
-
-// Example 1.3: Get all values for a repeated parameter
-// Query: ?item=apple&color=red&item=banana&color=yellow
-const repeatedParams = new URLSearchParams('item=apple&color=red&item=banana&color=yellow');
-const items = repeatedParams.getAll('item');
-const colors = repeatedParams.getAll('color');
-console.log('Items:', items);   // Output: Items: ['apple', 'banana']
-console.log('Colors:', colors); // Output: Colors: ['red', 'yellow']
-
-// Example 1.4: Check if a parameter exists
-const checkParams = new URLSearchParams('debug=true&mode=dev');
-const hasDebug = checkParams.has('debug');
-const hasEnv = checkParams.has('env');
-console.log(`Has debug parameter: ${hasDebug}`); // Output: Has debug parameter: true
-console.log(`Has env parameter: ${hasEnv}`);     // Output: Has env parameter: false
-
-// Example 1.5: Iterate over all parameters
-const iterateParams = new URLSearchParams('key1=value1&key2=value2&key3=value3');
-console.log('Iterating over parameters:');
-for (const [key, value] of iterateParams.entries()) {
-    console.log(`  ${key}: ${value}`);
-}
-// Output:
-//   key1: value1
-//   key2: value2
-//   key3: value3
-
-// Example 1.6: Convert URLSearchParams to a plain JavaScript object
-const objParams = new URLSearchParams('paramA=valA&paramB=valB&paramA=valC');
-const paramsAsObject = Object.fromEntries(objParams.entries());
-console.log('Parameters as Object:', paramsAsObject);
-// Note: Object.fromEntries will only keep the last value for duplicate keys.
-// Output: Parameters as Object: { paramA: 'valC', paramB: 'valB' }
-
-// Example 1.7: Modify and then stringify URLSearchParams
-const modifiableParams = new URLSearchParams('sort=asc&limit=10');
-modifiableParams.set('sort', 'desc'); // Change existing
-modifiableParams.append('filter', 'active'); // Add new
-modifiableParams.delete('limit'); // Remove
-console.log(`Modified Query String: ${modifiableParams.toString()}`);
-// Output: Modified Query String: sort=desc&filter=active
-
-// Example 1.8: Handling parameters without values (flags)
-const flagParams = new URLSearchParams('verbose&debug=true&dryRun');
-console.log(`Verbose: ${flagParams.get('verbose')}`); // Output: Verbose: '' (empty string)
-console.log(`Dry Run: ${flagParams.get('dryRun')}`);   // Output: Dry Run: '' (empty string)
-```
-
-# # Method 2: Manual Parsing with String Methods (Educational & Legacy Compatible)
-
-**User Personas:** *Learning Explorer, Legacy Maintainer*
-
-This method involves using basic JavaScript string manipulation functions like `split()`, `substring()`, and `indexOf()` to manually parse the query string. It's a great way to understand the underlying mechanics of query string parsing and is compatible with very old JavaScript environments (ES5 and earlier).
-
-## # How it Works
-
-The core idea is to:
-1.  Get the query string part of the URL (e.g., `window.location.search`).
-2.  Remove the leading `?`.
-3.  Split the string by `&` to get individual key-value pairs.
-4.  For each pair, split by `=` to separate the key and value.
-5.  Use `decodeURIComponent()` to handle URL-encoded characters.
-
-## # Advantages
-
-*   **High Compatibility:** Works in virtually any JavaScript environment, including very old browsers.
-*   **Educational:** Helps in understanding string manipulation and URL structure.
-*   **No Dependencies:** Pure vanilla JavaScript.
-
-## # Disadvantages
-
-*   **Verbosity:** Requires more lines of code compared to `URLSearchParams`.
-*   **Error Prone:** Manual handling of edge cases (e.g., missing values, malformed pairs, duplicate keys) can be tricky.
-*   **No Built-in Object Conversion:** You have to build the object yourself.
-*   **Performance:** Can be less optimized than native APIs for complex strings.
-
-## # Code Examples
-
-```javascript
-// Example 2.1: Basic function to get a single query variable
+/**
+ * Extracts a single query variable from the URL.
+ * @param {string} variable The name of the query variable to retrieve.
+ * @returns {string|undefined} The decoded value of the variable, or undefined if not found.
+ */
 function getQueryVariable(variable) {
-    const query = window.location.search.substring(1); // Remove '?'
+    const query = window.location.search.substring(1);
     const vars = query.split('&');
     for (let i = 0; i < vars.length; i++) {
         const pair = vars[i].split('=');
         if (decodeURIComponent(pair[0]) === variable) {
-            return decodeURIComponent(pair[1] || ''); // Handle cases like 'param=' or 'param'
+            return decodeURIComponent(pair[1] || ''); // Handle cases like `?param=`
         }
     }
-    return undefined; // Return undefined if not found
+    // console.log(`Query variable '${variable}' not found`); // Optional: log if not found
+    return undefined; // Explicitly return undefined if not found
 }
 
-// To test, imagine URL is: https://example.com/page?dest=aboutus.aspx&lang=en
-// console.log(`Destination: ${getQueryVariable('dest')}`); // Output: Destination: aboutus.aspx
-// console.log(`Language: ${getQueryVariable('lang')}`);   // Output: Language: en
-// console.log(`Theme: ${getQueryVariable('theme')}`);     // Output: Theme: undefined
+// Example usage:
+// Assuming URL: ?dest=aboutus.aspx&user=john%20doe
+const destination = getQueryVariable('dest');
+const userName = getQueryVariable('user');
+const nonExistentParam = getQueryVariable('foo');
 
-// Example 2.2: Getting a variable from a custom string
-function getQueryVariableFromString(queryString, variable) {
-    const query = queryString.startsWith('?') ? queryString.substring(1) : queryString;
+console.log(`Destination: ${destination}`); // "aboutus.aspx"
+console.log(`User Name: ${userName}`);     // "john doe"
+console.log(`Non-existent param: ${nonExistentParam}`); // undefined
+```
+
+## Method 1: Using `URLSearchParams` (Modern & Recommended)
+
+**Persona:** 🚀 Speed Seeker, 📚 Learning Explorer, 🔧 Problem Solver, 🏗️ Architecture Builder
+
+The `URLSearchParams` interface provides a powerful and standardized way to work with the query string of a URL. It's part of the URL API and is supported in all modern browsers (Chrome, Firefox, Edge, Safari, Opera) and Node.js environments. This is the **preferred method** for new development due to its clarity, robustness, and built-in handling of URL encoding/decoding.
+
+### How it Works
+
+`URLSearchParams` treats the query string as a collection of key-value pairs. You can create an instance by passing the `window.location.search` string (which includes the leading `?`) or any other query string.
+
+```javascript
+// Get the query string from the current URL
+const queryString = window.location.search; // e.g., "?dest=aboutus.aspx&id=123&tags=js,web"
+
+// Create a URLSearchParams object
+const urlParams = new URLSearchParams(queryString);
+
+// Accessing individual parameters
+const destination = urlParams.get('dest'); // "aboutus.aspx"
+const userId = urlParams.get('id');       // "123"
+const nonExistent = urlParams.get('foo'); // null
+
+console.log(`Destination: ${destination}`);
+console.log(`User ID: ${userId}`);
+console.log(`Non-existent param: ${nonExistent}`);
+```
+
+### Key Methods
+
+*   **`get(name)`**: Returns the first value associated with the given search parameter. If no such parameter is found, it returns `null`.
+*   **`getAll(name)`**: Returns an array of all values associated with a given search parameter. Useful for parameters that can appear multiple times (e.g., `?item=apple&item=banana`).
+*   **`has(name)`**: Returns a boolean indicating whether a parameter with the given name exists.
+*   **`set(name, value)`**: Sets the value of a search parameter. If there are multiple values, it replaces them all with the new one.
+*   **`append(name, value)`**: Appends a new key-value pair to the search parameters.
+*   **`delete(name)`**: Deletes all occurrences of the given search parameter.
+*   **`toString()`**: Returns a string containing all search parameters, suitable for use as a URL query string.
+*   **`entries()`, `keys()`, `values()`**: Iterators for looping through parameters.
+
+### Example: Handling Multiple Values and Manipulation
+
+```javascript
+// Example URL: https://www.example.com/products?category=electronics&sort=price_asc&filter=brandA&filter=brandB
+const currentUrlParams = new URLSearchParams(window.location.search);
+
+// Get a single value
+console.log(`Category: ${currentUrlParams.get('category')}`); // "electronics"
+
+// Get all values for a repeated parameter
+const filters = currentUrlParams.getAll('filter');
+console.log(`Filters: ${filters.join(', ')}`); // "brandA, brandB"
+
+// Check if a parameter exists
+console.log(`Has 'sort' parameter? ${currentUrlParams.has('sort')}`); // true
+console.log(`Has 'page' parameter? ${currentUrlParams.has('page')}`); // false
+
+// Modify parameters
+currentUrlParams.set('sort', 'name_asc'); // Change sort order
+currentUrlParams.append('filter', 'brandC'); // Add another filter
+currentUrlParams.delete('category'); // Remove category parameter
+
+// Convert back to string for a new URL
+const newQueryString = currentUrlParams.toString();
+console.log(`New Query String: ${newQueryString}`);
+// Output: "sort=name_asc&filter=brandA&filter=brandB&filter=brandC"
+
+// You can then use this to update the URL without reloading:
+// history.pushState(null, '', `?${newQueryString}`);
+```
+
+### Converting to a Plain Object
+
+While `URLSearchParams` is an object itself, sometimes you need a plain JavaScript object (`{ key: value }`) for easier manipulation or compatibility with other functions.
+
+```javascript
+/**
+ * Converts URLSearchParams to a plain JavaScript object.
+ * Handles multiple values for the same key by storing them as an array.
+ * @param {URLSearchParams} urlParams The URLSearchParams object.
+ * @returns {object} A plain object representation of the query parameters.
+ */
+function urlSearchParamsToObject(urlParams) {
+    const obj = {};
+    for (const [key, value] of urlParams.entries()) {
+        if (obj[key]) {
+            // If key already exists, convert to array or push to existing array
+            if (!Array.isArray(obj[key])) {
+                obj[key] = [obj[key]];
+            }
+            obj[key].push(value);
+        } else {
+            obj[key] = value;
+        }
+    }
+    return obj;
+}
+
+// Example: URL `?name=Alice&age=30&tag=js&tag=web`
+const params = new URLSearchParams(window.location.search);
+const paramsObject = urlSearchParamsToObject(params);
+
+console.log(paramsObject);
+/*
+{
+  name: "Alice",
+  age: "30",
+  tag: ["js", "web"]
+}
+*/
+```
+
+### Advantages
+
+*   **Standardized API:** Part of the Web API, ensuring consistent behavior.
+*   **Robust:** Handles encoding/decoding, special characters, and edge cases correctly.
+*   **Mutable:** Easy to add, remove, or modify parameters.
+*   **Iterable:** Supports `for...of` loops for easy iteration.
+*   **Readability:** Code is clear and self-documenting.
+
+### Disadvantages
+
+*   **Browser Support:** Not available in very old browsers (e.g., Internet Explorer). A polyfill might be needed for broader compatibility.
+
+## Method 2: Custom Function for Single Parameter (`getQueryVariable`)
+
+**Persona:** ⚡ Legacy Maintainer, 🔧 Problem Solver, 🚀 Speed Seeker
+
+This method involves writing a custom JavaScript function to manually parse the query string. It's a classic approach, highly compatible with older browsers, and very efficient if you only need to extract one specific parameter. This directly implements the logic from Answer 1.
+
+### How it Works
+
+The function takes the query string, removes the leading `?`, splits it into individual key-value pairs using `&` as a delimiter, and then iterates through these pairs. For each pair, it splits by `=`, decodes the key and value, and checks if the key matches the requested variable.
+
+```javascript
+/**
+ * Extracts a single query variable from the URL's search string.
+ * This function is highly compatible with older browsers.
+ * @param {string} variable The name of the query variable to retrieve.
+ * @returns {string|undefined} The decoded value of the variable, or undefined if not found.
+ */
+function getQueryVariable(variable) {
+    // Get the query string part of the URL, excluding the '?'
+    const query = window.location.search.substring(1);
+    
+    // Split the query string into individual key-value pairs
     const vars = query.split('&');
+    
+    // Iterate over each pair
     for (let i = 0; i < vars.length; i++) {
         const pair = vars[i].split('=');
+        
+        // Decode the key and compare it to the requested variable
         if (decodeURIComponent(pair[0]) === variable) {
+            // Return the decoded value. Handle cases where value might be missing (e.g., `?param=`)
             return decodeURIComponent(pair[1] || '');
         }
     }
+    // If the variable is not found after checking all pairs
     return undefined;
 }
-const customUrl = 'product=keyboard&price=75.99&currency=USD';
-console.log(`Product: ${getQueryVariableFromString(customUrl, 'product')}`); // Output: Product: keyboard
-console.log(`Price: ${getQueryVariableFromString(customUrl, 'price')}`);     // Output: Price: 75.99
 
-// Example 2.3: Handling spaces encoded as '+' (common in older forms)
-function getQueryVariableWithPlus(variable) {
-    const query = window.location.search.substring(1);
-    const vars = query.split('&');
-    for (let i = 0; i < vars.length; i++) {
-        const pair = vars[i].split('=');
-        if (decodeURIComponent(pair[0]) === variable) {
-            // Replace '+' with ' ' before decoding for values
-            return decodeURIComponent(pair[1] ? pair[1].replace(/\+/g, ' ') : '');
-        }
-    }
-    return undefined;
-}
-// To test, imagine URL is: https://example.com/search?q=hello+world&source=web
-// console.log(`Search Query (with plus): ${getQueryVariableWithPlus('q')}`); // Output: Search Query (with plus): hello world
+// Example Usage:
+// Assuming current URL is: https://www.example.com/page?dest=aboutus.aspx&id=123&name=John%20Doe
+const destination = getQueryVariable('dest');
+const userId = getQueryVariable('id');
+const userName = getQueryVariable('name');
+const nonExistentParam = getQueryVariable('category');
 
-// Example 2.4: A more robust manual parser that returns an object (similar to Method 3)
-function parseQueryStringToObjectManual(queryString) {
-    const query = queryString.startsWith('?') ? queryString.substring(1) : queryString;
-    const params = {};
-    if (!query) return params;
+console.log(`Destination: ${destination}`); // "aboutus.aspx"
+console.log(`User ID: ${userId}`);         // "123"
+console.log(`User Name: ${userName}`);     // "John Doe"
+console.log(`Non-existent parameter: ${nonExistentParam}`); // undefined
 
-    query.split('&').forEach(pair => {
-        let [key, value] = pair.split('=').map(decodeURIComponent);
-        key = key.replace(/\+/g, ' '); // Handle '+' for spaces in keys too, if needed
-        value = value ? value.replace(/\+/g, ' ') : ''; // Handle '+' for spaces in values
+// Example with a parameter having no value: ?param1=value1&param2=&param3
+// const param2Value = getQueryVariable('param2'); // "" (empty string)
+```
 
-        if (params.hasOwnProperty(key)) {
-            if (Array.isArray(params[key])) {
-                params[key].push(value);
-            } else {
-                params[key] = [params[key], value];
-            }
-        } else {
-            params[key] = value;
-        }
-    });
-    return params;
-}
-const manualParsed = parseQueryStringToObjectManual('?name=John%20Doe&age=30&tag=js&tag=web&city=New+York');
-console.log('Manual Parsed Object:', manualParsed);
-// Output: Manual Parsed Object: { name: 'John Doe', age: '30', tag: ['js', 'web'], city: 'New York' }
+### Advantages
 
-// Example 2.5: Getting a boolean flag (parameter without value)
-function getBooleanFlag(flagName) {
-    const query = window.location.search.substring(1);
-    const vars = query.split('&');
-    for (let i = 0; i < vars.length; i++) {
-        const pair = vars[i].split('=');
+*   **High Compatibility:** Works in virtually all JavaScript environments, including very old browsers (IE6+).
+*   **Lightweight:** No external dependencies, minimal code footprint.
+*   **Efficient for Single Lookups:** If you only need one specific parameter, this function is very direct.
+*   **Clear Logic:** Easy to understand and debug.
+
+### Disadvantages
+
+*   **Single Parameter Only:** Designed to retrieve one parameter at a time. Repeated calls for multiple parameters can be less efficient than parsing the entire string once.
+*   **No Object Output:** Does not return a structured object of all parameters.
+*   **No Handling for Duplicate Keys:** If a parameter appears multiple times (e.g., `?item=apple&item=banana`), it will only return the first occurrence.
+*   **Manual Decoding:** Relies on `decodeURIComponent`, which is handled automatically by `URLSearchParams`.
+
+### When to Use
+
+This method is ideal for:
+*   Projects requiring maximum backward compatibility.
+*   Scenarios where you only need to fetch one or two specific query parameters.
+*   Environments where `URLSearchParams` is not available or polyfilling is not desired.
+
+## Method 3: Custom Function for Object Parsing (`parseQuery` - Basic)
+
+**Persona:** 🔧 Problem Solver, ⚡ Legacy Maintainer, 📚 Learning Explorer
+
+This custom function parses the entire query string into a plain JavaScript object, making all parameters accessible at once. It's a good balance between compatibility and convenience, offering a structured output. This method is based on the logic from Answer 2.
+
+### How it Works
+
+The function takes a query string (or `window.location.search`), removes the leading `?` if present, and then splits it into key-value pairs. It iterates through these pairs, splitting each by `=`, and then decodes both the key and value before assigning them to properties of a new object.
+
+```javascript
+/**
+ * Parses a query string into a plain JavaScript object.
+ * Handles basic key-value pairs.
+ * @param {string} queryString The query string to parse (e.g., "?key=value&foo=bar").
+ * @returns {object} An object where keys are parameter names and values are their decoded strings.
+ */
+function parseQuery(queryString) {
+    const query = {};
+    // Remove leading '?' if present, then split by '&'
+    const pairs = (queryString[0] === '?' ? queryString.substring(1) : queryString).split('&');
+    
+    for (let i = 0; i < pairs.length; i++) {
+        const pair = pairs[i].split('=');
+        // Decode key and value, handling cases where value might be missing (e.g., `?param=`)
         const key = decodeURIComponent(pair[0]);
-        if (key === flagName) {
-            // If there's no '=', it's a flag. If there is, check its value.
-            return pair.length === 1 || decodeURIComponent(pair[1]).toLowerCase() === 'true';
-        }
+        const value = decodeURIComponent(pair[1] || ''); // Default to empty string if no value
+        query[key] = value;
     }
-    return false;
+    return query;
 }
-// To test, imagine URL is: https://example.com/settings?darkMode&notifications=false
-// console.log(`Dark Mode Enabled: ${getBooleanFlag('darkMode')}`);       // Output: Dark Mode Enabled: true
-// console.log(`Notifications Enabled: ${getBooleanFlag('notifications')}`); // Output: Notifications Enabled: false
 
-// Example 2.6: Using reduce for a more functional approach (still manual)
-function parseQueryReduce(queryString) {
-    const query = queryString.startsWith('?') ? queryString.substring(1) : queryString;
-    if (!query) return {};
-
-    return query.split('&').reduce((acc, part) => {
-        let [key, value] = part.split('=').map(decodeURIComponent);
-        key = key.replace(/\+/g, ' ');
-        value = value ? value.replace(/\+/g, ' ') : '';
-
-        if (acc.hasOwnProperty(key)) {
-            if (Array.isArray(acc[key])) {
-                acc[key].push(value);
-            } else {
-                acc[key] = [acc[key], value];
-            }
-        } else {
-            acc[key] = value;
-        }
-        return acc;
-    }, {});
+// Example Usage:
+// Assuming current URL is: https://www.example.com/search?q=javascript%20parsing&page=2&sort=date
+const currentQueryParams = parseQuery(window.location.search);
+console.log(currentQueryParams);
+/*
+{
+  q: "javascript parsing",
+  page: "2",
+  sort: "date"
 }
-const reducedParsed = parseQueryReduce('?color=red&size=M&color=blue&material=cotton');
-console.log('Reduced Parsed Object:', reducedParsed);
-// Output: Reduced Parsed Object: { color: ['red', 'blue'], size: 'M', material: 'cotton' }
+*/
+
+// Example with a custom query string
+const customQuery = "product=laptop&color=black&size=15inch";
+const customParams = parseQuery(customQuery);
+console.log(customParams);
+/*
+{
+  product: "laptop",
+  color: "black",
+  size: "15inch"
+}
+*/
+
+// Example with a parameter having no value: ?param1=value1&param2=&param3
+const noValueQuery = "?param1=value1&param2=&param3";
+const noValueParams = parseQuery(noValueQuery);
+console.log(noValueParams);
+/*
+{
+  param1: "value1",
+  param2: "",
+  param3: "" // Note: this implementation treats `param3` without `=` as `param3=""`
+}
+*/
 ```
 
-# # Method 3: Manual Parsing into an Object (Problem Solver & Architecture Builder)
+### Advantages
 
-**User Personas:** *Problem Solver, Architecture Builder, Legacy Maintainer*
+*   **Object Output:** Provides a convenient object for accessing all parameters.
+*   **Good Compatibility:** Works in most JavaScript environments.
+*   **Single Pass:** Parses the entire string once, making it efficient for retrieving multiple parameters.
+*   **Clear Structure:** The resulting object is easy to work with.
 
-This method builds upon the manual string manipulation by creating a function that returns a complete object containing all query parameters. This is often more convenient than repeatedly calling a function for each parameter, especially when you need to access multiple values. It also handles duplicate keys by storing them as arrays.
+### Disadvantages
 
-## # How it Works
-
-Similar to Method 2, but instead of returning a single value, it iterates through all key-value pairs and populates a JavaScript object. It includes logic to handle:
-*   URL decoding.
-*   Parameters without values (flags).
-*   Multiple parameters with the same name (e.g., `tag=js&tag=web`) by converting the value to an array.
-
-## # Advantages
-
-*   **Convenient:** Returns all parameters in a single, easy-to-access object.
-*   **Handles Duplicates:** Can store multiple values for the same key as an array.
-*   **Good for Legacy:** Works in older environments if `Object.fromEntries` or `URLSearchParams` are not available.
-*   **Customizable:** You have full control over how parameters are processed.
-
-## # Disadvantages
-
-*   **More Code:** Requires more boilerplate than `URLSearchParams`.
-*   **Manual Decoding:** Requires explicit `decodeURIComponent`.
-*   **Potential for Bugs:** More complex logic means more potential for errors if not carefully implemented.
-
-## # Code Examples
-
-```javascript
-// Example 3.1: Basic function to parse query string into an object
-function parseQueryStringAsObject(queryString) {
-    const query = queryString.startsWith('?') ? queryString.substring(1) : queryString;
-    const params = {};
-    if (!query) return params;
-
-    query.split('&').forEach(part => {
-        const [keyEncoded, valueEncoded] = part.split('=');
-        const key = decodeURIComponent(keyEncoded.replace(/\+/g, ' ')); // Handle '+' for spaces
-        const value = valueEncoded ? decodeURIComponent(valueEncoded.replace(/\+/g, ' ')) : ''; // Handle '+' and empty values
-
-        if (params.hasOwnProperty(key)) {
-            if (Array.isArray(params[key])) {
-                params[key].push(value);
-            } else {
-                params[key] = [params[key], value];
-            }
-        } else {
-            params[key] = value;
-        }
-    });
-    return params;
-}
-
-// To test, imagine URL is: https://example.com/search?q=javascript+tutorial&page=2&tag=web&tag=programming
-const currentUrlObject = parseQueryStringAsObject(window.location.search);
-// console.log('Current URL Parameters:', currentUrlObject);
-// Example output if URL was: ?q=javascript+tutorial&page=2&tag=web&tag=programming
-// { q: 'javascript tutorial', page: '2', tag: ['web', 'programming'] }
-
-// Example 3.2: Parsing a specific query string
-const specificQuery = 'user=Jane%20Doe&id=456&status=active&roles=admin&roles=editor';
-const parsedSpecific = parseQueryStringAsObject(specificQuery);
-console.log('Specific Query Parameters:', parsedSpecific);
-// Output: Specific Query Parameters: { user: 'Jane Doe', id: '456', status: 'active', roles: ['admin', 'editor'] }
-
-// Example 3.3: Handling parameters without values (flags)
-const flagQuery = '?debug&verbose=true&dryRun';
-const parsedFlags = parseQueryStringAsObject(flagQuery);
-console.log('Flag Parameters:', parsedFlags);
-// Output: Flag Parameters: { debug: '', verbose: 'true', dryRun: '' }
-
-// Example 3.4: Using the function with a full URL string
-function parseFullUrlQuery(url) {
-    const queryStringIndex = url.indexOf('?');
-    if (queryStringIndex === -1) return {};
-    const queryString = url.substring(queryStringIndex + 1);
-    return parseQueryStringAsObject(queryString);
-}
-const fullUrl = 'https://api.example.com/data?format=json&version=2.0&auth_token=abc-123';
-const parsedFullUrl = parseFullUrlQuery(fullUrl);
-console.log('Full URL Query:', parsedFullUrl);
-// Output: Full URL Query: { format: 'json', version: '2.0', auth_token: 'abc-123' }
-
-// Example 3.5: A slightly more concise version using Array.prototype.reduce
-const parseQueryReduce = (queryString) => {
-    const query = queryString.startsWith('?') ? queryString.substring(1) : queryString;
-    if (!query) return {};
-
-    return query.split('&').reduce((acc, part) => {
-        let [key, value] = part.split('=').map(s => decodeURIComponent(s.replace(/\+/g, ' ')));
-        value = value === undefined ? '' : value; // Ensure value is always a string
-
-        if (acc.hasOwnProperty(key)) {
-            if (Array.isArray(acc[key])) {
-                acc[key].push(value);
-            } else {
-                acc[key] = [acc[key], value];
-            }
-        } else {
-            acc[key] = value;
-        }
-        return acc;
-    }, {});
-};
-const reducedResult = parseQueryReduce('?param1=value1&param2=value2&param1=value3');
-console.log('Reduced Result:', reducedResult);
-// Output: Reduced Result: { param1: ['value1', 'value3'], param2: 'value2' }
-
-// Example 3.6: Handling empty query strings
-const emptyQuery = parseQueryStringAsObject('');
-console.log('Empty Query Result:', emptyQuery); // Output: Empty Query Result: {}
-const questionMarkOnly = parseQueryStringAsObject('?');
-console.log('Question Mark Only Result:', questionMarkOnly); // Output: Question Mark Only Result: {}
-```
-
-# # Method 4: Regular Expressions (Advanced & Concise)
-
-**User Personas:** *Speed Seeker, Architecture Builder*
-
-Regular expressions offer a powerful and often concise way to extract patterns from strings. While `URLSearchParams` is generally preferred for robustness, a well-crafted regex can be extremely fast for specific parsing tasks, especially when you need to extract all parameters into an object.
-
-## # How it Works
-
-A regular expression is used to match key-value pairs within the query string. The `exec()` method of a regex can be called repeatedly to find all matches.
-
-## # Advantages
-
-*   **Concise:** Can be very compact for certain patterns.
-*   **Potentially Fast:** For simple, well-defined patterns, regex can be very efficient.
-*   **Flexible:** Can be tailored to very specific parsing requirements.
-
-## # Disadvantages
-
-*   **Complexity:** Regular expressions can be difficult to read, write, and debug, especially for complex patterns.
-*   **Edge Cases:** Handling all possible query string edge cases (encoding, multiple values, flags, malformed strings) with a single regex can be extremely challenging and error-prone.
-*   **Performance:** A poorly written or overly complex regex can be slower than string manipulation or native APIs.
-*   **No Built-in Decoding:** Requires manual `decodeURIComponent`.
-
-## # Code Examples
-
-```javascript
-// Example 4.1: Function to parse query string into an object using regex
-function parseQueryStringWithRegex(queryString) {
-    const params = {};
-    // Regex to match key=value pairs, handling optional '?' at the start
-    // and '+' for spaces, and allowing for keys/values without '='
-    const regex = /[?&]([^=&]+)(?:=([^&]*))?/g;
-    let match;
-
-    // Ensure we're working with the actual query part
-    const query = queryString.startsWith('?') ? queryString : `?${queryString}`;
-
-    while ((match = regex.exec(query)) !== null) {
-        const key = decodeURIComponent(match[1].replace(/\+/g, ' '));
-        const value = match[2] ? decodeURIComponent(match[2].replace(/\+/g, ' ')) : ''; // Handle cases like 'param=' or 'param'
-
-        if (params.hasOwnProperty(key)) {
-            if (Array.isArray(params[key])) {
-                params[key].push(value);
-            } else {
-                params[key] = [params[key], value];
-            }
-        } else {
-            params[key] = value;
-        }
-    }
-    return params;
-}
-
-// To test, imagine URL is: https://example.com/report?type=summary&date=2024-01-01&filter=active&filter=new
-const regexParsedCurrent = parseQueryStringWithRegex(window.location.search);
-// console.log('Regex Parsed Current URL:', regexParsedCurrent);
-// Example output if URL was: ?type=summary&date=2024-01-01&filter=active&filter=new
-// { type: 'summary', date: '2024-01-01', filter: ['active', 'new'] }
-
-// Example 4.2: Parsing a custom query string with regex
-const customRegexQuery = 'search=javascript+regex&page=1&sort=date&debug';
-const parsedCustomRegex = parseQueryStringWithRegex(customRegexQuery);
-console.log('Custom Regex Parsed:', parsedCustomRegex);
-// Output: Custom Regex Parsed: { search: 'javascript regex', page: '1', sort: 'date', debug: '' }
-
-// Example 4.3: Getting a single variable using a simpler regex (less robust for general parsing)
-function getQueryVariableRegexSingle(variable, queryString) {
-    // Escaping variable name for regex safety
-    const escapedVariable = variable.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`(?:[?&]|&amp;)${escapedVariable}=([^&]*)`, 'i');
-    const match = regex.exec(queryString);
-    return match ? decodeURIComponent(match[1].replace(/\+/g, ' ')) : undefined;
-}
-const singleVarQuery = '?product=laptop&color=silver&size=15inch';
-console.log(`Product (Single Regex): ${getQueryVariableRegexSingle('product', singleVarQuery)}`); // Output: Product (Single Regex): laptop
-console.log(`Size (Single Regex): ${getQueryVariableRegexSingle('size', singleVarQuery)}`);       // Output: Size (Single Regex): 15inch
-
-// Example 4.4: Regex for a full URL, extracting query string first
-function parseFullUrlWithRegex(url) {
-    const queryPartMatch = url.match(/\?([^#]*)/); // Get everything after '?' and before '#'
-    if (!queryPartMatch) return {};
-    return parseQueryStringWithRegex(queryPartMatch[1]);
-}
-const fullUrlRegex = 'https://example.com/path/to/resource?param1=value1&param2=value2#section';
-const parsedFullUrlRegex = parseFullUrlWithRegex(fullUrlRegex);
-console.log('Full URL Regex Parsed:', parsedFullUrlRegex);
-// Output: Full URL Regex Parsed: { param1: 'value1', param2: 'value2' }
-
-// Example 4.5: Handling empty query strings with regex
-const emptyRegexResult = parseQueryStringWithRegex('');
-console.log('Empty Regex Result:', emptyRegexResult); // Output: Empty Regex Result: {}
-const questionMarkRegexResult = parseQueryStringWithRegex('?');
-console.log('Question Mark Regex Result:', questionMarkRegexResult); // Output: Question Mark Regex Result: {}
-
-// Example 4.6: Regex for specific parameter with potential multiple values (more complex)
-function getQueryVariableRegexAll(variable, queryString) {
-    const escapedVariable = variable.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`(?:[?&]|&amp;)${escapedVariable}=([^&]*)`, 'gi'); // 'g' for all matches
-    const values = [];
-    let match;
-    while ((match = regex.exec(queryString)) !== null) {
-        values.push(decodeURIComponent(match[1].replace(/\+/g, ' ')));
-    }
-    return values.length > 0 ? values : undefined;
-}
-const multiValueRegexQuery = '?tag=js&tag=web&category=dev';
-console.log(`Tags (Regex All): ${getQueryVariableRegexAll('tag', multiValueRegexQuery)}`); // Output: Tags (Regex All): js,web
-console.log(`Category (Regex All): ${getQueryVariableRegexAll('category', multiValueRegexQuery)}`); // Output: Category (Regex All): dev
-```
-
-# # Method 5: External Libraries (URI.js) (Architecture Builder & Output Focused)
-
-**User Personas:** *Architecture Builder, Output Focused*
-
-For complex URL manipulation, including parsing query strings, managing paths, and handling fragments, external libraries can provide a more comprehensive and robust solution. `URI.js` is a popular choice that offers a fluent API for all aspects of URL handling.
-
-## # How it Works
-
-You instantiate a `URI` object with a URL string. The library then provides methods like `query()` to access and manipulate the query string, often returning it as a JavaScript object.
-
-## # Advantages
-
-*   **Comprehensive:** Handles all aspects of URL parsing and building.
-*   **Robust:** Thoroughly tested for edge cases and compliance with RFCs.
-*   **Fluent API:** Chaining methods makes code readable and concise for complex operations.
-*   **Cross-Browser:** Abstract away browser inconsistencies.
-*   **Additional Features:** Includes normalization, relative path resolution, and more.
-
-## # Disadvantages
-
-*   **Dependency:** Adds an external library to your project, increasing bundle size.
-*   **Overkill for Simple Tasks:** For just getting one parameter, it's more than what's needed.
-*   **Learning Curve:** Requires learning the library's API.
-
-## # Code Examples
-
-First, you would need to include the URI.js library in your project. For example, via CDN or npm:
-```html
-<!-- Via CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/URI.js/1.19.11/URI.min.js"></script>
-```
-Or if using a module bundler:
-```javascript
-// npm install uri.js
-import URI from 'urijs';
-```
-
-```javascript
-// Example 5.1: Parse current page's query string into an object
-// Assume current URL is: https://example.com/dashboard?user=admin&theme=dark
-// var $_GET = URI(document.URL).query(true); // Original example from source
-// console.log(`User from URI.js: ${$_GET['user']}`); // Output: User from URI.js: admin
-
-// Since we can't directly use document.URL in a generic code block,
-// we'll simulate it with a string.
-const currentUrlSimulated = 'https://example.com/dashboard?user=admin&theme=dark&feature=beta';
-const currentQs = URI(currentUrlSimulated).query(true);
-console.log('URI.js Current Query:', currentQs);
-console.log(`User: ${currentQs.user}`);     // Output: User: admin
-console.log(`Theme: ${currentQs.theme}`);   // Output: Theme: dark
-
-// Example 5.2: Parse a specific query string
-const specificUriQuery = 'product=widget&color=blue&size=M';
-const qsObject = URI('?' + specificUriQuery).query(true); // URI.js expects a full URL or a query string starting with '?'
-console.log('URI.js Specific Query:', qsObject);
-console.log(`Product: ${qsObject.product}`); // Output: Product: widget
-
-// Example 5.3: Handling multiple values for the same parameter
-const multiValueUri = 'https://example.com/items?tag=electronics&tag=sale&sort=price';
-const multiQs = URI(multiValueUri).query(true);
-console.log('URI.js Multi-Value Query:', multiQs);
-// URI.js by default returns the last value for duplicate keys in query(true)
-// To get all, you might need to iterate or use specific methods if available.
-// For simple query(true), it behaves like Object.fromEntries.
-// Output: URI.js Multi-Value Query: { tag: 'sale', sort: 'price' }
-
-// Example 5.4: Building a query string
-const newUri = URI('https://example.com/search');
-newUri.addQuery('q', 'javascript');
-newUri.addQuery('page', 3);
-newUri.addQuery('sort', 'relevance');
-console.log(`URI.js Built Query: ${newUri.toString()}`);
-// Output: URI.js Built Query: https://example.com/search?q=javascript&page=3&sort=relevance
-
-// Example 5.5: Modifying an existing query string
-const modifyUri = URI('https://example.com/settings?theme=light&notifications=true');
-modifyUri.setQuery('theme', 'dark'); // Change existing
-modifyUri.removeQuery('notifications'); // Remove
-modifyUri.addQuery('lang', 'es'); // Add new
-console.log(`URI.js Modified Query: ${modifyUri.toString()}`);
-// Output: URI.js Modified Query: https://example.com/settings?theme=dark&lang=es
-
-// Example 5.6: Getting a specific parameter directly
-const directParamUri = URI('https://example.com/profile?id=user123&view=compact');
-const userId = directParamUri.query(true).id;
-console.log(`Direct User ID: ${userId}`); // Output: Direct User ID: user123
-
-// Example 5.7: Handling parameters without values (flags)
-const flagUri = URI('https://example.com/debug?verbose&log=true');
-const flagQs = flagUri.query(true);
-console.log('URI.js Flag Query:', flagQs);
-// Output: URI.js Flag Query: { verbose: '', log: 'true' }
-
-// Example 5.8: Parsing a query string from a full URL and then accessing a specific parameter
-const fullUrlWithQuery = 'https://www.mysite.com/default.aspx?dest=aboutus.aspx&param2=value2';
-const qs = URI(fullUrlWithQuery).query(true);
-console.log(`Destination from full URL: ${qs.dest}`); // Output: Destination from full URL: aboutus.aspx
-```
-
-# # Method 6: Simplified Regex for Single Parameter (Speed Seeker & Legacy Maintainer)
-
-**User Personas:** *Speed Seeker, Legacy Maintainer*
-
-For scenarios where you only need to extract a single, known query parameter and want the absolute minimum code, a very simple regular expression can be used. This method is less robust for general parsing but extremely efficient for its specific purpose.
-
-## # How it Works
-
-A regex is constructed to specifically look for `variableName=value` within the query string. It then captures the `value` part.
-
-## # Advantages
-
-*   **Extremely Concise:** Often a single line of code.
-*   **Fast:** For its specific use case, it can be very quick as it doesn't need to parse the entire string.
-*   **Legacy Compatible:** Works in older JavaScript environments.
-
-## # Disadvantages
-
-*   **Limited Scope:** Only suitable for extracting a single parameter.
-*   **No Object Output:** Doesn't provide a structured object of all parameters.
+*   **No Duplicate Key Handling:** If a parameter appears multiple times (e.g., `?item=apple&item=banana`), only the last value will be stored, overwriting previous ones. The object will look like `{ item: "banana" }`.
+*   **Basic Value Handling:** Treats all values as strings. No automatic type conversion.
 *   **Manual Decoding:** Requires `decodeURIComponent`.
-*   **Fragile:** Can be brittle if the query string format deviates even slightly (e.g., `&amp;` instead of `&`).
-*   **Doesn't Handle Duplicates:** Will typically only return the first or last match depending on the regex.
 
-## # Code Examples
+### When to Use
+
+This method is suitable for:
+*   Applications needing to access multiple query parameters in an object format.
+*   Environments where `URLSearchParams` is not available, and you need a custom, widely compatible solution.
+*   Scenarios where duplicate query parameters are not expected or the last value is always preferred.
+
+## Method 4: Custom Function for Object Parsing (`parseQuery` - Advanced)
+
+**Persona:** 🏗️ Architecture Builder, ⚡ Legacy Maintainer, 🎨 Output Focused
+
+This advanced custom function builds upon the basic object parsing by adding robust handling for duplicate query parameters, storing them as arrays. It also correctly handles parameters without values (e.g., `?debug`). This method is based on the logic from Answer 6.
+
+### How it Works
+
+Similar to the basic `parseQuery`, this function splits the query string into key-value pairs. However, when assigning values to the result object, it checks if a key already exists. If it does, and it's not yet an array, it converts the existing value into an array and pushes the new value. If it's already an array, it simply pushes the new value. This ensures all occurrences of a parameter are captured.
 
 ```javascript
-// Example 6.1: Get a single parameter using a simple regex
-function getSingleQueryParam(paramName) {
-    // Escaping paramName to prevent regex injection issues
-    const escapedParamName = paramName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`(?:[?&]|&amp;)${escapedParamName}=([^&]*)`, 'i');
-    const match = regex.exec(window.location.search);
-    return match ? decodeURIComponent(match[1].replace(/\+/g, ' ')) : null;
+/**
+ * Parses a query string into a JavaScript object, handling duplicate keys as arrays
+ * and parameters without values.
+ * @param {string} str The query string to parse (e.g., "key=value&foo=bar&tag=a&tag=b").
+ * @returns {object} An object where keys are parameter names and values are strings or arrays of strings.
+ */
+function parseQueryAdvanced(str) {
+    if (typeof str !== "string" || str.length === 0) {
+        return {};
+    }
+
+    const query = {};
+    // Remove leading '?' if present
+    const cleanStr = str[0] === '?' ? str.substring(1) : str;
+    const s = cleanStr.split("&");
+
+    for (let i = 0; i < s.length; i++) {
+        const bit = s[i].split("=");
+        const first = decodeURIComponent(bit[0]);
+
+        if (first.length === 0) {
+            continue; // Skip empty keys
+        }
+
+        // Decode the value, defaulting to an empty string if no '=' was present
+        // or if the value part is empty (e.g., `param=`)
+        const second = (bit.length > 1) ? decodeURIComponent(bit[1]) : '';
+
+        if (typeof query[first] === "undefined") {
+            // First occurrence of this key
+            query[first] = second;
+        } else if (Array.isArray(query[first])) {
+            // Key already exists and is an array, push new value
+            query[first].push(second);
+        } else {
+            // Key exists but is not an array, convert to array and add new value
+            query[first] = [query[first], second];
+        }
+    }
+    return query;
 }
 
-// To test, imagine URL is: https://example.com/item?id=product123&ref=homepage
-// console.log(`Item ID: ${getSingleQueryParam('id')}`); // Output: Item ID: product123
-// console.log(`Referrer: ${getSingleQueryParam('ref')}`); // Output: Referrer: homepage
-// console.log(`Category: ${getSingleQueryParam('category')}`); // Output: Category: null
-
-// Example 6.2: Simplified regex for a single parameter (from source)
-// This version assumes the parameter is the ONLY one or the FIRST one,
-// and doesn't handle multiple parameters well.
-// var dest = location.search.replace(/^.*?\=/, ''); // Original source example
-// This regex is very specific and might not work for all cases.
-// It replaces everything up to the first '=' with an empty string.
-// If the URL is `?dest=aboutus.aspx&param=value`, it would return `aboutus.aspx&param=value`.
-// If the URL is `?param=value&dest=aboutus.aspx`, it would return `value&dest=aboutus.aspx`.
-// It's generally not recommended for robust parsing.
-
-// A more robust single-parameter regex:
-function getSingleParamRobust(paramName, queryString) {
-    const escapedParamName = paramName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`(?:[?&])${escapedParamName}=([^&]*)`);
-    const match = regex.exec(queryString);
-    return match ? decodeURIComponent(match[1].replace(/\+/g, ' ')) : null;
+// Example Usage:
+// Assuming current URL: ?name=Alice&age=30&tag=js&tag=web&debug
+const currentQueryParams = parseQueryAdvanced(window.location.search);
+console.log(currentQueryParams);
+/*
+{
+  name: "Alice",
+  age: "30",
+  tag: ["js", "web"],
+  debug: "" // Parameter without value is treated as an empty string
 }
-const urlForSingleParam = '?dest=aboutus.aspx&lang=en&user=guest';
-console.log(`Destination (Robust Single): ${getSingleParamRobust('dest', urlForSingleParam)}`); // Output: Destination (Robust Single): aboutus.aspx
-console.log(`Language (Robust Single): ${getSingleParamRobust('lang', urlForSingleParam)}`);   // Output: Language (Robust Single): en
-console.log(`Non-existent (Robust Single): ${getSingleParamRobust('theme', urlForSingleParam)}`); // Output: Non-existent (Robust Single): null
+*/
 
-// Example 6.3: Handling parameters with no value (flags)
-function getSingleFlagParam(flagName, queryString) {
-    const escapedFlagName = flagName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`(?:[?&])${escapedFlagName}(?=[&]|$)`); // Matches flag followed by & or end of string
-    return regex.test(queryString);
+// Example with a custom query string
+const complexQuery = "item=book&item=pen&price=10&price=5&category=&active";
+const complexParams = parseQueryAdvanced(complexQuery);
+console.log(complexParams);
+/*
+{
+  item: ["book", "pen"],
+  price: ["10", "5"],
+  category: "",
+  active: ""
 }
-const flagQueryString = '?debug&mode=test&verbose';
-console.log(`Is debug flag present: ${getSingleFlagParam('debug', flagQueryString)}`);   // Output: Is debug flag present: true
-console.log(`Is verbose flag present: ${getSingleFlagParam('verbose', flagQueryString)}`); // Output: Is verbose flag present: true
-console.log(`Is prod flag present: ${getSingleFlagParam('prod', flagQueryString)}`);     // Output: Is prod flag present: false
-
-// Example 6.4: Getting a parameter from a full URL string
-function getSingleParamFromFullUrl(paramName, fullUrl) {
-    const queryStringIndex = fullUrl.indexOf('?');
-    if (queryStringIndex === -1) return null;
-    const queryString = fullUrl.substring(queryStringIndex); // Keep '?' for regex
-    return getSingleParamRobust(paramName, queryString);
-}
-const fullUrlExample = 'https://app.example.com/settings?user=admin&token=xyz123&env=prod';
-console.log(`Token from full URL: ${getSingleParamFromFullUrl('token', fullUrlExample)}`); // Output: Token from full URL: xyz123
-
-// Example 6.5: Handling encoded characters in the value
-const encodedUrl = '?data=hello%20world%21&id=1';
-console.log(`Decoded data: ${getSingleParamRobust('data', encodedUrl)}`); // Output: Decoded data: hello world!
-
-// Example 6.6: Handling '+' for spaces in the value
-const plusEncodedUrl = '?query=search+term+with+spaces&page=1';
-console.log(`Decoded query: ${getSingleParamRobust('query', plusEncodedUrl)}`); // Output: Decoded query: search term with spaces
+*/
 ```
 
-# # Performance Comparison
+### Advantages
 
-| Method                                      | Speed (Relative) | Compatibility (Oldest JS) | Complexity (Dev) | Robustness (Edge Cases) | Bundle Size |
-| :------------------------------------------ | :--------------- | :------------------------ | :--------------- | :---------------------- | :---------- |
-| **`URLSearchParams`**                       | Fast             | ES6 (Polyfill for IE11)   | Low              | High                    | Native      |
-| **Manual Parsing (String Methods)**         | Medium           | ES5                       | Medium           | Medium                  | Zero        |
-| **Manual Parsing (into Object)**            | Medium           | ES5                       | Medium-High      | Medium-High             | Zero        |
-| **Regular Expressions (General)**           | Medium-Fast      | ES5                       | High             | Medium                  | Zero        |
-| **External Libraries (e.g., URI.js)**       | Medium           | ES5 (Library dependent)   | Low (API usage)  | Very High               | Small       |
-| **Simplified Regex (Single Parameter)**     | Very Fast        | ES5                       | Low              | Low                     | Zero        |
+*   **Handles Duplicate Keys:** Correctly collects all values for repeated parameters into an array.
+*   **Handles No-Value Parameters:** Parameters like `?debug` are correctly parsed (as an empty string value).
+*   **High Compatibility:** Works in most JavaScript environments.
+*   **Comprehensive Output:** Provides a rich object structure that reflects the full query string.
+
+### Disadvantages
+
+*   **More Complex Code:** Slightly more involved logic than the basic `parseQuery` or `getQueryVariable`.
+*   **Manual Decoding:** Still relies on `decodeURIComponent`.
+*   **No Built-in URL Manipulation:** Unlike `URLSearchParams`, this is purely for parsing.
+
+### When to Use
+
+This method is excellent for:
+*   Applications requiring a complete and accurate representation of the query string, including all duplicate parameters.
+*   Legacy projects where `URLSearchParams` is not an option, but robust parsing is critical.
+*   When you need to process all query parameters in a structured object format.
+
+## Method 5: Using External Libraries (e.g., URI.js)
+
+**Persona:** 🏗️ Architecture Builder, ⚡ Legacy Maintainer (if library already in use), 🎨 Output Focused
+
+For projects that already incorporate powerful utility libraries or require advanced URL manipulation beyond simple parsing, using a dedicated library can be highly beneficial. `URI.js` (from Answer 3) is one such example, offering a comprehensive API for URL handling.
+
+### How it Works (with URI.js)
+
+`URI.js` provides an object-oriented interface to parse, manipulate, and build URLs. When you pass a URL string to `URI()`, it creates an instance with various methods to access different parts of the URL, including the query string. The `.query(true)` method specifically parses the query string into a JavaScript object.
+
+### Example with URI.js
+
+First, you would need to include the `URI.js` library in your project.
+
+```html
+<!-- In your HTML head or before your script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/URI.js/1.19.2/URI.min.js"></script>
+```
+
+```javascript
+// Example 1: Parsing a specific URL string
+const urlString = 'https://www.mysite.com/default.aspx?dest=aboutus.aspx&id=123&tags=js,web';
+const uriObject = URI(urlString);
+
+// Parse the query string into an object
+const qsObject = uriObject.query(true);
+
+console.log(qsObject);
+/*
+{
+  dest: "aboutus.aspx",
+  id: "123",
+  tags: "js,web"
+}
+*/
+console.log(`Destination: ${qsObject.dest}`); // "aboutus.aspx"
+
+// Example 2: Parsing the current page's URL (ala PHP's $_GET)
+// Assuming current URL: https://www.example.com/page?param1=value1&param2=value2
+const currentUri = URI(document.URL);
+const $_GET = currentUri.query(true);
+
+console.log($_GET);
+/*
+{
+  param1: "value1",
+  param2: "value2"
+}
+*/
+console.log(`Param1: ${$_GET['param1']}`); // "value1"
+
+// URI.js also handles array-like parameters if configured or using specific methods
+// Example: ?item[]=apple&item[]=banana
+// URI().query(true) might return { "item[]": ["apple", "banana"] } or similar depending on version/config.
+// For more advanced array handling, you might need to use specific URI.js methods or post-process.
+
+// Manipulation example:
+const modifiedUri = currentUri.setQuery("newParam", "newValue").removeQuery("param1");
+console.log(`Modified URL: ${modifiedUri.toString()}`);
+// Output: "https://www.example.com/page?param2=value2&newParam=newValue"
+```
+
+### Advantages
+
+*   **Comprehensive URL API:** Not just for parsing, but also for building, modifying, and normalizing URLs.
+*   **Robust Parsing:** Handles many edge cases, encoding, and complex structures.
+*   **Cross-Browser:** Designed for broad compatibility.
+*   **Readability:** Can make complex URL operations more concise and readable.
+
+### Disadvantages
+
+*   **External Dependency:** Adds a library to your project, increasing bundle size.
+*   **Overkill for Simple Needs:** If you only need to parse a single parameter, this might be too heavy.
+*   **Learning Curve:** Requires understanding the library's API.
+
+### When to Use
+
+Consider `URI.js` or similar libraries when:
+*   Your project already uses or benefits from a URL utility library.
+*   You need to perform complex URL manipulations (e.g., adding/removing parameters, changing host, path, etc.) in addition to parsing.
+*   You require extremely robust and battle-tested URL parsing for all possible edge cases.
+
+## Method 6: Regex for Specific Single Parameter
+
+**Persona:** 🚀 Speed Seeker (for very specific cases), 🔧 Problem Solver (if regex is preferred)
+
+This method uses a regular expression to extract a single, known query parameter. It can be very concise and efficient if you are absolutely certain about the structure of the parameter you're looking for and only need that one value. This is based on the logic from Answer 7 and Answer 8.
+
+### How it Works
+
+A regular expression is constructed to match the specific parameter name and capture its value. The `location.search` string is then processed using `replace()` or `exec()` with this regex.
+
+#### Sub-Method 6.1: Using `replace()` for a single, known parameter
+
+This is particularly useful if you know the parameter will be the *only* one or the *first* one, and you want to strip everything else.
+
+```javascript
+/**
+ * Extracts a single query variable using a simple regex and replace.
+ * Best for scenarios where the parameter is expected to be the only one or the first.
+ * @param {string} paramName The name of the parameter to extract.
+ * @returns {string|null} The decoded value of the parameter, or null if not found.
+ */
+function getSingleParamWithReplace(paramName) {
+    // Construct a regex to find `?paramName=` or `&paramName=` and capture the value
+    // This regex assumes the parameter is followed by an '=' and then its value.
+    // It will capture everything until the next '&' or the end of the string.
+    const regex = new RegExp(`[?&]${paramName}=([^&]*)`);
+    const match = window.location.search.match(regex);
+
+    if (match && match[1]) {
+        return decodeURIComponent(match[1]);
+    }
+    return null;
+}
+
+// Example Usage:
+// Assuming URL: https://www.example.com/page?dest=aboutus.aspx&id=123
+const destination = getSingleParamWithReplace('dest');
+console.log(`Destination: ${destination}`); // "aboutus.aspx"
+
+const userId = getSingleParamWithReplace('id');
+console.log(`User ID: ${userId}`); // "123"
+
+const nonExistent = getSingleParamWithReplace('foo');
+console.log(`Non-existent: ${nonExistent}`); // null
+
+// Original Answer 7's approach:
+// var dest = location.search.replace(/^.*?\=/, '');
+// This specific regex `^.*?\=` is very aggressive and will remove everything up to the first '='.
+// It only works reliably if you know the *first* parameter is the one you want and it's the only one.
+// For example, if URL is `?dest=aboutus.aspx`, it returns `aboutus.aspx`.
+// If URL is `?id=123&dest=aboutus.aspx`, it returns `123&dest=aboutus.aspx`.
+// Therefore, the `getSingleParamWithReplace` function above is generally safer and more flexible.
+```
+
+#### Sub-Method 6.2: Using `RegExp.exec()` with Caching for All Parameters
+
+This approach uses a regular expression to iterate through all key-value pairs in the query string and builds an object, often with caching for performance on subsequent calls. This is based on Answer 8.
+
+```javascript
+/**
+ * Parses the entire query string into an object using regex, with caching.
+ * @returns {object} An object containing all query parameters.
+ */
+function getSearchWithRegexCache() {
+    // Use a closure to store the parsed result
+    let parsedSearch = null;
+
+    return function(variable) {
+        if (!parsedSearch) {
+            parsedSearch = {};
+            // Regex to match key=value pairs.
+            // It handles the leading '?' or '&' and captures key and value.
+            // Note: This regex might need tweaking for complex cases like `param=` or `param` without value.
+            const re = /[?&]([^=&]+)=([^&]*)/g;
+            let match;
+
+            // Iterate through all matches
+            while ((match = re.exec(window.location.search)) !== null) {
+                const key = decodeURIComponent(match[1]);
+                const value = decodeURIComponent(match[2]);
+                // Simple assignment, does not handle duplicate keys as arrays
+                parsedSearch[key] = value;
+            }
+            // Handle parameters without values (e.g., `?debug`) if needed,
+            // this regex won't catch them. A more complex regex would be needed.
+        }
+        
+        // If a specific variable is requested, return its value
+        if (variable) {
+            return parsedSearch[variable];
+        }
+        // Otherwise, return the full parsed object
+        return parsedSearch;
+    };
+}
+
+// Get the cached parser function
+const getQueryParam = getSearchWithRegexCache();
+
+// Example Usage:
+// Assuming URL: https://www.example.com/page?dest=aboutus.aspx&id=123&debug=true
+const destination = getQueryParam('dest');
+console.log(`Destination: ${destination}`); // "aboutus.aspx"
+
+const userId = getQueryParam('id');
+console.log(`User ID: ${userId}`);         // "123"
+
+const debugFlag = getQueryParam('debug');
+console.log(`Debug Flag: ${debugFlag}`);   // "true"
+
+// Get the full object (subsequent calls will use the cached object)
+const allParams = getQueryParam();
+console.log(allParams);
+/*
+{
+  dest: "aboutus.aspx",
+  id: "123",
+  debug: "true"
+}
+*/
+```
+
+### Advantages
+
+*   **Concise (for simple cases):** A well-crafted regex can be very short.
+*   **Potentially Fast:** For very specific, simple extractions, regex can be highly optimized by the JavaScript engine.
+*   **Caching:** The `getSearchWithRegexCache` approach offers performance benefits for repeated lookups within the same page load.
+
+### Disadvantages
+
+*   **Complexity:** Writing robust regular expressions for all query string edge cases (e.g., `param=`, `param`, `param=value1&param=value2`, `param=value=with=equals`) can be extremely difficult and error-prone.
+*   **Readability:** Regex can be hard to read and maintain for others (and your future self).
+*   **Limited Functionality:** Primarily for extraction; not for modification or building URLs.
+*   **No Duplicate Key Handling (in simple regex):** Most simple regex solutions will only capture the last occurrence or require complex logic to handle arrays.
+
+### When to Use
+
+*   When you have a very specific, simple, and predictable query string structure.
+*   When performance for a single, known parameter is absolutely critical, and you've benchmarked regex as faster than string splitting for your specific use case.
+*   When you are comfortable with regular expressions and their limitations.
+*   For `getSearchWithRegexCache`, when you need to parse the entire query string once and then access individual parameters multiple times without re-parsing.
+
+## Performance Comparison
+
+**Persona:** 🚀 Speed Seeker, 🏗️ Architecture Builder
+
+Choosing a method often involves trade-offs between performance, browser compatibility, and ease of use. Here's a comparison of the discussed methods.
+
+| Method                                  | Performance (Relative) | Browser Support (Modern) | Browser Support (Legacy) | Complexity (Code) | Handles Duplicates (as array) | Handles No Value (`param=`) | Handles No Equals (`param`) |
+| :-------------------------------------- | :--------------------- | :----------------------- | :----------------------- | :---------------- | :---------------------------- | :-------------------------- | :-------------------------- |
+| **`URLSearchParams`**                   | Fast                   | Excellent (ES6+)         | No (IE, older Edge)      | Low               | Yes (`getAll()`)              | Yes (`get()` returns `""`)  | No (`get()` returns `null`) |
+| **`getQueryVariable` (Answer 1)**       | Very Fast (single)     | Excellent                | Excellent (IE6+)         | Low               | No (first value)              | Yes (`""`)                  | No (`undefined`)            |
+| **`parseQuery` (Basic, Answer 2)**      | Fast                   | Excellent                | Excellent (IE6+)         | Low               | No (last value)               | Yes (`""`)                  | Yes (`""`)                  |
+| **`parseQueryAdvanced` (Answer 6)**     | Moderate               | Excellent                | Excellent (IE6+)         | Moderate          | Yes                           | Yes (`""`)                  | Yes (`""`)                  |
+| **External Library (e.g., URI.js)**     | Moderate               | Excellent                | Good (depends on lib)    | Low (API usage)   | Yes (library dependent)       | Yes (library dependent)     | Yes (library dependent)     |
+| **Regex (`getSingleParamWithReplace`)** | Very Fast (single)     | Excellent                | Excellent (IE6+)         | Moderate          | No (first value)              | Yes                         | No                          |
+| **Regex (`getSearchWithRegexCache`)**   | Moderate (initial parse) | Excellent                | Excellent (IE6+)         | High (regex)      | No (last value)               | Yes                         | No                          |
 
 **Notes on Performance:**
 
-*   **`URLSearchParams`** is generally the best balance of speed, robustness, and ease of use for modern applications. Native implementations are highly optimized.
-*   **Manual Parsing** methods can be surprisingly fast for simple query strings, but their performance degrades with very long or complex strings due to repeated string operations and loop iterations.
-*   **Regular Expressions** can be very fast for simple, targeted extractions. However, complex regex patterns can lead to "catastrophic backtracking" and become very slow. For general-purpose parsing, they are often less efficient and harder to maintain than `URLSearchParams`.
-*   **External Libraries** introduce overhead due to their size and abstraction layers, but their internal parsing logic is usually well-optimized. The "cost" is typically in initial load time, not runtime performance for parsing.
-*   **Simplified Regex** for a single parameter is often the fastest if you truly only need one specific value, as it avoids iterating through all parameters.
-
-For most web applications, the performance difference between these methods will be negligible unless you are parsing extremely long query strings thousands of times per second. **Readability, maintainability, and correctness (handling edge cases) should often take precedence over micro-optimizations.**
-
-# # JavaScript Version Support
-
-| Feature / Method          | ES5 (IE9-11) | ES6+ (Modern Browsers) | Node.js (v6+) |
-| :------------------------ | :----------- | :--------------------- | :------------ |
-| `URLSearchParams`         | No (Polyfill) | Yes                    | Yes           |
-| `String.prototype.split`  | Yes          | Yes                    | Yes           |
-| `String.prototype.indexOf`| Yes          | Yes                    | Yes           |
-| `String.prototype.substring`| Yes          | Yes                    | Yes           |
-| `decodeURIComponent`      | Yes          | Yes                    | Yes           |
-| `Array.prototype.forEach` | Yes          | Yes                    | Yes           |
-| `Array.prototype.reduce`  | Yes          | Yes                    | Yes           |
-| `Object.fromEntries`      | No           | Yes                    | Yes (v12+)    |
-| `const`/`let`             | No           | Yes                    | Yes           |
-| Arrow Functions (`=>`)    | No           | Yes                    | Yes           |
-| `URI.js` (Library)        | Yes (via script tag) | Yes                    | Yes           |
-
-**Key Takeaways:**
-
-*   For maximum compatibility with older browsers (like IE11), stick to ES5 features. This means using `var` instead of `const`/`let`, traditional `function` declarations, and avoiding `URLSearchParams` or `Object.fromEntries` unless you include polyfills.
-*   Modern JavaScript (ES6+) and Node.js environments fully support `URLSearchParams` and other convenient features, making it the preferred choice.
-*   If you must support IE11 and don't want to use polyfills, the "Manual Parsing with String Methods" or "Manual Parsing into an Object" (carefully written with ES5 syntax) are your best bets.
-
-# # Common Problems & Solutions
-
-## # 1. URL Encoding/Decoding Issues
-
-**Problem:** Query string values often contain special characters (spaces, `&`, `=`, `/`, etc.) that are URL-encoded (e.g., ` ` becomes `%20` or `+`). Failing to decode them results in incorrect values.
-
-**Solution:** Always use `decodeURIComponent()` for values retrieved from the query string. Be mindful of `+` characters, which are sometimes used to represent spaces (though `%20` is standard).
-
-```javascript
-// Problematic:
-const encodedValue = 'hello%20world%21';
-console.log(encodedValue); // Output: hello%20world! (not decoded)
-
-// Solution:
-const decodedValue = decodeURIComponent(encodedValue);
-console.log(decodedValue); // Output: hello world!
-
-// Handling '+' for spaces (URLSearchParams does this automatically)
-const plusEncoded = 'search+term';
-const decodedPlus = decodeURIComponent(plusEncoded.replace(/\+/g, ' '));
-console.log(decodedPlus); // Output: search term
-```
-
-## # 2. Parameters with No Values (Flags)
-
-**Problem:** A query string might contain parameters without an `=` sign, acting as boolean flags (e.g., `?debug&verbose`).
-
-**Solution:**
-*   **`URLSearchParams`:** `get('debug')` will return an empty string `''` if the parameter exists without a value. `has('debug')` will return `true`.
-*   **Manual Parsing:** Check if `pair.length === 1` after splitting by `=`.
-
-```javascript
-// Using URLSearchParams
-const params = new URLSearchParams('?debug&mode=test');
-console.log(`Debug value: '${params.get('debug')}'`); // Output: Debug value: ''
-console.log(`Has debug: ${params.has('debug')}`);     // Output: Has debug: true
-
-// Manual Parsing (from Method 3)
-function parseQueryStringAsObject(queryString) {
-    const query = queryString.startsWith('?') ? queryString.substring(1) : queryString;
-    const params = {};
-    if (!query) return params;
-    query.split('&').forEach(part => {
-        const [keyEncoded, valueEncoded] = part.split('=');
-        const key = decodeURIComponent(keyEncoded.replace(/\+/g, ' '));
-        // If valueEncoded is undefined, it's a flag, assign empty string
-        const value = valueEncoded ? decodeURIComponent(valueEncoded.replace(/\+/g, ' ')) : '';
-        params[key] = value;
-    });
-    return params;
-}
-const manualFlags = parseQueryStringAsObject('?debug&verbose=true');
-console.log('Manual Flags:', manualFlags); // Output: Manual Flags: { debug: '', verbose: 'true' }
-```
-
-## # 3. Multiple Parameters with the Same Name
-
-**Problem:** A query string can have multiple instances of the same parameter (e.g., `?tag=js&tag=web`). Standard object assignment would overwrite previous values.
-
-**Solution:**
-*   **`URLSearchParams`:** Use `getAll('tag')` to retrieve an array of all values.
-*   **Manual Parsing:** When building the object, check if the key already exists. If it does, convert the existing value to an array and push the new value.
-
-```javascript
-// Using URLSearchParams
-const params = new URLSearchParams('?tag=js&tag=web&category=dev');
-const tags = params.getAll('tag');
-console.log('Tags:', tags); // Output: Tags: ['js', 'web']
-
-// Manual Parsing (from Method 3)
-function parseQueryStringAsObjectWithArrays(queryString) {
-    const query = queryString.startsWith('?') ? queryString.substring(1) : queryString;
-    const params = {};
-    if (!query) return params;
-    query.split('&').forEach(part => {
-        const [keyEncoded, valueEncoded] = part.split('=');
-        const key = decodeURIComponent(keyEncoded.replace(/\+/g, ' '));
-        const value = valueEncoded ? decodeURIComponent(valueEncoded.replace(/\+/g, ' ')) : '';
-
-        if (params.hasOwnProperty(key)) {
-            if (Array.isArray(params[key])) {
-                params[key].push(value);
-            } else {
-                params[key] = [params[key], value];
-            }
-        } else {
-            params[key] = value;
-        }
-    });
-    return params;
-}
-const manualMulti = parseQueryStringAsObjectWithArrays('?item=apple&color=red&item=banana');
-console.log('Manual Multi-value:', manualMulti); // Output: Manual Multi-value: { item: ['apple', 'banana'], color: 'red' }
-```
-
-## # 4. Malformed Query Strings
-
-**Problem:** Query strings can be malformed (e.g., `key==value`, `key=`, `&key=value`, `key`).
-
-**Solution:** Robust parsing functions (like `URLSearchParams` or well-tested libraries) handle these gracefully. Manual parsers need careful error checking and default assignments.
-
-```javascript
-// URLSearchParams is robust:
-const malformedParams = new URLSearchParams('?a=1&&b=2&c=&d');
-console.log(malformedParams.get('a')); // Output: 1
-console.log(malformedParams.get('b')); // Output: 2
-console.log(malformedParams.get('c')); // Output: ''
-console.log(malformedParams.get('d')); // Output: ''
-console.log(malformedParams.has('e')); // Output: false
-
-// Manual parsing needs to be careful with `split('=')` results
-// (already handled in Method 3 examples with `valueEncoded ? ... : ''`)
-```
-
-## # 5. Accessing Query String from Full URL
-
-**Problem:** You have a full URL string, not just `window.location.search`, and need to extract the query part.
-
-**Solution:** Use `String.prototype.indexOf('?')` and `String.prototype.substring()` to isolate the query string before parsing.
-
-```javascript
-function getQueryStringFromUrl(fullUrl) {
-    const questionMarkIndex = fullUrl.indexOf('?');
-    if (questionMarkIndex === -1) {
-        return ''; // No query string
-    }
-    const hashIndex = fullUrl.indexOf('#', questionMarkIndex);
-    if (hashIndex === -1) {
-        return fullUrl.substring(questionMarkIndex);
-    }
-    return fullUrl.substring(questionMarkIndex, hashIndex);
-}
-
-const fullUrl = 'https://example.com/path/page?param1=value1&param2=value2#section';
-const queryString = getQueryStringFromUrl(fullUrl);
-console.log(`Extracted Query String: ${queryString}`); // Output: Extracted Query String: ?param1=value1&param2=value2
-
-const params = new URLSearchParams(queryString);
-console.log(`Param1: ${params.get('param1')}`); // Output: Param1: value1
-```
-
-# # Real-World Examples
-
-## # 1. Dynamic Content Loading Based on URL
-
-```javascript
-// Scenario: A product page loads product details based on an 'id' parameter.
-// URL: https://mystore.com/product.html?id=PROD123&category=electronics
-
-function loadProductDetails() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get('id');
-    const category = urlParams.get('category');
-
-    if (productId) {
-        console.log(`Loading details for Product ID: ${productId} in category: ${category}`);
-        // Simulate fetching data
-        fetch(`/api/products/${productId}`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('product-title').textContent = data.name || `Product ${productId}`;
-                document.getElementById('product-description').textContent = data.description || 'No description available.';
-                document.getElementById('product-price').textContent = `$${data.price || 'N/A'}`;
-                console.log('Product data loaded:', data);
-            })
-            .catch(error => console.error('Error loading product:', error));
-    } else {
-        console.log('No product ID found in URL. Displaying default content.');
-        document.getElementById('product-title').textContent = 'Product Not Found';
-        document.getElementById('product-description').textContent = 'Please provide a valid product ID.';
-    }
-}
-
-// Assume HTML elements exist: <h1 id="product-title"></h1>, <p id="product-description"></p>, <span id="product-price"></span>
-// Call this function on page load
-// document.addEventListener('DOMContentLoaded', loadProductDetails);
-// For demonstration:
-const mockLocationSearch = '?id=PROD123&category=electronics';
-const mockWindow = { location: { search: mockLocationSearch } };
-const urlParams = new URLSearchParams(mockWindow.location.search);
-const productId = urlParams.get('id');
-const category = urlParams.get('category');
-console.log(`[Mock] Loading details for Product ID: ${productId} in category: ${category}`);
-```
-
-## # 2. Filtering and Sorting Data in a Table
-
-```javascript
-// Scenario: A data table allows filtering by 'status' and sorting by 'column'.
-// URL: https://myapp.com/data.html?status=active&sort=name&order=asc
-
-function applyTableFiltersAndSort() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const statusFilter = urlParams.get('status') || 'all';
-    const sortBy = urlParams.get('sort') || 'id';
-    const sortOrder = urlParams.get('order') || 'asc';
-
-    console.log(`Applying filters: Status=${statusFilter}, SortBy=${sortBy}, Order=${sortOrder}`);
-
-    // Simulate updating UI or fetching data
-    // document.getElementById('status-dropdown').value = statusFilter;
-    // document.getElementById('sort-column').value = sortBy;
-    // document.getElementById('sort-order').value = sortOrder;
-    // fetchData({ status: statusFilter, sortBy: sortBy, sortOrder: sortOrder });
-}
-
-// document.addEventListener('DOMContentLoaded', applyTableFiltersAndSort);
-// For demonstration:
-const mockLocationSearch2 = '?status=pending&sort=date&order=desc';
-const mockWindow2 = { location: { search: mockLocationSearch2 } };
-const urlParams2 = new URLSearchParams(mockWindow2.location.search);
-const statusFilter2 = urlParams2.get('status') || 'all';
-const sortBy2 = urlParams2.get('sort') || 'id';
-const sortOrder2 = urlParams2.get('order') || 'asc';
-console.log(`[Mock] Applying filters: Status=${statusFilter2}, SortBy=${sortBy2}, Order=${sortOrder2}`);
-```
-
-## # 3. A/B Testing or Feature Flags
-
-```javascript
-// Scenario: Enable a new UI feature based on a 'feature' flag in the URL.
-// URL: https://myapp.com/home?feature=new-dashboard&variant=A
-
-function initializeFeatures() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const featureFlag = urlParams.get('feature');
-    const variant = urlParams.get('variant');
-
-    if (featureFlag === 'new-dashboard') {
-        console.log(`Enabling new dashboard feature. Variant: ${variant || 'default'}`);
-        // document.getElementById('old-dashboard').style.display = 'none';
-        // document.getElementById('new-dashboard').style.display = 'block';
-    } else {
-        console.log('Using old dashboard.');
-        // document.getElementById('old-dashboard').style.display = 'block';
-        // document.getElementById('new-dashboard').style.display = 'none';
-    }
-}
-
-// document.addEventListener('DOMContentLoaded', initializeFeatures);
-// For demonstration:
-const mockLocationSearch3 = '?feature=new-dashboard&variant=B';
-const mockWindow3 = { location: { search: mockLocationSearch3 } };
-const urlParams3 = new URLSearchParams(mockWindow3.location.search);
-const featureFlag3 = urlParams3.get('feature');
-const variant3 = urlParams3.get('variant');
-console.log(`[Mock] Initializing features: Feature=${featureFlag3}, Variant=${variant3}`);
-```
-
-## # 4. Pre-filling Form Fields
-
-```javascript
-// Scenario: A registration form can be pre-filled from URL parameters.
-// URL: https://myapp.com/register?email=test@example.com&name=John%20Doe
-
-function prefillForm() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const email = urlParams.get('email');
-    const name = urlParams.get('name');
-
-    if (email) {
-        console.log(`Prefilling email: ${email}`);
-        // document.getElementById('email-input').value = email;
-    }
-    if (name) {
-        console.log(`Prefilling name: ${name}`);
-        // document.getElementById('name-input').value = name;
-    }
-}
-
-// document.addEventListener('DOMContentLoaded', prefillForm);
-// For demonstration:
-const mockLocationSearch4 = '?email=user@domain.com&name=Alice%20Wonderland';
-const mockWindow4 = { location: { search: mockLocationSearch4 } };
-const urlParams4 = new URLSearchParams(mockWindow4.location.search);
-const email4 = urlParams4.get('email');
-const name4 = urlParams4.get('name');
-console.log(`[Mock] Prefilling form: Email=${email4}, Name=${name4}`);
-```
-
-## # 5. Tracking and Analytics
-
-```javascript
-// Scenario: Capture UTM parameters for analytics.
-// URL: https://myapp.com/landing?utm_source=google&utm_medium=cpc&utm_campaign=summer_sale
-
-function trackUtmParameters() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const utmSource = urlParams.get('utm_source');
-    const utmMedium = urlParams.get('utm_medium');
-    const utmCampaign = urlParams.get('utm_campaign');
-
-    if (utmSource || utmMedium || utmCampaign) {
-        const trackingData = {
-            source: utmSource,
-            medium: utmMedium,
-            campaign: utmCampaign
-        };
-        console.log('Tracking UTM data:', trackingData);
-        // Send to analytics platform (e.g., Google Analytics, custom backend)
-        // analytics.trackEvent('page_view', trackingData);
-    } else {
-        console.log('No UTM parameters found.');
-    }
-}
-
-// document.addEventListener('DOMContentLoaded', trackUtmParameters);
-// For demonstration:
-const mockLocationSearch5 = '?utm_source=facebook&utm_medium=social&utm_campaign=spring_promo';
-const mockWindow5 = { location: { search: mockLocationSearch5 } };
-const urlParams5 = new URLSearchParams(mockWindow5.location.search);
-const utmSource5 = urlParams5.get('utm_source');
-const utmMedium5 = urlParams5.get('utm_medium');
-const utmCampaign5 = urlParams5.get('utm_campaign');
-console.log(`[Mock] Tracking UTM data: Source=${utmSource5}, Medium=${utmMedium5}, Campaign=${utmCampaign5}`);
-```
-
-# # Related JavaScript Functions
-
-When working with query strings, several other JavaScript functions and APIs are often used in conjunction:
-
-*   **`window.location.search`**: The primary source for the current page's query string. Returns the query string including the leading `?`.
-    ```javascript
-    console.log(window.location.search); // e.g., "?param1=value1&param2=value2"
-    ```
-*   **`window.location.href`**: The entire URL of the current page. Useful if you need to parse a full URL string.
-    ```javascript
-    console.log(window.location.href); // e.g., "https://example.com/page?param1=value1"
-    ```
-*   **`window.location.origin`**: Returns the protocol, hostname and port number of the URL.
-    ```javascript
-    console.log(window.location.origin); // e.g., "https://example.com"
-    ```
-*   **`encodeURIComponent()`**: Encodes a URI component. Use this when *creating* query string values to ensure special characters are handled correctly.
-    ```javascript
-    const rawValue = "my value with spaces & symbols!";
-    const encodedValue = encodeURIComponent(rawValue);
-    console.log(encodedValue); // Output: "my%20value%20with%20spaces%20%26%20symbols%21"
-    ```
-*   **`decodeURIComponent()`**: Decodes a URI component. Essential for retrieving correct values from a parsed query string.
-    ```javascript
-    const encoded = "my%20value%20with%20spaces%20%26%20symbols%21";
-    const decoded = decodeURIComponent(encoded);
-    console.log(decoded); // Output: "my value with spaces & symbols!"
-    ```
-*   **`URL` API**: The `URL` constructor can parse an entire URL string and provides properties like `search`, `pathname`, `hostname`, etc. `URLSearchParams` is often used in conjunction with `new URL()`.
-    ```javascript
-    const url = new URL('https://example.com/path?name=Alice&age=30#section');
-    console.log(url.search);    // Output: "?name=Alice&age=30"
-    console.log(url.pathname);  // Output: "/path"
-    console.log(url.hash);      // Output: "#section"
-    const params = new URLSearchParams(url.search);
-    console.log(params.get('name')); // Output: "Alice"
-    ```
-*   **`history.pushState()` / `history.replaceState()`**: Used to modify the URL in the browser's address bar without causing a full page reload. This is crucial for single-page applications that update query parameters dynamically.
-    ```javascript
-    // Example: Add a 'page' parameter to the URL
-    const currentParams = new URLSearchParams(window.location.search);
-    currentParams.set('page', '2');
-    const newUrl = `${window.location.pathname}?${currentParams.toString()}${window.location.hash}`;
-    history.pushState({ path: newUrl }, '', newUrl);
-    console.log('URL updated to:', newUrl);
-    ```
-
-# # Summary
-
-Choosing the right method for parsing query strings in JavaScript depends heavily on your project's specific requirements, target browser compatibility, and personal preference for code style.
-
-*   **Speed Seeker:** For modern environments, `URLSearchParams` is fast and efficient. For single, known parameters in legacy contexts, a simplified regex can be the quickest.
-*   **Learning Explorer:** Manual parsing with `split()` and `substring()` is excellent for understanding the fundamentals. `URLSearchParams` offers a clear, high-level API to learn modern practices.
-*   **Problem Solver:** `URLSearchParams` provides a robust, copy-paste solution that handles most common scenarios without fuss.
-*   **Architecture Builder:** `URLSearchParams` is the go-to for maintainable, scalable code in modern applications. For highly complex URL management, an external library like URI.js might be considered.
-*   **Output Focused:** `URLSearchParams` offers clean methods for both parsing and building query strings, making it easy to control the output format. External libraries also excel here.
-*   **Legacy Maintainer:** Manual parsing with string methods (carefully written in ES5) is the safest bet for maximum compatibility without polyfills.
-
-In 2025, for most new projects targeting modern browsers and Node.js, **`URLSearchParams` is the unequivocally recommended method**. It offers the best balance of features, performance, and ease of use, abstracting away the complexities of URL encoding and edge cases. Only resort to manual parsing or external libraries if you have very specific, compelling reasons (e.g., extreme legacy support without polyfills, or highly specialized URL manipulation
+*   **"Very Fast (single)"**: These methods are optimized for extracting just one parameter. If you need multiple parameters, the overhead of repeated calls can make them slower than parsing the entire string once.
+*   **"Fast"**: Generally efficient for parsing the entire string into an object. `URLSearchParams` benefits from being a native implementation.
+*   **"Moderate"**: Involves more complex string manipulation or object construction logic, which can add a slight overhead compared to the simplest methods. External libraries also have initialization costs.
+*   **Benchmarking:** Actual performance can vary significantly based on browser, JavaScript engine, query string length, and the number of parameters. For critical applications, always benchmark with your specific data.
+
+**General Recommendation:**
+
+*   For **modern applications**, `URLSearchParams` is the clear winner due to its balance of performance, features, and ease of use.
+*   For **legacy support** or when `URLSearchParams` is not an option, `parseQueryAdvanced` offers the most robust custom parsing into an object.
+*   If you only need a **single, specific parameter** and compatibility is paramount, `getQueryVariable` is a solid choice.
+
+## JavaScript Version Support
+
+**Persona:** ⚡ Legacy Maintainer, 🏗️ Architecture Builder
+
+Understanding which JavaScript features are available in different environments is crucial for choosing the right parsing method.
+
+| Method                                  | ES Version Required | Browser Support (Modern)                               | Browser Support (Legacy)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+## Table of Contents
+- [Quick Answer](#quick-answer)
+- [Choose Your Method](#choose-your-method)
+- [Ready-to-Use Code](#ready-to-use-code)
+- [Method 1: Using `URLSearchParams` (Modern & Recommended)](#method-1-using-urlsearchparams-modern--recommended)
+  - [How it Works](#how-it-works)
+  - [Key Methods](#key-methods)
+  - [Example: Handling Multiple Values and Manipulation](#example-handling-multiple-values-and-manipulation)
+  - [Converting to a Plain Object](#converting-to-a-plain-object)
+  - [Advantages](#advantages)
+  - [Disadvantages](#disadvantages)
+- [Method 2: Custom Function for Single Parameter (`getQueryVariable`)](#method-2-custom-function-for-single-parameter-getqueryvariable)
+  - [How it Works](#how-it-works-1)
+  - [Advantages](#advantages-1)
+  - [Disadvantages](#disadvantages-1)
+  - [When to Use](#when-to-use)
+- [Method 3: Custom Function for Object Parsing (`parseQuery` - Basic)](#method-3-custom-function-for-object-parsing-parsequery---basic)
+  - [How it Works](#how-it-works-2)
+  - [Advantages](#advantages-2)
+  - [Disadvantages](#disadvantages-2)
+  - [When to Use](#when-to-use-1)
+- [Method 4: Custom Function for Object Parsing (`parseQuery` - Advanced)](#method-4-custom-function-for-object-parsing-parsequery---advanced)
+  - [How it Works](#how-it-works-3)
+  - [Advantages](#advantages-3)
+  - [Disadvantages](#disadvantages-3)
+  - [When to Use](#when-to-use-2)
+- [Method 5: Using External Libraries (e.g., URI.js)](#method-5-using-external-libraries-e.g.-urijs)
+  - [How it Works (with URI.js)](#how-it-works-with-urijs)
+  - [Example with URI.js](#example-with-urijs)
+  - [Advantages](#advantages-4)
+  - [Disadvantages](#disadvantages-4)
+  - [When to Use](#when-to-use-3)
+- [Method 6: Regex for Specific Single Parameter](#method-6-regex-for-specific-single-parameter)
+  - [How it Works](#how-it-works-4)
+  - [Sub-Method 6.1: Using `replace()` for a single, known parameter](#sub-method-61-using-replace-for-a-single-known-parameter)
+  - [Sub-Method 6.2: Using `RegExp.exec()` with Caching for All Parameters](#sub-method-62-using-regexpexec-with-caching-for-all-parameters)
+  - [Advantages](#advantages-5)
+  - [Disadvantages](#disadvantages-5)
+  - [When to Use](#when-to-use-4)
+- [Performance Comparison](#performance-comparison)
+- [JavaScript Version Support](#javascript-version-support)
+- [Common Problems & Solutions](#common-problems--solutions)
+- [Real-World Use Cases](#real-world-use-cases)
+- [Related: Other JavaScript Operations](#related-other-javascript-operations)
+- [Summary](#summary)
+- [Frequently Asked Questions](#frequently-asked-questions)
+- [Tools & Resources](#tools--resources)
+
+## Common Problems & Solutions
+
+**Persona

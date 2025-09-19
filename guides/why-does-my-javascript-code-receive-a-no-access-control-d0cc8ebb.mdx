@@ -1,27 +1,19 @@
 ---
-title: "Why does my JavaScript code receive a \"No..."
+title: "Why does my JavaScript code receive a \"No 'Access-Control-Allow-Origin"
 slug: "why-does-my-javascript-code-receive-a-no-access-control"
 category: "web-frontend"
 subcategory: "javascript"
 description: "The \"No 'Access-Control-Allow-Origin' header is present on the requested resource\" error occurs in browsers due to the Same-Origin Policy (SOP), a fundamenta..."
+tags: ["javascript","jquery","cors","postman","same-origin-policy"]
 difficulty: "beginner"
 readTime: 16
-lastUpdated: "2025-09-18T07:29:53.000Z"
-tags:
-  - "javascript"
-  - "jquery"
-  - "cors"
-  - "postman"
-  - "same-origin-policy"
-  - "frontend"
-  - "web"
-  - "js"
+lastUpdated: "2025-09-17T11:22:21.963Z"
 featured: true
 ---
 
 # Why does my JavaScript code receive a "No 'Access-Control-Allow-Origin' header is present on the requested resource" error, while Postman does not?: Complete Guide with 6 Solutions
 
-# # Quick Answer
+## Quick Answer
 The "No 'Access-Control-Allow-Origin' header is present on the requested resource" error occurs in browsers due to the Same-Origin Policy (SOP), a fundamental security mechanism. SOP restricts web pages from making requests to a different domain than the one that served the page. Postman, being a development tool and not a browser, does not enforce SOP, allowing it to make cross-origin requests without encountering this restriction.
 
 To quickly resolve this error for development or testing purposes, you can configure your server to send the `Access-Control-Allow-Origin` header. Here are a few common server-side quick fixes:
@@ -100,7 +92,7 @@ chrome.exe --user-data-dir="C:/Chrome dev session" --disable-web-security --disa
 ```
 This command opens a new Chrome instance with web security disabled, allowing cross-origin requests.
 
-# # Choose Your Method
+## Choose Your Method
 ```mermaid
 flowchart TD
     A[Your Situation] --> B{Performance Critical?}
@@ -110,33 +102,33 @@ flowchart TD
     D -->|No| F[Method 3: Quick Solution]
 ```
 
-# # Table of Contents
-- Ready-to-Use Code
-- Method 1: Understanding CORS and Same-Origin Policy (SOP) (Learning Explorer, Architecture Builder)
-- Method 2: Server-Side CORS Configuration (Problem Solver, Architecture Builder, Legacy Maintainer)
-  - 2.1 Node.js with Express
-  - 2.2 Python with Flask
-  - 2.3 PHP
-  - 2.4 Java with Spring Boot
-  - 2.5 .NET Web API
-  - 2.6 Nginx Proxy Configuration
-  - 2.7 Apache HTTP Server Configuration
-- Method 3: Client-Side Proxies (Development/Advanced) (Speed Seeker, Problem Solver)
-  - 3.1 Webpack Dev Server Proxy
-  - 3.2 Vite Proxy
-- Method 4: JSONP (Legacy/Specific Use Cases) (Legacy Maintainer)
-- Method 5: Disabling Browser Security (Development Only) (Speed Seeker, Problem Solver)
-- Method 6: Using a CORS Proxy Service (Problem Solver, Speed Seeker)
-- Performance Comparison
-- JavaScript Version Support
-- Common Problems & Solutions
-- Real-World Examples
-- Related JavaScript Functions
-- Summary
-- Frequently Asked Questions
-- Test Your Code
+## Table of Contents
+- [Ready-to-Use Code](#ready-to-use-code)
+- [Method 1: Understanding CORS and Same-Origin Policy (SOP)](#method-1-understanding-cors-and-same-origin-policy-sop) (Learning Explorer, Architecture Builder)
+- [Method 2: Server-Side CORS Configuration](#method-2-server-side-cors-configuration) (Problem Solver, Architecture Builder, Legacy Maintainer)
+  - [2.1 Node.js with Express](#21-nodejs-with-express)
+  - [2.2 Python with Flask](#22-python-with-flask)
+  - [2.3 PHP](#23-php)
+  - [2.4 Java with Spring Boot](#24-java-with-spring-boot)
+  - [2.5 .NET Web API](#25-net-web-api)
+  - [2.6 Nginx Proxy Configuration](#26-nginx-proxy-configuration)
+  - [2.7 Apache HTTP Server Configuration](#27-apache-http-server-configuration)
+- [Method 3: Client-Side Proxies (Development/Advanced)](#method-3-client-side-proxies-developmentadvanced) (Speed Seeker, Problem Solver)
+  - [3.1 Webpack Dev Server Proxy](#31-webpack-dev-server-proxy)
+  - [3.2 Vite Proxy](#32-vite-proxy)
+- [Method 4: JSONP (Legacy/Specific Use Cases)](#method-4-jsonp-legacyspecific-use-cases) (Legacy Maintainer)
+- [Method 5: Disabling Browser Security (Development Only)](#method-5-disabling-browser-security-development-only) (Speed Seeker, Problem Solver)
+- [Method 6: Using a CORS Proxy Service](#method-6-using-a-cors-proxy-service) (Problem Solver, Speed Seeker)
+- [Performance Comparison](#performance-comparison)
+- [JavaScript Version Support](#javascript-version-support)
+- [Common Problems & Solutions](#common-problems--solutions)
+- [Real-World Examples](#real-world-examples)
+- [Related JavaScript Functions](#related-javascript-functions)
+- [Summary](#summary)
+- [Frequently Asked Questions](#frequently-asked-questions)
+- [Test Your Code](#test-your-code)
 
-# # Ready-to-Use Code
+## Ready-to-Use Code
 
 Here are several complete, working examples for common scenarios.
 
@@ -400,9 +392,9 @@ fetch(proxyUrl + targetUrl)
 ```
 *Note: Public proxies are generally not recommended for production due to reliability, security, and rate limiting concerns. Consider hosting your own if this approach is necessary.*
 
-# # Method Sections
+## Method Sections
 
-## # Method 1: Understanding CORS and Same-Origin Policy (SOP)
+### Method 1: Understanding CORS and Same-Origin Policy (SOP)
 **User Personas:** Learning Explorer, Architecture Builder
 
 The core reason for the "No 'Access-Control-Allow-Origin' header" error lies in the browser's implementation of the **Same-Origin Policy (SOP)**. SOP is a critical security feature that prevents a malicious website from reading sensitive data from another website.
@@ -460,12 +452,12 @@ CORS is a mechanism that allows servers to explicitly grant permission for cross
     {"key": "value"}
     ```
 
-## # Method 2: Server-Side CORS Configuration
+### Method 2: Server-Side CORS Configuration
 **User Personas:** Problem Solver, Architecture Builder, Legacy Maintainer
 
 This is the most robust and recommended solution for production environments. It involves configuring your API server to send the necessary CORS headers.
 
-### # 2.1 Node.js with Express
+#### 2.1 Node.js with Express
 The `cors` middleware simplifies CORS configuration for Express applications.
 
 **Installation:**
@@ -564,7 +556,7 @@ app.listen(port, () => {
 });
 ```
 
-### # 2.2 Python with Flask
+#### 2.2 Python with Flask
 The `Flask-CORS` extension provides easy CORS integration for Flask.
 
 **Installation:**
@@ -640,7 +632,7 @@ if __name__ == "__main__":
     app.run(debug=True, port=5000)
 ```
 
-### # 2.3 PHP
+#### 2.3 PHP
 CORS headers are set using the `header()` function. This must be done before any output is sent to the browser.
 
 **Basic Usage (Allow all origins):**
@@ -695,7 +687,7 @@ echo json_encode($response);
 ?>
 ```
 
-### # 2.4 Java with Spring Boot
+#### 2.4 Java with Spring Boot
 Spring Boot provides excellent CORS support through annotations or global configuration.
 
 **Global CORS Configuration:**
@@ -752,7 +744,7 @@ public class MyController {
 }
 ```
 
-### # 2.5 .NET Web API
+#### 2.5 .NET Web API
 .NET Core and .NET 5+ provide robust CORS configuration.
 
 **Installation:**
@@ -804,4 +796,3 @@ public class Startup
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers
-```

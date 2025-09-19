@@ -1,0 +1,1011 @@
+---
+title: "How to create a trie in Python: 0 Methods + Performance Guide"
+slug: "how-to-create-a-trie-in-python"
+category: "programming-languages"
+subcategory: "python"
+description: "For a robust and efficient Trie implementation in Python, a class-based approach using nested dictionaries for children nodes is generally recommended. This ..."
+tags: ["python","trie","dawg"]
+difficulty: "beginner"
+readTime: 26
+lastUpdated: "2025-09-19T02:26:45.064Z"
+featured: false
+---
+
+# How to create a trie in Python: 0 Methods + Performance Guide
+
+## Quick Answer
+
+For a robust and efficient Trie implementation in Python, a class-based approach using nested dictionaries for children nodes is generally recommended. This provides a clear, object-oriented structure that is both readable and performant for typical use cases.
+
+```python
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end_of_word = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word: str) -> None:
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end_of_word = True
+
+    def search(self, word: str) -> bool:
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                return False
+            node = node.children[char]
+        return node.is_end_of_word
+
+    def starts_with(self, prefix: str) -> bool:
+        node = self.root
+        for char in prefix:
+            if char not in node.children:
+                return False
+            node = node.children[char]
+        return True
+
+# Example Usage:
+trie = Trie()
+trie.insert("apple")
+trie.insert("app")
+print(f"Search 'apple': {trie.search('apple')}") # True
+print(f"Search 'app': {trie.search('app')}")     # True
+print(f"Search 'apricot': {trie.search('apricot')}") # False
+print(f"Starts with 'app': {trie.starts_with('app')}") # True
+print(f"Starts with 'ap': {trie.starts_with('ap')}")   # True
+print(f"Starts with 'bat': {trie.starts_with('bat')}") # False
+```
+
+## Choose Your Method
+
+Deciding on the best Trie implementation depends heavily on your specific needs and priorities. This decision tree will guide you through the common scenarios and help you select the most suitable approach.
+
+```mermaid
+graph TD
+    A[Start: Need a Trie in Python?] --> B{Primary Goal?};
+
+    B --&gt; B1{Fast Lookups & Prefix Search?};
+    B1 --&gt; C{Memory Efficiency Critical?};
+    C --&gt; C1{Small Alphabet (e.g., 'a'-'z')?};
+    C1 --&gt; D[Method 1: Class-based with Dictionary (Default)];
+    C1 --&gt; E[Method 2: Class-based with Array/List (Fixed Alphabet)];
+
+    C --&gt; C2{Large/Dynamic Alphabet (e.g., Unicode)?};
+    C2 --&gt; D;
+
+    B --&gt; B2{Minimal Code & Quick Prototype?};
+    B2 --&gt; F[Method 3: Nested Dictionaries (Functional)];
+
+    B --&gt; B3{Advanced Features (e.g., Deletion, DAWG)?};
+    B3 --&gt; G[Method 4: Class-based with Advanced Features];
+
+    B --&gt; B4{Learning & Understanding Trie Structure?};
+    B4 --&gt; D;
+
+    D --&gt; H[End: Use Class-based Trie with Dictionary for children];
+    E --&gt; I[End: Use Class-based Trie with Array/List for children];
+    F --&gt; J[End: Use Functional Nested Dictionaries];
+    G --&gt; K[End: Use Class-based Trie with advanced features];
+
+    subgraph Personas
+        D --&gt; |🚀 Speed Seeker, 📚 Learning Explorer, 🏗️ Architecture Builder| D_Persona;
+        E --&gt; |🚀 Speed Seeker, 🏗️ Architecture Builder| E_Persona;
+        F --&gt; |🔧 Problem Solver, 🎨 Output Focused| F_Persona;
+        G --&gt; |🏗️ Architecture Builder, ⚡ Legacy Maintainer| G_Persona;
+    end
+```
+
+## Table of Contents
+- [Quick Answer](#quick-answer)
+- [Choose Your Method](#choose-your-method)
+- [Table of Contents](#table-of-contents)
+- [Ready-to-Use Code](#ready-to-use-code)
+- [Method 1: Class-based Trie with Dictionary Children](#method-1-class-based-trie-with-dictionary-children)
+- [Method 2: Class-based Trie with Array/List Children](#method-2-class-based-trie-with-arraylist-children)
+- [Method 3: Functional Trie using Nested Dictionaries](#method-3-functional-trie-using-nested-dictionaries)
+- [Method 4: Trie with Deletion and Prefix Search (Advanced)](#method-4-trie-with-deletion-and-prefix-search-advanced)
+- [Performance Comparison](#performance-comparison)
+- [Python Version Support](#python-version-support)
+- [Common Problems & Solutions](#common-problems--solutions)
+- [Real-World Use Cases](#real-world-use-cases)
+- [Related Technology Functions](#related-technology-functions)
+- [Summary](#summary)
+- [Frequently Asked Questions](#frequently-asked-questions)
+- [Tools & Resources](#tools--resources)
+
+## Ready-to-Use Code
+
+Here are a few ready-to-use code snippets for different scenarios, catering to various user personas.
+
+### 🚀 Speed Seeker / 🏗️ Architecture Builder: Class-based Trie (Dictionary)
+
+This is the most common and balanced approach, offering good performance and flexibility.
+
+```python
+# trie_dict_children.py
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end_of_word = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word: str) -> None:
+        """Inserts a word into the trie."""
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end_of_word = True
+
+    def search(self, word: str) -> bool:
+        """Returns true if the word is in the trie."""
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                return False
+            node = node.children[char]
+        return node.is_end_of_word
+
+    def starts_with(self, prefix: str) -> bool:
+        """Returns true if there is any word in the trie that starts with the given prefix."""
+        node = self.root
+        for char in prefix:
+            if char not in node.children:
+                return False
+            node = node.children[char]
+        return True
+
+    def get_words_with_prefix(self, prefix: str) -> list[str]:
+        """Returns all words in the trie that start with the given prefix."""
+        node = self.root
+        for char in prefix:
+            if char not in node.children:
+                return []
+            node = node.children[char]
+
+        results = []
+        self._dfs_collect_words(node, prefix, results)
+        return results
+
+    def _dfs_collect_words(self, node: TrieNode, current_prefix: str, results: list[str]):
+        if node.is_end_of_word:
+            results.append(current_prefix)
+        for char, child_node in node.children.items():
+            self._dfs_collect_words(child_node, current_prefix + char, results)
+
+# Example Usage:
+if __name__ == "__main__":
+    trie = Trie()
+    words_to_insert = ["apple", "app", "apricot", "banana", "band", "bat"]
+    for word in words_to_insert:
+        trie.insert(word)
+
+    print(f"Search 'apple': {trie.search('apple')}") # True
+    print(f"Search 'app': {trie.search('app')}")     # True
+    print(f"Search 'apricot': {trie.search('apricot')}") # True
+    print(f"Search 'ap': {trie.search('ap')}")       # False (not a full word)
+    print(f"Search 'grape': {trie.search('grape')}") # False
+
+    print(f"Starts with 'app': {trie.starts_with('app')}") # True
+    print(f"Starts with 'ap': {trie.starts_with('ap')}")   # True
+    print(f"Starts with 'ban': {trie.starts_with('ban')}") # True
+    print(f"Starts with 'gra': {trie.starts_with('gra')}") # False
+
+    print(f"Words with prefix 'ap': {trie.get_words_with_prefix('ap')}") # ['apple', 'app', 'apricot']
+    print(f"Words with prefix 'ban': {trie.get_words_with_prefix('ban')}") # ['banana', 'band']
+    print(f"Words with prefix 'b': {trie.get_words_with_prefix('b')}") # ['banana', 'band', 'bat']
+    print(f"Words with prefix 'z': {trie.get_words_with_prefix('z')}") # []
+```
+
+### 🔧 Problem Solver / 🎨 Output Focused: Functional Trie (Nested Dictionaries)
+
+This approach is concise and can be useful for quick scripts or when you prefer a more functional style without explicit classes.
+
+```python
+# trie_functional.py
+def create_trie():
+    """Initializes an empty trie."""
+    return {}
+
+def insert_word(trie: dict, word: str) -> None:
+    """Inserts a word into the trie."""
+    node = trie
+    for char in word:
+        if char not in node:
+            node[char] = {}
+        node = node[char]
+    node['#'] = True # Mark end of word
+
+def search_word(trie: dict, word: str) -> bool:
+    """Returns true if the word is in the trie."""
+    node = trie
+    for char in word:
+        if char not in node:
+            return False
+        node = node[char]
+    return '#' in node
+
+def starts_with_prefix(trie: dict, prefix: str) -> bool:
+    """Returns true if there is any word in the trie that starts with the given prefix."""
+    node = trie
+    for char in prefix:
+        if char not in node:
+            return False
+        node = node[char]
+    return True
+
+def get_all_words(trie: dict) -> list[str]:
+    """Returns all words stored in the trie."""
+    words = []
+    def _dfs(current_node, current_word):
+        if '#' in current_node:
+            words.append(current_word)
+        for char, next_node in current_node.items():
+            if char != '#':
+                _dfs(next_node, current_word + char)
+    _dfs(trie, "")
+    return words
+
+# Example Usage:
+if __name__ == "__main__":
+    my_trie = create_trie()
+    words_to_insert = ["cat", "car", "cart", "dog", "door"]
+    for word in words_to_insert:
+        insert_word(my_trie, word)
+
+    print(f"Trie structure: {my_trie}") # Shows the nested dictionary structure
+
+    print(f"Search 'cat': {search_word(my_trie, 'cat')}") # True
+    print(f"Search 'car': {search_word(my_trie, 'car')}") # True
+    print(f"Search 'ca': {search_word(my_trie, 'ca')}")   # False
+    print(f"Search 'cow': {search_word(my_trie, 'cow')}") # False
+
+    print(f"Starts with 'ca': {starts_with_prefix(my_trie, 'ca')}") # True
+    print(f"Starts with 'do': {starts_with_prefix(my_trie, 'do')}") # True
+    print(f"Starts with 'z': {starts_with_prefix(my_trie, 'z')}")   # False
+
+    print(f"All words in trie: {get_all_words(my_trie)}") # ['cat', 'car', 'cart', 'dog', 'door']
+```
+
+## Method 1: Class-based Trie with Dictionary Children
+
+**Persona:** 📚 Learning Explorer, 🏗️ Architecture Builder, 🚀 Speed Seeker
+
+This method is the most common and recommended way to implement a Trie in Python. It uses a class `TrieNode` to represent each node in the trie, and each `TrieNode` contains a dictionary (`self.children`) to store references to its child nodes. The keys of this dictionary are the characters, and the values are other `TrieNode` instances. A boolean flag (`self.is_end_of_word`) indicates if a node marks the end of a valid word.
+
+### Core Concepts
+
+*   **TrieNode:** Each node represents a character in a word. It holds:
+    *   `children`: A dictionary mapping characters to child `TrieNode` objects.
+    *   `is_end_of_word`: A boolean flag, `True` if the path to this node forms a complete word.
+*   **Trie:** The main class that manages the `root` node and provides methods for `insert`, `search`, and `starts_with`.
+
+### Advantages
+
+*   **Clarity and Readability:** Object-oriented structure makes the code easy to understand and maintain.
+*   **Flexibility:** Handles any character set (ASCII, Unicode) naturally due to dictionary keys.
+*   **Efficiency:** Dictionary lookups for children are O(1) on average.
+*   **Extensibility:** Easy to add more functionalities like deletion, prefix word retrieval, etc.
+
+### Disadvantages
+
+*   **Memory Overhead:** Each `TrieNode` object and dictionary can consume more memory compared to simpler structures, especially for very sparse tries or small alphabets.
+
+### Implementation Details
+
+```python
+# Method 1: Class-based Trie with Dictionary Children
+# File: trie_class_dict.py
+
+class TrieNode:
+    """
+    Represents a single node in the Trie.
+    Each node stores references to its children and a flag indicating if it's the end of a word.
+    """
+    def __init__(self):
+        self.children: dict[str, TrieNode] = {}
+        self.is_end_of_word: bool = False
+
+    def __repr__(self):
+        """Provides a string representation for debugging."""
+        return f"TrieNode(children={list(self.children.keys())}, is_end={self.is_end_of_word})"
+
+class Trie:
+    """
+    Implements a Trie (Prefix Tree) data structure.
+    Supports insertion, search, and prefix matching of words.
+    """
+    def __init__(self):
+        """Initializes the Trie with a root node."""
+        self.root = TrieNode()
+
+    def insert(self, word: str) -> None:
+        """
+        Inserts a word into the trie.
+        Time Complexity: O(L), where L is the length of the word.
+        Space Complexity: O(L) in the worst case (new characters added).
+        """
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end_of_word = True
+        # print(f"Inserted: '{word}'") # For debugging
+
+    def search(self, word: str) -> bool:
+        """
+        Checks if a word exists in the trie.
+        Time Complexity: O(L), where L is the length of the word.
+        Space Complexity: O(1)
+        """
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                return False
+            node = node.children[char]
+        return node.is_end_of_word
+
+    def starts_with(self, prefix: str) -> bool:
+        """
+        Checks if any word in the trie starts with the given prefix.
+        Time Complexity: O(L), where L is the length of the prefix.
+        Space Complexity: O(1)
+        """
+        node = self.root
+        for char in prefix:
+            if char not in node.children:
+                return False
+            node = node.children[char]
+        return True
+
+    def _find_node(self, prefix: str) -> TrieNode | None:
+        """Helper method to find the node corresponding to a given prefix."""
+        node = self.root
+        for char in prefix:
+            if char not in node.children:
+                return None
+            node = node.children[char]
+        return node
+
+    def get_words_with_prefix(self, prefix: str) -> list[str]:
+        """
+        Retrieves all words in the trie that start with the given prefix.
+        Time Complexity: O(L + N*M), where L is prefix length, N is number of words
+                         with prefix, M is average length of those words.
+        Space Complexity: O(N*M) for storing results.
+        """
+        node = self.root
+        current_word_prefix = ""
+        for char in prefix:
+            if char not in node.children:
+                return [] # No words start with this prefix
+            node = node.children[char]
+            current_word_prefix += char
+
+        results = []
+        self._dfs_collect_words(node, current_word_prefix, results)
+        return results
+
+    def _dfs_collect_words(self, node: TrieNode, current_prefix: str, results: list[str]):
+        """
+        Depth-First Search helper to collect words from a given node downwards.
+        """
+        if node.is_end_of_word:
+            results.append(current_prefix)
+        for char, child_node in node.children.items():
+            self._dfs_collect_words(child_node, current_prefix + char, results)
+
+    def delete(self, word: str) -> bool:
+        """
+        Deletes a word from the trie. Returns True if the word was found and deleted, False otherwise.
+        This is a more complex operation, often implemented recursively.
+        Time Complexity: O(L), where L is the length of the word.
+        Space Complexity: O(L) for recursion stack.
+        """
+        def _delete_recursive(current_node: TrieNode, word_part: str, depth: int) -> bool:
+            if depth == len(word_part):
+                if not current_node.is_end_of_word:
+                    return False # Word not found
+                current_node.is_end_of_word = False
+                # If this node has no other children, it can be removed
+                return len(current_node.children) == 0
+
+            char = word_part[depth]
+            if char not in current_node.children:
+                return False # Word not found
+
+            child_node = current_node.children[char]
+            should_delete_child = _delete_recursive(child_node, word_part, depth + 1)
+
+            if should_delete_child:
+                del current_node.children[char]
+                # If current_node is no longer part of any other word and has no children, it can be removed
+                return not current_node.is_end_of_word and len(current_node.children) == 0
+            return False
+
+        return _delete_recursive(self.root, word, 0)
+
+# Example Usage for Method 1:
+if __name__ == "__main__":
+    print("--- Method 1: Class-based Trie with Dictionary Children ---")
+    trie = Trie()
+    words = ["apple", "app", "apricot", "banana", "band", "bat", "apply"]
+
+    print("\nInserting words:")
+    for word in words:
+        trie.insert(word)
+        print(f"  Inserted '{word}'")
+
+    print("\nSearching words:")
+    print(f"  'apple': {trie.search('apple')}")     # True
+    print(f"  'app': {trie.search('app')}")         # True
+    print(f"  'apricot': {trie.search('apricot')}") # True
+    print(f"  'ap': {trie.search('ap')}")           # False (not a full word)
+    print(f"  'grape': {trie.search('grape')}")     # False
+    print(f"  'apply': {trie.search('apply')}")     # True
+
+    print("\nChecking prefixes:")
+    print(f"  Starts with 'app': {trie.starts_with('app')}") # True
+    print(f"  Starts with 'ap': {trie.starts_with('ap')}")   # True
+    print(f"  Starts with 'ban': {trie.starts_with('ban')}") # True
+    print(f"  Starts with 'gra': {trie.starts_with('gra')}") # False
+
+    print("\nGetting words with prefix 'ap':")
+    print(f"  {trie.get_words_with_prefix('ap')}") # ['apple', 'app', 'apricot', 'apply']
+
+    print("\nGetting words with prefix 'ban':")
+    print(f"  {trie.get_words_with_prefix('ban')}") # ['banana', 'band']
+
+    print("\nDeleting words:")
+    print(f"  Deleting 'app': {trie.delete('app')}") # True
+    print(f"  Search 'app' after deletion: {trie.search('app')}") # False
+    print(f"  Search 'apple' after 'app' deletion: {trie.search('apple')}") # True (should still exist)
+    print(f"  Words with prefix 'ap' after 'app' deletion: {trie.get_words_with_prefix('ap')}") # ['apple', 'apricot', 'apply']
+
+    print(f"  Deleting 'nonexistent': {trie.delete('nonexistent')}") # False
+    print(f"  Deleting 'apple': {trie.delete('apple')}") # True
+    print(f"  Search 'apple' after deletion: {trie.search('apple')}") # False
+    print(f"  Words with prefix 'ap' after 'apple' deletion: {trie.get_words_with_prefix('ap')}") # ['apricot', 'apply']
+
+    print(f"  Deleting 'apricot': {trie.delete('apricot')}") # True
+    print(f"  Deleting 'apply': {trie.delete('apply')}") # True
+    print(f"  Words with prefix 'ap' after all deletions: {trie.get_words_with_prefix('ap')}") # []
+    print(f"  Starts with 'ap' after all deletions: {trie.starts_with('ap')}") # False (no words left with 'ap' prefix)
+```
+
+### Cloud Architecture Diagram: Trie Service
+
+This diagram illustrates how a Trie might be integrated into a larger cloud-based application, for example, a search autocomplete service.
+
+```mermaid
+graph TD
+    A[User Request: "auto-complete ap"] --> B(API Gateway);
+    B --> C(Load Balancer);
+    C --> D(Trie Service Cluster);
+
+    subgraph Trie Service Cluster
+        D1[Trie Service Instance 1]
+        D2[Trie Service Instance 2]
+        D3[Trie Service Instance 3]
+    end
+
+    D1 --> E(Trie Data Store);
+    D2 --> E;
+    D3 --> E;
+
+    E --&gt; F(Persistent Storage: S3/Blob Storage);
+    E --&gt; G(In-Memory Cache: Redis/Memcached);
+
+    D --> H(Response: ["apple", "app", "apricot", "apply"]);
+    H --> B;
+
+    subgraph Data Ingestion
+        I[Data Source: Word Lists, User Queries] --> J(ETL Process);
+        J --> K(Trie Builder Service);
+        K --> L(Trie Serialization: Pickle/JSON);
+        L --> F;
+        F --&gt; E;
+    end
+
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style B fill:#bbf,stroke:#333,stroke-width:2px
+    style C fill:#bfb,stroke:#333,stroke-width:2px
+    style D fill:#fbb,stroke:#333,stroke-width:2px
+    style E fill:#ccf,stroke:#333,stroke-width:2px
+    style F fill:#ffc,stroke:#333,stroke-width:2px
+    style G fill:#cfc,stroke:#333,stroke-width:2px
+    style H fill:#f9f,stroke:#333,stroke-width:2px
+    style I fill:#fcc,stroke:#333,stroke-width:2px
+    style J fill:#cff,stroke:#333,stroke-width:2px
+    style K fill:#fcf,stroke:#333,stroke-width:2px
+    style L fill:#fcf,stroke:#333,stroke-width:2px
+```
+**Explanation of the Architecture:**
+
+1.  **User Request:** A user types a prefix (e.g., "ap") into a search bar.
+2.  **API Gateway:** Receives the request, handles authentication, rate limiting, etc.
+3.  **Load Balancer:** Distributes requests across multiple instances of the Trie Service for scalability and fault tolerance.
+4.  **Trie Service Cluster:** Contains multiple Python application instances, each capable of serving Trie operations.
+5.  **Trie Data Store:** This represents the actual Trie data structure loaded into memory within each service instance. It's often initialized from a persistent source.
+6.  **Persistent Storage (S3/Blob Storage):** Stores the serialized Trie data (e.g., a pickled Python object, JSON, or a custom binary format). This allows the Trie to be rebuilt quickly across service restarts or new deployments.
+7.  **In-Memory Cache (Redis/Memcached):** Can be used to cache frequently requested prefixes or full words, reducing the load on the Trie itself for very hot queries.
+8.  **Response:** The Trie Service returns the list of matching words to the user.
+9.  **Data Ingestion Pipeline:**
+    *   **Data Source:** Raw word lists, dictionaries, user search logs, etc.
+    *   **ETL Process:** Extracts, Transforms, and Loads data, cleaning and preparing it for Trie construction.
+    *   **Trie Builder Service:** A dedicated service (or script) that constructs the Trie from the processed data.
+    *   **Trie Serialization:** The built Trie object is serialized into a format suitable for storage and later loading.
+    *   **Storage Update:** The serialized Trie is stored in persistent storage, making it available to the Trie Service Cluster.
+
+This architecture ensures high availability, scalability, and efficient management of the Trie data for real-world applications.
+
+## Method 2: Class-based Trie with Array/List Children
+
+**Persona:** 🚀 Speed Seeker (for specific alphabets), 🏗️ Architecture Builder (memory optimization for fixed alphabets)
+
+This method is an alternative to using dictionaries for children. Instead, it uses a fixed-size array (or list in Python) where each index corresponds to a specific character in a predefined alphabet (e.g., 'a' through 'z').
+
+### Core Concepts
+
+*   **TrieNode:** Similar to Method 1, but `children` is a list.
+    *   `children`: A list of `TrieNode` objects, where `children[i]` corresponds to the i-th character in the alphabet. `None` indicates no child for that character.
+    *   `is_end_of_word`: Boolean flag.
+*   **Alphabet Mapping:** A crucial part is mapping characters to array indices. For lowercase English letters, `ord(char) - ord('a')` is common.
+
+### Advantages
+
+*   **Memory Efficiency (for dense alphabets):** If your alphabet is small and words are dense (many words share prefixes), an array can be more memory-efficient than dictionaries, as dictionaries have overhead.
+*   **Potentially Faster Lookups:** Array access by index can be marginally faster than dictionary hash lookups, especially in languages like C/Java. In Python, the difference might be negligible or even slower due to list overheads for sparse arrays.
+*   **Predictable Memory Footprint:** For a fixed alphabet size, each node's children array has a consistent size.
+
+### Disadvantages
+
+*   **Fixed Alphabet:** Requires a predefined, fixed alphabet. Not suitable for arbitrary Unicode characters or very large, sparse alphabets.
+*   **Memory Waste (for sparse alphabets):** If the alphabet is large but words use only a small subset of characters (e.g., full Unicode), most array slots will be `None`, leading to significant memory waste.
+*   **Complexity:** Requires character-to-index mapping logic.
+
+### Implementation Details
+
+```python
+# Method 2: Class-based Trie with Array/List Children
+# File: trie_class_array.py
+
+class TrieNodeArray:
+    """
+    Represents a single node in the Trie, using a fixed-size array for children.
+    Assumes a small, fixed alphabet (e.g., 26 lowercase English letters).
+    """
+    ALPHABET_SIZE = 26 # For 'a' through 'z'
+
+    def __init__(self):
+        self.children: list[TrieNodeArray | None] = [None] * self.ALPHABET_SIZE
+        self.is_end_of_word: bool = False
+
+    def __repr__(self):
+        """Provides a string representation for debugging."""
+        active_children = [chr(ord('a') + i) for i, child in enumerate(self.children) if child is not None]
+        return f"TrieNodeArray(children={active_children}, is_end={self.is_end_of_word})"
+
+class TrieArray:
+    """
+    Implements a Trie using arrays for children, optimized for a fixed, small alphabet.
+    """
+    def __init__(self):
+        self.root = TrieNodeArray()
+
+    def _char_to_index(self, char: str) -> int:
+        """Converts a character to its corresponding array index (0-25 for 'a'-'z')."""
+        if not ('a' <= char <= 'z'):
+            raise ValueError(f"Character '{char}' is not a lowercase English letter.")
+        return ord(char) - ord('a')
+
+    def insert(self, word: str) -> None:
+        """
+        Inserts a word into the trie.
+        Assumes words consist only of lowercase English letters.
+        Time Complexity: O(L), where L is the length of the word.
+        Space Complexity: O(L) in the worst case.
+        """
+        node = self.root
+        for char in word:
+            index = self._char_to_index(char)
+            if node.children[index] is None:
+                node.children[index] = TrieNodeArray()
+            node = node.children[index]
+        node.is_end_of_word = True
+        # print(f"Inserted: '{word}'") # For debugging
+
+    def search(self, word: str) -> bool:
+        """
+        Checks if a word exists in the trie.
+        Assumes words consist only of lowercase English letters.
+        Time Complexity: O(L), where L is the length of the word.
+        Space Complexity: O(1)
+        """
+        node = self.root
+        for char in word:
+            index = self._char_to_index(char)
+            if node.children[index] is None:
+                return False
+            node = node.children[index]
+        return node.is_end_of_word
+
+    def starts_with(self, prefix: str) -> bool:
+        """
+        Checks if any word in the trie starts with the given prefix.
+        Assumes prefixes consist only of lowercase English letters.
+        Time Complexity: O(L), where L is the length of the prefix.
+        Space Complexity: O(1)
+        """
+        node = self.root
+        for char in prefix:
+            index = self._char_to_index(char)
+            if node.children[index] is None:
+                return False
+            node = node.children[index]
+        return True
+
+    def get_words_with_prefix(self, prefix: str) -> list[str]:
+        """
+        Retrieves all words in the trie that start with the given prefix.
+        Assumes prefixes consist only of lowercase English letters.
+        """
+        node = self.root
+        current_word_prefix = ""
+        for char in prefix:
+            index = self._char_to_index(char)
+            if node.children[index] is None:
+                return []
+            node = node.children[index]
+            current_word_prefix += char
+
+        results = []
+        self._dfs_collect_words(node, current_word_prefix, results)
+        return results
+
+    def _dfs_collect_words(self, node: TrieNodeArray, current_prefix: str, results: list[str]):
+        """
+        Depth-First Search helper to collect words from a given node downwards.
+        """
+        if node.is_end_of_word:
+            results.append(current_prefix)
+        for i in range(TrieNodeArray.ALPHABET_SIZE):
+            child_node = node.children[i]
+            if child_node is not None:
+                char = chr(ord('a') + i)
+                self._dfs_collect_words(child_node, current_prefix + char, results)
+
+    def delete(self, word: str) -> bool:
+        """
+        Deletes a word from the trie. Returns True if the word was found and deleted, False otherwise.
+        Assumes words consist only of lowercase English letters.
+        """
+        def _delete_recursive(current_node: TrieNodeArray, word_part: str, depth: int) -> bool:
+            if depth == len(word_part):
+                if not current_node.is_end_of_word:
+                    return False # Word not found
+                current_node.is_end_of_word = False
+                # If this node has no other children, it can be removed
+                return all(child is None for child in current_node.children)
+
+            char = word_part[depth]
+            index = self._char_to_index(char)
+            if current_node.children[index] is None:
+                return False # Word not found
+
+            child_node = current_node.children[index]
+            should_delete_child = _delete_recursive(child_node, word_part, depth + 1)
+
+            if should_delete_child:
+                current_node.children[index] = None
+                # If current_node is no longer part of any other word and has no children, it can be removed
+                return not current_node.is_end_of_word and all(child is None for child in current_node.children)
+            return False
+
+        return _delete_recursive(self.root, word, 0)
+
+# Example Usage for Method 2:
+if __name__ == "__main__":
+    print("--- Method 2: Class-based Trie with Array/List Children ---")
+    trie_array = TrieArray()
+    words = ["apple", "app", "apricot", "banana", "band", "bat", "apply"]
+
+    print("\nInserting words:")
+    for word in words:
+        trie_array.insert(word)
+        print(f"  Inserted '{word}'")
+
+    print("\nSearching words:")
+    print(f"  'apple': {trie_array.search('apple')}")     # True
+    print(f"  'app': {trie_array.search('app')}")         # True
+    print(f"  'apricot': {trie_array.search('apricot')}") # True
+    print(f"  'ap': {trie_array.search('ap')}")           # False
+    print(f"  'grape': {trie_array.search('grape')}")     # False
+    print(f"  'apply': {trie_array.search('apply')}")     # True
+
+    print("\nChecking prefixes:")
+    print(f"  Starts with 'app': {trie_array.starts_with('app')}") # True
+    print(f"  Starts with 'ap': {trie_array.starts_with('ap')}")   # True
+    print(f"  Starts with 'ban': {trie_array.starts_with('ban')}") # True
+    print(f"  Starts with 'gra': {trie_array.starts_with('gra')}") # False
+
+    print("\nGetting words with prefix 'ap':")
+    print(f"  {trie_array.get_words_with_prefix('ap')}") # ['apple', 'app', 'apricot', 'apply']
+
+    print("\nDeleting words:")
+    print(f"  Deleting 'app': {trie_array.delete('app')}") # True
+    print(f"  Search 'app' after deletion: {trie_array.search('app')}") # False
+    print(f"  Search 'apple' after 'app' deletion: {trie_array.search('apple')}") # True
+    print(f"  Words with prefix 'ap' after 'app' deletion: {trie_array.get_words_with_prefix('ap')}") # ['apple', 'apricot', 'apply']
+
+    print(f"  Deleting 'nonexistent': {trie_array.delete('nonexistent')}") # False
+    print(f"  Deleting 'apple': {trie_array.delete('apple')}") # True
+    print(f"  Search 'apple' after deletion: {trie_array.search('apple')}") # False
+    print(f"  Words with prefix 'ap' after 'apple' deletion: {trie_array.get_words_with_prefix('ap')}") # ['apricot', 'apply']
+
+    print(f"  Deleting 'apricot': {trie_array.delete('apricot')}") # True
+    print(f"  Deleting 'apply': {trie_array.delete('apply')}") # True
+    print(f"  Words with prefix 'ap' after all deletions: {trie_array.get_words_with_prefix('ap')}") # []
+    print(f"  Starts with 'ap' after all deletions: {trie_array.starts_with('ap')}") # False
+```
+
+## Method 3: Functional Trie using Nested Dictionaries
+
+**Persona:** 🔧 Problem Solver, 🎨 Output Focused, 📚 Learning Explorer (for understanding the raw structure)
+
+This approach represents the Trie purely as a nested dictionary structure, without explicit `TrieNode` classes. Each dictionary represents a node, and its keys are the characters leading to child nodes. A special key (e.g., `'#'` or `'_end_'`) is used to mark the end of a word.
+
+### Core Concepts
+
+*   **Trie as a Dictionary:** The entire Trie is a single, deeply nested Python dictionary.
+*   **Node Representation:** Each sub-dictionary within the main dictionary acts as a node.
+*   **End-of-Word Marker:** A unique key (e.g., `'#'`) with a boolean value (`True`) signifies that the path leading to this dictionary forms a complete word.
+
+### Advantages
+
+*   **Simplicity and Conciseness:** Very little boilerplate code, making it quick to implement for simple use cases.
+*   **Direct Representation:** Directly reflects the "nested dictionary" idea, which can be intuitive for some.
+*   **No Custom Classes:** Avoids the overhead of custom class instances if memory is extremely tight and you're not concerned with object-oriented features.
+*   **Easy Serialization:** Can be easily serialized to JSON or other formats, as it's just a standard Python dictionary.
+
+### Disadvantages
+
+*   **Less Structured:** Can become harder to manage for complex operations (like deletion or advanced traversals) compared to a class-based approach.
+*   **Readability for Complex Operations:** Recursive functions might be less intuitive to debug without explicit node objects.
+*   **No Type Hinting for Nodes:** Harder to enforce types for "nodes" since they are just dictionaries.
+
+### Implementation Details
+
+```python
+# Method 3: Functional Trie using Nested Dictionaries
+# File: trie_functional.py
+
+# Type alias for better readability
+TrieDict = dict[str, 'TrieDict']
+
+def create_trie() -> TrieDict:
+    """
+    Initializes an empty trie as a dictionary.
+    """
+    return {}
+
+def insert_word(trie: TrieDict, word: str) -> None:
+    """
+    Inserts a word into the trie.
+    The '#' key marks the end of a word.
+    Time Complexity: O(L), where L is the length of the word.
+    Space Complexity: O(L) in the worst case.
+    """
+    node = trie
+    for char in word:
+        if char not in node:
+            node[char] = {}
+        node = node[char]
+    node['#'] = True # Mark end of word
+
+def search_word(trie: TrieDict, word: str) -> bool:
+    """
+    Checks if a word exists in the trie.
+    Time Complexity: O(L), where L is the length of the word.
+    Space Complexity: O(1)
+    """
+    node = trie
+    for char in word:
+        if char not in node:
+            return False
+        node = node[char]
+    return '#' in node # Check if the end-of-word marker exists
+
+def starts_with_prefix(trie: TrieDict, prefix: str) -> bool:
+    """
+    Checks if any word in the trie starts with the given prefix.
+    Time Complexity: O(L), where L is the length of the prefix.
+    Space Complexity: O(1)
+    """
+    node = trie
+    for char in prefix:
+        if char not in node:
+            return False
+        node = node[char]
+    return True # If we reached here, the prefix exists
+
+def _find_prefix_node(trie: TrieDict, prefix: str) -> TrieDict | None:
+    """Helper function to find the node corresponding to a given prefix."""
+    node = trie
+    for char in prefix:
+        if char not in node:
+            return None
+        node = node[char]
+    return node
+
+def get_words_with_prefix(trie: TrieDict, prefix: str) -> list[str]:
+    """
+    Retrieves all words in the trie that start with the given prefix.
+    Time Complexity: O(L + N*M), where L is prefix length, N is number of words
+                     with prefix, M is average length of those words.
+    Space Complexity: O(N*M) for storing results.
+    """
+    prefix_node = _find_prefix_node(trie, prefix)
+    if prefix_node is None:
+        return []
+
+    results = []
+    def _dfs_collect(current_node: TrieDict, current_word: str):
+        if '#' in current_node:
+            results.append(current_word)
+        for char, next_node in current_node.items():
+            if char != '#': # Avoid treating the end-of-word marker as a character
+                _dfs_collect(next_node, current_word + char)
+
+    _dfs_collect(prefix_node, prefix)
+    return results
+
+def delete_word(trie: TrieDict, word: str) -> bool:
+    """
+    Deletes a word from the trie. Returns True if the word was found and deleted, False otherwise.
+    This is a more complex operation for functional tries, often implemented recursively.
+    Time Complexity: O(L), where L is the length of the word.
+    Space Complexity: O(L) for recursion stack.
+    """
+    path = [] # Stores (node, char) pairs to traverse back up
+    node = trie
+    for char in word:
+        if char not in node:
+            return False # Word not found
+        path.append((node, char))
+        node = node[char]
+
+    if '#' not in node:
+        return False # Word not found (prefix exists, but not as a full word)
+
+    # Mark the end of word as False
+    del node['#']
+
+    # Traverse back up the path and remove nodes if they are no longer needed
+    # A node can be removed if it's not an end-of-word for another word
+    # AND it has no children (other than the one just removed)
+    for i in reversed(range(len(path))):
+        parent_node, char_to_child = path[i]
+        child_node = parent_node[char_to_child]
+
+        # Check if the child node has any remaining children or is an end-of-word for another word
+        if len(child_node) == 0: # No children and not an end-of-word
+            del parent_node[char_to_child]
+        else:
+            break # Stop deleting, this node is still part of another word or prefix
+
+    return True
+
+# Example Usage for Method 3:
+if __name__ == "__main__":
+    print("--- Method 3: Functional Trie using Nested Dictionaries ---")
+    my_trie = create_trie()
+    words = ["cat", "car", "cart", "dog", "door", "do"]
+
+    print("\nInserting words:")
+    for word in words:
+        insert_word(my_trie, word)
+        print(f"  Inserted '{word}'")
+
+    print("\nRaw Trie Structure (partial for brevity):")
+    # print(my_trie) # This can be very large for many words
+    print(f"  Root keys: {list(my_trie.keys())}")
+    if 'c' in my_trie:
+        print(f"  'c' children keys: {list(my_trie['c'].keys())}")
+    if 'd' in my_trie:
+        print(f"  'd' children keys: {list(my_trie['d'].keys())}")
+
+    print("\nSearching words:")
+    print(f"  'cat': {search_word(my_trie, 'cat')}")     # True
+    print(f"  'car': {search_word(my_trie, 'car')}")     # True
+    print(f"  'ca': {search_word(my_trie, 'ca')}")       # False
+    print(f"  'dog': {search_word(my_trie, 'dog')}")     # True
+    print(f"  'do': {search_word(my_trie, 'do')}")       # True
+    print(f"  'cow': {search_word(my_trie, 'cow')}")     # False
+
+    print("\nChecking prefixes:")
+    print(f"  Starts with 'ca': {starts_with_prefix(my_trie, 'ca')}") # True
+    print(f"  Starts with 'do': {starts_with_prefix(my_trie, 'do')}") # True
+    print(f"  Starts with 'z': {starts_with_prefix(my_trie, 'z')}")   # False
+
+    print("\nGetting words with prefix 'ca':")
+    print(f"  {get_words_with_prefix(my_trie, 'ca')}") # ['cat', 'car', 'cart']
+
+    print("\nGetting words with prefix 'do':")
+    print(f"  {get_words_with_prefix(my_trie, 'do')}") # ['dog', 'door', 'do']
+
+    print("\nDeleting words:")
+    print(f"  Deleting 'do': {delete_word(my_trie, 'do')}") # True
+    print(f"  Search 'do' after deletion: {search_word(my_trie, 'do')}") # False
+    print(f"  Search 'dog' after 'do' deletion: {search_word(my_trie, 'dog')}") # True (should still exist)
+    print(f"  Words with prefix 'do' after 'do' deletion: {get_words_with_prefix(my_trie, 'do')}") # ['dog', 'door']
+
+    print(f"  Deleting 'nonexistent': {delete_word(my_trie, 'nonexistent')}") # False
+    print(f"  Deleting 'cat': {delete_word(my_trie, 'cat')}") # True
+    print(f"  Search 'cat' after deletion: {search_word(my_trie, 'cat')}") # False
+    print(f"  Words with prefix 'ca' after 'cat' deletion: {get_words_with_prefix(my_trie, 'ca')}") # ['car', 'cart']
+
+    print(f"  Deleting 'car': {delete_word(my_trie, 'car')}") # True
+    print(f"  Deleting 'cart': {delete_word(my_trie, 'cart')}") # True
+    print(f"  Words with prefix 'ca' after all deletions: {get_words_with_prefix(my_trie, 'ca')}") # []
+    print(f"  Starts with 'ca' after all deletions: {starts_with_prefix(my_trie, 'ca')}") # False
+```
+
+## Method 4: Trie with Deletion and Prefix Search (Advanced)
+
+**Persona:** 🏗️ Architecture Builder, ⚡ Legacy Maintainer (needing full feature set), 📚 Learning Explorer (deep dive)
+
+This method builds upon the class-based dictionary approach (Method 1) by adding more advanced features, specifically a robust deletion mechanism and enhanced prefix search capabilities. While Method 1 already included a basic deletion, this section emphasizes the importance of a well-designed deletion and expands on prefix-based word retrieval.
+
+### Core Concepts
+
+*   **Reference Counting (Implicit):** The deletion logic implicitly handles reference counting by only removing nodes that are no longer part of any other word or prefix.
+*   **Recursive Deletion:** Deletion is often best implemented recursively, traversing down to the word's end and then backtracking to remove unnecessary nodes.
+*   **Prefix Word Retrieval:** A Depth-First Search (DFS) or Breadth-First Search (BFS) can be used to collect all words starting with a given prefix.
+
+### Advantages
+
+*   **Full Functionality:** Provides a complete set of operations for a dynamic dictionary.
+*   **Maintainability:** Class-based structure makes it easier to extend and debug.
+*   **Correct Deletion:** Ensures that deleting one word doesn't inadvertently break other words sharing prefixes.
+
+### Disadvantages
+
+*   **Increased Complexity:** Deletion logic, especially recursive, can be tricky to get right.
+*   **Memory for Recursion:** Recursive deletion uses stack space.
+
+### Implementation Details
+
+The `Trie` class from Method 1 already includes `delete` and `get_words_with_prefix` methods. Here, we'll reiterate and emphasize their importance and provide additional examples.
+
+```python
+# Method 4: Trie with Deletion and Prefix Search (Advanced)
+# File: trie_advanced.py
+
+class TrieNode:
+    def __init__(self):
+        self.children: dict[str, TrieNode] = {}
+        self.is_end_of_word: bool = False
+        # Optional: could add a counter for words passing through this node
+        # self.count = 0
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word: str) -> None:
+        node = self.root
+        for char in word:
+            if char not in node.

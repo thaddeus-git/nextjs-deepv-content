@@ -1,0 +1,1112 @@
+---
+title: "Multiline string literal in C#: Complete Guide with 0 Solutions"
+slug: "multiline-string-literal-in-c"
+category: "programming-languages"
+subcategory: "csharp"
+description: "For modern C development (C 8.0+), the most straightforward and readable way to create multiline string literals is by using verbatim string literals (@\"\") c..."
+tags: ["c#","string","shorthand"]
+difficulty: "intermediate"
+readTime: 24
+lastUpdated: "2025-09-18T16:49:50.254Z"
+featured: true
+---
+
+# Multiline string literal in C#: Complete Guide with 0 Solutions
+
+## Quick Answer
+
+For modern C# development (C# 8.0+), the most straightforward and readable way to create multiline string literals is by using **verbatim string literals** (`@""`) combined with **string interpolation** (`$""`). This allows you to embed newlines directly within the string and include variables seamlessly.
+
+```csharp
+// Quick Answer for C# 8.0+
+string name = "Alice";
+string greeting = $@"
+Hello, {name}!
+Welcome to the world of C#.
+This is a multiline string.
+";
+
+Console.WriteLine(greeting);
+```
+
+This approach satisfies the **🚀 Speed Seeker** for its conciseness, the **🔧 Problem Solver** for its direct functionality, and the **📚 Learning Explorer** for demonstrating modern C# features.
+
+## Choose Your Method
+
+Deciding on the best method for multiline strings in C# depends on your specific needs, C# version, and desired readability. Use the following decision tree to navigate to the most suitable approach.
+
+```mermaid
+graph TD
+    A[Start: Need a Multiline String in C#?] --> B{C# Version?};
+
+    B -- C# 11+ --> C{Need to preserve indentation exactly?};
+    C -- Yes --> D[Use Raw String Literals (`"""`)];
+    C -- No --> E[Use Verbatim String Literals (`@""`) with Trim/Replace];
+
+    B -- C# 8.0 - C# 10.0 --> F{Need to embed variables?};
+    F -- Yes --> G[Use Interpolated Verbatim String Literals (`$@""`)];
+    F -- No --> H[Use Verbatim String Literals (`@""`)];
+
+    B -- C# 1.0 - C# 7.0 --> I{Need to embed variables?};
+    I -- Yes --> J[Use String Concatenation (`+`) with `Environment.NewLine` or `\n`];
+    I -- No --> K[Use Verbatim String Literals (`@""`)];
+
+    D --> L[Example: Raw String Literals];
+    E --> M[Example: Verbatim with Trim/Replace];
+    G --> N[Example: Interpolated Verbatim];
+    H --> O[Example: Verbatim];
+    J --> P[Example: Concatenation];
+    K --> Q[Example: Verbatim (Legacy)];
+
+    subgraph Persona Considerations
+        D -- 🏗️ Architecture Builder --> D;
+        D -- 🎨 Output Focused --> D;
+        E -- 🎨 Output Focused --> E;
+        G -- 🚀 Speed Seeker --> G;
+        G -- 📚 Learning Explorer --> G;
+        H -- 🔧 Problem Solver --> H;
+        J -- ⚡ Legacy Maintainer --> J;
+        K -- ⚡ Legacy Maintainer --> K;
+    end
+```
+
+## Table of Contents
+- [Ready-to-Use Code](#ready-to-use-code)
+- [Method 1: Raw String Literals (C# 11+)](#method-1-raw-string-literals-c-11)
+  - [Persona: 🏗️ Architecture Builder, 🎨 Output Focused](#persona-architecture-builder-🎨-output-focused)
+- [Method 2: Interpolated Verbatim String Literals (C# 8.0+)](#method-2-interpolated-verbatim-string-literals-c-80)
+  - [Persona: 🚀 Speed Seeker, 📚 Learning Explorer](#persona-🚀-speed-seeker-📚-learning-explorer)
+- [Method 3: Verbatim String Literals (C# 1.0+)](#method-3-verbatim-string-literals-c-10)
+  - [Persona: 🔧 Problem Solver, ⚡ Legacy Maintainer](#persona-🔧-problem-solver-⚡-legacy-maintainer)
+- [Method 4: String Concatenation with Newline Characters (C# 1.0+)](#method-4-string-concatenation-with-newline-characters-c-10)
+  - [Persona: ⚡ Legacy Maintainer](#persona-⚡-legacy-maintainer)
+- [Method 5: String.Join with Arrays (C# 1.0+)](#method-5-stringjoin-with-arrays-c-10)
+  - [Persona: 📚 Learning Explorer, 🏗️ Architecture Builder](#persona-📚-learning-explorer-🏗️-architecture-builder)
+- [Method 6: StringBuilder for Dynamic Multiline Strings (C# 1.0+)](#method-6-stringbuilder-for-dynamic-multiline-strings-c-10)
+  - [Persona: 🏗️ Architecture Builder, 🚀 Speed Seeker](#persona-🏗️-architecture-builder-🚀-speed-seeker)
+- [Performance Comparison](#performance-comparison)
+- [C# Version Support](#c-version-support)
+- [Common Problems & Solutions](#common-problems--solutions)
+- [Real-World Use Cases](#real-world-use-cases)
+- [Related: Other C# Operations](#related-other-c-operations)
+- [Summary](#summary)
+- [Frequently Asked Questions](#frequently-asked-questions)
+- [Tools & Resources](#tools--resources)
+
+## Ready-to-Use Code
+
+Here are the top 3 most common and effective ways to create multiline strings in C#, ready for you to copy and paste.
+
+### 1. Raw String Literals (C# 11+) - Best for exact formatting
+
+```csharp
+// C# 11+ Raw String Literal
+// Ideal for JSON, XML, or SQL where indentation matters.
+string jsonPayload = """
+    {
+        "id": 123,
+        "name": "Product X",
+        "details": {
+            "price": 99.99,
+            "currency": "USD"
+        }
+    }
+    """;
+
+Console.WriteLine("--- Raw String Literal (C# 11+) ---");
+Console.WriteLine(jsonPayload);
+```
+
+### 2. Interpolated Verbatim String Literals (C# 8.0+) - Best for readability and variable embedding
+
+```csharp
+// C# 8.0+ Interpolated Verbatim String Literal
+// Combines multiline support with variable interpolation.
+string userName = "Dr. Evelyn Reed";
+int projectCount = 5;
+
+string reportSummary = $@"
+Dear {userName},
+
+Your quarterly report is ready.
+You have {projectCount} active projects.
+Please review the attached document.
+
+Best regards,
+The System Team
+";
+
+Console.WriteLine("\n--- Interpolated Verbatim String Literal (C# 8.0+) ---");
+Console.WriteLine(reportSummary);
+```
+
+### 3. Verbatim String Literals (C# 1.0+) - Simple multiline, no interpolation
+
+```csharp
+// C# 1.0+ Verbatim String Literal
+// Simple, multiline string without variable embedding.
+string sqlQuery = @"
+SELECT
+    OrderID,
+    CustomerID,
+    OrderDate
+FROM
+    Orders
+WHERE
+    OrderDate >= '2024-01-01'
+ORDER BY
+    OrderDate DESC;
+";
+
+Console.WriteLine("\n--- Verbatim String Literal (C# 1.0+) ---");
+Console.WriteLine(sqlQuery);
+```
+
+## Method 1: Raw String Literals (C# 11+)
+
+Raw string literals, introduced in C# 11, provide the most elegant solution for multiline strings, especially when dealing with content that requires precise formatting, such as JSON, XML, or SQL queries. They start and end with at least three double-quote characters (`"""`) and allow you to embed any characters, including newlines and quotes, without escaping. The indentation of the string is determined by the closing delimiter.
+
+### Persona: 🏗️ Architecture Builder, 🎨 Output Focused
+
+**🏗️ Architecture Builders** will appreciate the clean syntax for defining complex data structures like JSON or XML directly in code, improving maintainability and reducing parsing errors. **🎨 Output Focused** users will love the exact control over whitespace and formatting, ensuring the output matches specifications precisely.
+
+### How it Works
+
+1.  **Delimiter:** Start and end the string with at least three double-quotes (`"""`). If your string contains three consecutive double-quotes, you'll need to use four (or more) for the delimiter.
+2.  **Indentation:** The indentation of the closing delimiter (`"""`) determines the minimum indentation for the entire string. Any whitespace to the left of the closing delimiter is removed from every line in the raw string literal. This allows you to indent your code for readability without affecting the string's content.
+3.  **Interpolation:** Raw string literals can be interpolated by adding a `$` prefix, similar to interpolated strings. If your string contains `{` or `}` characters that are not part of an interpolation, you can add more `$` characters to the prefix (e.g., `$$"""`) and match the number of braces in your interpolation (e.g., `{{variable}}`).
+
+### Examples
+
+#### Basic Raw String Literal
+
+```csharp
+// Example 1.1: Basic Raw String Literal for a simple message
+string welcomeMessage = """
+Hello, C# 11!
+This is a raw string literal.
+It preserves all newlines and spaces.
+""";
+
+Console.WriteLine("--- Example 1.1: Basic Raw String Literal ---");
+Console.WriteLine(welcomeMessage);
+// Expected Output:
+// Hello, C# 11!
+// This is a raw string literal.
+// It preserves all newlines and spaces.
+```
+
+#### Raw String Literal with JSON
+
+```csharp
+// Example 1.2: Raw String Literal for JSON payload
+// Notice how the indentation of the closing """ determines the base indentation.
+string jsonConfig = """
+    {
+        "appName": "MyAwesomeApp",
+        "version": "1.0.0",
+        "settings": {
+            "logLevel": "Info",
+            "maxRetries": 3
+        },
+        "features": [
+            "authentication",
+            "data_encryption"
+        ]
+    }
+    """;
+
+Console.WriteLine("\n--- Example 1.2: Raw String Literal for JSON ---");
+Console.WriteLine(jsonConfig);
+// Expected Output (indented as shown in the code):
+// {
+//     "appName": "MyAwesomeApp",
+//     "version": "1.0.0",
+//     "settings": {
+//         "logLevel": "Info",
+//         "maxRetries": 3
+//     },
+//     "features": [
+//         "authentication",
+//         "data_encryption"
+//     ]
+// }
+```
+
+#### Interpolated Raw String Literal
+
+```csharp
+// Example 1.3: Interpolated Raw String Literal
+string productName = "Quantum Processor";
+decimal price = 1299.99m;
+int quantity = 5;
+
+string orderDetails = $"""
+    Order Summary:
+    --------------------
+    Item: {productName}
+    Price: {price:C}
+    Quantity: {quantity}
+    Total: {price * quantity:C}
+    --------------------
+    Thank you for your purchase!
+    """;
+
+Console.WriteLine("\n--- Example 1.3: Interpolated Raw String Literal ---");
+Console.WriteLine(orderDetails);
+// Expected Output (assuming US culture for currency):
+// Order Summary:
+// --------------------
+// Item: Quantum Processor
+// Price: $1,299.99
+// Quantity: 5
+// Total: $6,499.95
+// --------------------
+// Thank you for your purchase!
+```
+
+#### Raw String Literal with Braces (Escaping Interpolation)
+
+```csharp
+// Example 1.4: Raw String Literal with Braces (escaping interpolation)
+// If your string contains literal { or } that are NOT interpolation placeholders,
+// you can use more $ signs and match the number of braces.
+// Here, we use $$""" and {{ and }} to denote literal braces.
+string jsonTemplate = $$"""
+    {
+        "templateName": "{{templateName}}",
+        "placeholders": {
+            "user": "{{userName}}",
+            "date": "{{currentDate}}"
+        }
+    }
+    """;
+
+string templateNameValue = "EmailConfirmation";
+string userNameValue = "Jane Doe";
+string currentDateValue = DateTime.Now.ToShortDateString();
+
+// To actually interpolate, you'd replace the {{...}} with real values
+// This example shows how to define a template string with literal braces.
+string finalJson = jsonTemplate
+    .Replace("{{templateName}}", templateNameValue)
+    .Replace("{{userName}}", userNameValue)
+    .Replace("{{currentDate}}", currentDateValue);
+
+Console.WriteLine("\n--- Example 1.4: Raw String Literal with Braces ---");
+Console.WriteLine(finalJson);
+// Expected Output:
+// {
+//     "templateName": "EmailConfirmation",
+//     "placeholders": {
+//         "user": "Jane Doe",
+//         "date": "1/1/2025" (or current date)
+//     }
+// }
+```
+
+#### Raw String Literal for SQL Query
+
+```csharp
+// Example 1.5: Raw String Literal for a complex SQL query
+string tableName = "Customers";
+string city = "New York";
+
+string complexSqlQuery = $"""
+    SELECT
+        c.CustomerID,
+        c.FirstName,
+        c.LastName,
+        o.OrderID,
+        o.OrderDate
+    FROM
+        {tableName} c
+    JOIN
+        Orders o ON c.CustomerID = o.CustomerID
+    WHERE
+        c.City = '{city}'
+        AND o.OrderDate >= '2024-01-01'
+    ORDER BY
+        o.OrderDate DESC, c.LastName ASC;
+    """;
+
+Console.WriteLine("\n--- Example 1.5: Raw String Literal for SQL Query ---");
+Console.WriteLine(complexSqlQuery);
+// Expected Output:
+// SELECT
+//     c.CustomerID,
+//     c.FirstName,
+//     c.LastName,
+//     o.OrderID,
+//     o.OrderDate
+// FROM
+//     Customers c
+// JOIN
+//     Orders o ON c.CustomerID = o.CustomerID
+// WHERE
+//     c.City = 'New York'
+//     AND o.OrderDate >= '2024-01-01'
+// ORDER BY
+//     o.OrderDate DESC, c.LastName ASC;
+```
+
+## Method 2: Interpolated Verbatim String Literals (C# 8.0+)
+
+Introduced in C# 6.0 (interpolation) and combined with verbatim strings in C# 8.0, this method offers a powerful and highly readable way to create multiline strings that include embedded expressions. It combines the `$` for interpolation and `@` for verbatim string literals, resulting in `$@""` or `@$""`.
+
+### Persona: 🚀 Speed Seeker, 📚 Learning Explorer
+
+**🚀 Speed Seekers** will find this method incredibly efficient for quickly constructing complex strings with dynamic content. **📚 Learning Explorers** will appreciate how it clearly demonstrates modern C# features, making code both powerful and easy to understand.
+
+### How it Works
+
+1.  **Prefixes:** Start the string with both `$` and `@` (e.g., `$@"..."` or `@$"..."`). The order doesn't matter, but `$@` is more common.
+2.  **Multiline Support:** The `@` prefix allows the string to span multiple lines, preserving newlines and most whitespace directly as typed.
+3.  **Interpolation:** The `$` prefix enables embedding C# expressions directly within the string using curly braces `{}`.
+4.  **Escaping:** Double quotes within the string must be escaped by doubling them (`""`). Backslashes (`\`) are treated as literal characters, not escape sequences.
+
+### Examples
+
+#### Basic Interpolated Verbatim String
+
+```csharp
+// Example 2.1: Basic Interpolated Verbatim String
+string eventName = "Tech Summit 2025";
+DateTime eventDate = new DateTime(2025, 10, 26);
+string location = "Convention Center, Cityville";
+
+string invitation = $@"
+You are cordially invited to the
+{eventName}
+on {eventDate:D} at {location}.
+
+We look forward to seeing you there!
+";
+
+Console.WriteLine("--- Example 2.1: Basic Interpolated Verbatim String ---");
+Console.WriteLine(invitation);
+// Expected Output (date format depends on culture):
+// You are cordially invited to the
+// Tech Summit 2025
+// on Sunday, October 26, 2025 at Convention Center, Cityville.
+//
+// We look forward to seeing you there!
+```
+
+#### Interpolated Verbatim with Complex Expressions
+
+```csharp
+// Example 2.2: Interpolated Verbatim with complex expressions
+int itemPrice = 150;
+int discountPercentage = 10;
+int quantity = 3;
+
+string invoiceItem = $@"
+Item: Advanced Widget
+Unit Price: {itemPrice:C}
+Quantity: {quantity}
+Discount: {discountPercentage}%
+Subtotal: {itemPrice * quantity:C}
+Total after discount: {(itemPrice * quantity * (100 - discountPercentage) / 100):C}
+";
+
+Console.WriteLine("\n--- Example 2.2: Interpolated Verbatim with Complex Expressions ---");
+Console.WriteLine(invoiceItem);
+// Expected Output (assuming US culture for currency):
+// Item: Advanced Widget
+// Unit Price: $150.00
+// Quantity: 3
+// Discount: 10%
+// Subtotal: $450.00
+// Total after discount: $405.00
+```
+
+#### Handling Quotes in Interpolated Verbatim Strings
+
+```csharp
+// Example 2.3: Handling quotes in Interpolated Verbatim Strings
+string author = "Jane 'The Code Whisperer' Doe";
+string bookTitle = "C# Mastery";
+
+string quote = $@"
+The author, {author}, once said,
+""Learning {bookTitle} is an adventure.""
+";
+
+Console.WriteLine("\n--- Example 2.3: Handling Quotes in Interpolated Verbatim Strings ---");
+Console.WriteLine(quote);
+// Expected Output:
+// The author, Jane 'The Code Whisperer' Doe, once said,
+// "Learning C# Mastery is an adventure."
+```
+
+#### Generating HTML with Interpolated Verbatim
+
+```csharp
+// Example 2.4: Generating HTML with Interpolated Verbatim
+string pageTitle = "Welcome Page";
+string userName = "Guest";
+string linkUrl = "/dashboard";
+string linkText = "Go to Dashboard";
+
+string htmlContent = $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{pageTitle}</title>
+</head>
+<body>
+    <h1>Hello, {userName}!</h1>
+    <p>Click <a href=""{linkUrl}"">{linkText}</a> to continue.</p>
+</body>
+</html>
+";
+
+Console.WriteLine("\n--- Example 2.4: Generating HTML with Interpolated Verbatim ---");
+Console.WriteLine(htmlContent);
+// Expected Output:
+// <!DOCTYPE html>
+// <html>
+// <head>
+//     <title>Welcome Page</title>
+// </head>
+// <body>
+//     <h1>Hello, Guest!</h1>
+//     <p>Click <a href="/dashboard">Go to Dashboard</a> to continue.</p>
+// </body>
+// </html>
+```
+
+#### SQL Query with Interpolated Verbatim
+
+```csharp
+// Example 2.5: SQL Query with Interpolated Verbatim
+string customerId = "CUST001";
+DateTime startDate = new DateTime(2024, 1, 1);
+DateTime endDate = new DateTime(2024, 12, 31);
+
+string parameterizedSqlQuery = $@"
+SELECT
+    o.OrderID,
+    o.OrderDate,
+    p.ProductName,
+    oi.Quantity,
+    oi.UnitPrice
+FROM
+    Orders o
+JOIN
+    OrderItems oi ON o.OrderID = oi.OrderID
+JOIN
+    Products p ON oi.ProductID = p.ProductID
+WHERE
+    o.CustomerID = '{customerId}'
+    AND o.OrderDate BETWEEN '{startDate:yyyy-MM-dd}' AND '{endDate:yyyy-MM-dd}'
+ORDER BY
+    o.OrderDate DESC;
+";
+
+Console.WriteLine("\n--- Example 2.5: SQL Query with Interpolated Verbatim ---");
+Console.WriteLine(parameterizedSqlQuery);
+// Expected Output:
+// SELECT
+//     o.OrderID,
+//     o.OrderDate,
+//     p.ProductName,
+//     oi.Quantity,
+//     oi.UnitPrice
+// FROM
+//     Orders o
+// JOIN
+//     OrderItems oi ON o.OrderID = oi.OrderID
+// JOIN
+//     Products p ON oi.ProductID = p.ProductID
+// WHERE
+//     o.CustomerID = 'CUST001'
+//     AND o.OrderDate BETWEEN '2024-01-01' AND '2024-12-31'
+// ORDER BY
+//     o.OrderDate DESC;
+```
+**Important Note on SQL:** While interpolated strings are convenient, **always use parameterized queries** when constructing SQL queries with user input to prevent SQL injection vulnerabilities. The example above is for demonstration of string construction only.
+
+## Method 3: Verbatim String Literals (C# 1.0+)
+
+Verbatim string literals, denoted by the `@` prefix, have been a part of C# since its inception. They allow a string to span multiple lines and treat backslash characters (`\`) as literal characters rather than escape sequences. This makes them ideal for paths, regular expressions, and simple multiline text where interpolation isn't needed.
+
+### Persona: 🔧 Problem Solver, ⚡ Legacy Maintainer
+
+**🔧 Problem Solvers** will find this a reliable "just works" solution for basic multiline strings without the complexity of interpolation. **⚡ Legacy Maintainers** will frequently encounter and use this method in older codebases, as it's been available since C# 1.0.
+
+### How it Works
+
+1.  **Prefix:** Start the string with an `@` symbol immediately followed by a double quote (`@"`).
+2.  **Multiline Support:** The string can span multiple lines, and all newlines and whitespace (including leading whitespace on subsequent lines) are preserved as part of the string content.
+3.  **No Escape Sequences:** Backslashes (`\`) are treated as literal characters. For example, `@"\n"` is a literal backslash followed by 'n', not a newline character.
+4.  **Escaping Double Quotes:** To include a double quote within a verbatim string, you must double it (`""`).
+
+### Examples
+
+#### Basic Verbatim String Literal
+
+```csharp
+// Example 3.1: Basic Verbatim String Literal
+string poem = @"
+Roses are red,
+Violets are blue,
+C# makes multiline strings
+Easy for you!
+";
+
+Console.WriteLine("--- Example 3.1: Basic Verbatim String Literal ---");
+Console.WriteLine(poem);
+// Expected Output:
+//
+// Roses are red,
+// Violets are blue,
+// C# makes multiline strings
+// Easy for you!
+// (Note the leading newline from the first line after @")
+```
+
+#### File Paths and Regular Expressions
+
+```csharp
+// Example 3.2: Verbatim String for File Paths and Regular Expressions
+string filePath = @"C:\Program Files\MyApp\config.json";
+string regexPattern = @"^(\d{3})-(\d{2})-(\d{4})$"; // Matches a Social Security Number format
+
+Console.WriteLine("\n--- Example 3.2: Verbatim String for File Paths and Regex ---");
+Console.WriteLine($"File Path: {filePath}");
+Console.WriteLine($"Regex Pattern: {regexPattern}");
+
+// Demonstrating regex usage
+System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match("123-45-6789", regexPattern);
+if (match.Success)
+{
+    Console.WriteLine($"Regex Match: {match.Value}");
+}
+else
+{
+    Console.WriteLine("Regex Match: No match found.");
+}
+// Expected Output:
+// File Path: C:\Program Files\MyApp\config.json
+// Regex Pattern: ^(\d{3})-(\d{2})-(\d{4})$
+// Regex Match: 123-45-6789
+```
+
+#### SQL Query with Verbatim String
+
+```csharp
+// Example 3.3: Verbatim String for a SQL Query
+string complexSql = @"
+SELECT
+    e.EmployeeID,
+    e.FirstName,
+    e.LastName,
+    d.DepartmentName
+FROM
+    Employees e
+JOIN
+    Departments d ON e.DepartmentID = d.DepartmentID
+WHERE
+    e.IsActive = 1
+    AND d.Location = 'Headquarters'
+ORDER BY
+    e.LastName, e.FirstName;
+";
+
+Console.WriteLine("\n--- Example 3.3: Verbatim String for SQL Query ---");
+Console.WriteLine(complexSql);
+// Expected Output:
+// SELECT
+//     e.EmployeeID,
+//     e.FirstName,
+//     e.LastName,
+//     d.DepartmentName
+// FROM
+//     Employees e
+// JOIN
+//     Departments d ON e.DepartmentID = d.DepartmentID
+// WHERE
+//     e.IsActive = 1
+//     AND d.Location = 'Headquarters'
+// ORDER BY
+//     e.LastName, e.FirstName;
+```
+
+#### Handling Double Quotes in Verbatim Strings
+
+```csharp
+// Example 3.4: Handling double quotes in Verbatim Strings
+string messageWithQuotes = @"
+He said, ""Hello, world!""
+She replied, ""How are you today?""
+";
+
+Console.WriteLine("\n--- Example 3.4: Handling Double Quotes in Verbatim Strings ---");
+Console.WriteLine(messageWithQuotes);
+// Expected Output:
+// He said, "Hello, world!"
+// She replied, "How are you today?"
+```
+
+#### Verbatim String with `String.Trim()` for Indentation Control
+
+```csharp
+// Example 3.5: Verbatim String with String.Trim() for indentation control
+// Verbatim strings preserve all whitespace, including leading whitespace.
+// To remove unwanted leading indentation, you can use Trim().
+string indentedText = @"
+    This line is indented.
+        This line is more indented.
+    And this line is also indented.
+";
+
+Console.WriteLine("\n--- Example 3.5: Verbatim String with Trim() (Original) ---");
+Console.WriteLine(indentedText);
+
+// To remove the common leading whitespace, you can use TrimStart() or a custom trim.
+// For more advanced trimming, consider String.Replace() or regex.
+string trimmedText = indentedText.Trim(); // Removes leading/trailing whitespace including newlines
+
+Console.WriteLine("\n--- Example 3.5: Verbatim String with Trim() (Trimmed) ---");
+Console.WriteLine(trimmedText);
+
+// For more precise control over leading indentation, especially for code blocks:
+// You might need to manually remove common leading whitespace or use a utility function.
+// Example of a simple custom trim for common leading whitespace:
+string[] lines = indentedText.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+int minIndent = int.MaxValue;
+foreach (string line in lines)
+{
+    if (string.IsNullOrWhiteSpace(line)) continue;
+    int currentIndent = line.TakeWhile(char.IsWhiteSpace).Count();
+    if (currentIndent < minIndent)
+    {
+        minIndent = currentIndent;
+    }
+}
+
+string cleanedText = string.Join(Environment.NewLine, lines.Select(line =>
+    line.Length >= minIndent ? line.Substring(minIndent) : line));
+
+Console.WriteLine("\n--- Example 3.5: Verbatim String with Custom Indent Trim ---");
+Console.WriteLine(cleanedText);
+// Expected Output (trimmed):
+// This line is indented.
+//     This line is more indented.
+// And this line is also indented.
+```
+
+## Method 4: String Concatenation with Newline Characters (C# 1.0+)
+
+This is the most basic and oldest method for creating multiline strings in C#. It involves concatenating multiple string literals or variables using the `+` operator and explicitly inserting newline characters (`\n`, `\r\n`, or `Environment.NewLine`).
+
+### Persona: ⚡ Legacy Maintainer
+
+**⚡ Legacy Maintainers** will be very familiar with this approach, as it was the primary way to construct multiline strings before verbatim and interpolated strings became common. It's often found in older codebases.
+
+### How it Works
+
+1.  **Concatenation:** Use the `+` operator to join individual string segments.
+2.  **Newline Characters:**
+    *   `\n`: Represents a line feed (LF). Common on Unix-like systems.
+    *   `\r\n`: Represents a carriage return followed by a line feed (CRLF). Standard on Windows.
+    *   `Environment.NewLine`: A platform-agnostic way to get the correct newline sequence for the current operating system. This is generally preferred for portability.
+3.  **Escaping:** Standard string literal rules apply, meaning backslashes (`\`) are escape characters (e.g., `\\` for a literal backslash, `\"` for a literal double quote).
+
+### Examples
+
+#### Basic Concatenation with `\n`
+
+```csharp
+// Example 4.1: Basic Concatenation with \n
+string message1 = "Line 1\n"
+                + "Line 2\n"
+                + "Line 3.";
+
+Console.WriteLine("--- Example 4.1: Basic Concatenation with \\n ---");
+Console.WriteLine(message1);
+// Expected Output:
+// Line 1
+// Line 2
+// Line 3.
+```
+
+#### Concatenation with `Environment.NewLine`
+
+```csharp
+// Example 4.2: Concatenation with Environment.NewLine for portability
+string header = "Report Title";
+string author = "John Doe";
+
+string reportHeader = header + Environment.NewLine
+                    + "--------------------" + Environment.NewLine
+                    + "Author: " + author + Environment.NewLine
+                    + "Date: " + DateTime.Now.ToShortDateString();
+
+Console.WriteLine("\n--- Example 4.2: Concatenation with Environment.NewLine ---");
+Console.WriteLine(reportHeader);
+// Expected Output (date depends on current date):
+// Report Title
+// --------------------
+// Author: John Doe
+// Date: 1/1/2025
+```
+
+#### Concatenation with Variables and Formatting
+
+```csharp
+// Example 4.3: Concatenation with variables and String.Format
+string customerName = "Alice Smith";
+int orderId = 1001;
+decimal totalAmount = 250.75m;
+
+string orderConfirmation = "Dear " + customerName + "," + Environment.NewLine
+                         + Environment.NewLine
+                         + "Your order #" + orderId + " has been placed." + Environment.NewLine
+                         + "Total amount: " + string.Format("{0:C}", totalAmount) + Environment.NewLine
+                         + Environment.NewLine
+                         + "Thank you for your business!";
+
+Console.WriteLine("\n--- Example 4.3: Concatenation with Variables and Formatting ---");
+Console.WriteLine(orderConfirmation);
+// Expected Output (currency depends on culture):
+// Dear Alice Smith,
+//
+// Your order #1001 has been placed.
+// Total amount: $250.75
+//
+// Thank you for your business!
+```
+
+#### Building a SQL Query with Concatenation (Legacy Style)
+
+```csharp
+// Example 4.4: Building a SQL Query with Concatenation (Legacy Style)
+// Note: This approach is highly susceptible to SQL Injection if 'userName' is user-provided.
+// Always use parameterized queries in real applications.
+string userName = "admin";
+string status = "Active";
+
+string legacySqlQuery = "SELECT UserID, UserName, Email " + Environment.NewLine
+                      + "FROM Users " + Environment.NewLine
+                      + "WHERE UserName = '" + userName + "' " + Environment.NewLine
+                      + "AND Status = '" + status + "';";
+
+Console.WriteLine("\n--- Example 4.4: Building a SQL Query with Concatenation (Legacy) ---");
+Console.WriteLine(legacySqlQuery);
+// Expected Output:
+// SELECT UserID, UserName, Email
+// FROM Users
+// WHERE UserName = 'admin'
+// AND Status = 'Active';
+```
+
+## Method 5: String.Join with Arrays (C# 1.0+)
+
+The `String.Join` method provides a clean and efficient way to concatenate elements of a string array or any `IEnumerable<string>` into a single string, using a specified separator. This is particularly useful when you have a collection of lines that you want to combine into a multiline string.
+
+### Persona: 📚 Learning Explorer, 🏗️ Architecture Builder
+
+**📚 Learning Explorers** will find this method demonstrates a functional programming style for string manipulation. **🏗️ Architecture Builders** might use this for dynamically generating configuration files or reports where lines are constructed programmatically and then joined.
+
+### How it Works
+
+1.  **`String.Join(separator, values)`:** Takes a separator string (e.g., `Environment.NewLine`) and an array or enumerable of strings.
+2.  **Efficiency:** It's generally more efficient than repeated `+` concatenation for a large number of strings because it allocates memory only once for the final string.
+3.  **Readability:** Can improve readability when dealing with a list of distinct lines.
+
+### Examples
+
+#### Basic `String.Join` with `Environment.NewLine`
+
+```csharp
+// Example 5.1: Basic String.Join with Environment.NewLine
+string[] lines = new string[]
+{
+    "First line of text.",
+    "Second line, dynamically generated.",
+    "Third and final line."
+};
+
+string multilineText = string.Join(Environment.NewLine, lines);
+
+Console.WriteLine("--- Example 5.1: Basic String.Join ---");
+Console.WriteLine(multilineText);
+// Expected Output:
+// First line of text.
+// Second line, dynamically generated.
+// Third and final line.
+```
+
+#### `String.Join` with a List of Strings
+
+```csharp
+// Example 5.2: String.Join with a List<string>
+List<string> shoppingList = new List<string>
+{
+    "Milk",
+    "Eggs",
+    "Bread",
+    "Cheese"
+};
+
+string formattedList = "Shopping List:" + Environment.NewLine
+                     + string.Join(Environment.NewLine, shoppingList.Select(item => $"- {item}"));
+
+Console.WriteLine("\n--- Example 5.2: String.Join with a List<string> ---");
+Console.WriteLine(formattedList);
+// Expected Output:
+// Shopping List:
+// - Milk
+// - Eggs
+// - Bread
+// - Cheese
+```
+
+#### Generating a CSV Header with `String.Join`
+
+```csharp
+// Example 5.3: Generating a CSV Header with String.Join
+string[] csvHeaders = { "ID", "Name", "Email", "Status" };
+string csvHeaderLine = string.Join(",", csvHeaders);
+
+Console.WriteLine("\n--- Example 5.3: Generating a CSV Header ---");
+Console.WriteLine(csvHeaderLine);
+// Expected Output:
+// ID,Name,Email,Status
+```
+
+#### `String.Join` for a Multiline SQL `IN` Clause
+
+```csharp
+// Example 5.4: String.Join for a Multiline SQL IN Clause
+List<int> productIds = new List<int> { 101, 105, 203, 210 };
+
+// For SQL, you might want to format each ID as a string
+string idList = string.Join(", ", productIds.Select(id => id.ToString()));
+
+string sqlQueryWithInClause = $@"
+SELECT
+    ProductName,
+    Price
+FROM
+    Products
+WHERE
+    ProductID IN ({idList});
+";
+
+Console.WriteLine("\n--- Example 5.4: String.Join for SQL IN Clause ---");
+Console.WriteLine(sqlQueryWithInClause);
+// Expected Output:
+// SELECT
+//     ProductName,
+//     Price
+// FROM
+//     Products
+// WHERE
+//     ProductID IN (101, 105, 203, 210);
+```
+
+#### Combining `String.Join` with LINQ for Dynamic Content
+
+```csharp
+// Example 5.5: Combining String.Join with LINQ for Dynamic Content
+var users = new[]
+{
+    new { Name = "Alice", Role = "Admin" },
+    new { Name = "Bob", Role = "User" },
+    new { Name = "Charlie", Role = "Guest" }
+};
+
+string userReport = "User Report:" + Environment.NewLine
+                  + string.Join(Environment.NewLine,
+                      users.Select((user, index) => $"{index + 1}. {user.Name} ({user.Role})"));
+
+Console.WriteLine("\n--- Example 5.5: String.Join with LINQ ---");
+Console.WriteLine(userReport);
+// Expected Output:
+// User Report:
+// 1. Alice (Admin)
+// 2. Bob (User)
+// 3. Charlie (Guest)
+```
+
+## Method 6: StringBuilder for Dynamic Multiline Strings (C# 1.0+)
+
+When you need to construct a multiline string dynamically, especially within loops or conditional logic, and performance is a concern (e.g., building very large strings), `System.Text.StringBuilder` is the go-to solution. It avoids the overhead of creating many intermediate string objects that occur with repeated string concatenation.
+
+### Persona: 🏗️ Architecture Builder, 🚀 Speed Seeker
+
+**🏗️ Architecture Builders** will use `StringBuilder` for robust, scalable solutions where strings are built incrementally. **🚀 Speed Seekers** will opt for `StringBuilder` when performance is critical, particularly for large or frequently constructed strings.
+
+### How it Works
+
+1.  **Mutable String:** `StringBuilder` is a mutable sequence of characters, unlike `string` which is immutable. This means operations like `Append` or `AppendLine` modify the existing `StringBuilder` object rather than creating new string objects.
+2.  **`Append` and `AppendLine`:**
+    *   `Append(string value)`: Adds the specified string to the end of the `StringBuilder`.
+    *   `AppendLine(string value)`: Adds the specified string followed by a newline character (`Environment.NewLine`). There's also an overload `AppendLine()` that just adds a newline.
+3.  **`ToString()`:** Once all parts of the string have been added, call `ToString()` to convert the `StringBuilder` content into an immutable `string` object.
+4.  **Capacity:** You can optionally specify an initial capacity to minimize reallocations, though `StringBuilder` handles resizing efficiently.
+
+### Examples
+
+#### Basic `StringBuilder` Usage
+
+```csharp
+// Example 6.1: Basic StringBuilder for a simple multiline message
+System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+sb.AppendLine("This is the first line.");
+sb.Append("This is the second line, ");
+sb.AppendLine("and it continues here.");
+sb.AppendLine("Finally, the third line.");
+
+string result = sb.ToString();
+
+Console.WriteLine("--- Example 6.1: Basic StringBuilder Usage ---");
+Console.WriteLine(result);
+// Expected Output:
+// This is the first line.
+// This is the second line, and it continues here.
+// Finally, the third line.
+```
+
+#### Building a Report with `StringBuilder` in a Loop
+
+```csharp
+// Example 6.2: Building a Report with StringBuilder in a Loop
+var products = new[]
+{
+    new { Name = "Laptop", Price = 1200.00m, Stock = 10 },
+    new { Name = "Mouse", Price = 25.50m, Stock = 50 },
+    new { Name = "Keyboard", Price = 75.00m, Stock = 20 }
+};
+
+System.Text.StringBuilder reportBuilder = new System.Text.StringBuilder();
+reportBuilder.AppendLine("Product Inventory Report");
+reportBuilder.AppendLine("------------------------");
+reportBuilder.AppendLine($"Generated On: {DateTime.Now:yyyy-MM-dd HH:mm}");
+reportBuilder.AppendLine(); // Blank line
+
+foreach (var product in products)
+{
+    reportBuilder.AppendLine($"Product: {product.Name}");
+    reportBuilder.AppendLine($"  Price: {product.Price:C}");
+    reportBuilder.AppendLine($"  Stock: {product.Stock} units");
+    reportBuilder.AppendLine(); // Blank line between products
+}
+
+reportBuilder.AppendLine("------------------------");
+reportBuilder.AppendLine($"Total Products: {products.Length}");
+
+string inventoryReport = reportBuilder.ToString();
+
+Console.WriteLine("\n--- Example 6.2: Building a Report with StringBuilder ---");
+Console.WriteLine(inventoryReport);
+// Expected Output (date/time will vary):
+// Product Inventory Report
+// ------------------------
+// Generated On: 2025-01-01 10:30
+//
+// Product: Laptop
+//   Price: $1,200.00
+//   Stock: 10 units
+//
+// Product: Mouse
+//   Price: $25.50
+//   Stock: 50 units
+//
+// Product: Keyboard
+//   Price: $75.00
+//   Stock: 20 units
+//
+// ------------------------
+// Total Products: 3
+```
+
+#### Conditional String Building with `StringBuilder`
+
+```csharp
+// Example 6.3: Conditional String Building with StringBuilder
+bool includeDetails = true;
+bool isAdmin = true;
+string userName = "Alice";
+
+System.Text.StringBuilder emailBuilder = new System.Text.StringBuilder();
+emailBuilder.AppendLine($"Dear {userName},");
+emailBuilder.AppendLine();
+emailBuilder.AppendLine("Your account summary is attached.");
+
+if (includeDetails)
+{
+    emailBuilder.AppendLine("Here are some details:");
+    emailBuilder.AppendLine("- Last login: 2024-12-31");
+    emailBuilder.AppendLine("- Active sessions: 2");
+}
+
+if (isAdmin)
+{
+    emailBuilder.AppendLine();
+    emailBuilder.AppendLine("Admin Notice: System maintenance scheduled for next week.");
+}
+
+emailBuilder.AppendLine();
+emailBuilder.AppendLine("Best regards,");
+emailBuilder.AppendLine("The Support Team");
+
+string emailContent = emailBuilder.ToString();
+
+Console.WriteLine("\n--- Example 6.3: Conditional String Building with StringBuilder ---");
+Console.WriteLine(emailContent);
+// Expected Output:
+// Dear Alice,
+//
+// Your account summary is attached.
+// Here are some details:
+// - Last login: 2024-12-31
+// - Active sessions: 2
+//
+// Admin Notice: System maintenance scheduled for next week.
+//
+// Best regards,
+// The Support Team
+```
+
+#### Generating XML with `StringBuilder`
+
+```csharp
+// Example 6.4: Generating XML with StringBuilder
+string rootElement = "Configuration";
+string settingName = "LogLevel";
+string settingValue = "Debug";
+
+System.Text.StringBuilder xmlBuilder = new System.Text.StringBuilder();
+xmlBuilder.AppendLine($"<{rootElement}>");
+xmlBuilder.AppendLine($"  <Setting Name=\"{settingName}\" Value=\"{settingValue}\" />");
+xmlBuilder.AppendLine($"  <Features>");
+xmlBuilder.AppendLine($"    <Feature Enabled=\"true\">FeatureA</Feature>");
+xmlBuilder.AppendLine($"    <Feature Enabled=\"false\">FeatureB</Feature>");
+xmlBuilder.AppendLine($"  </Features>");
+xmlBuilder.AppendLine($"</{rootElement}>");
+
+string xmlOutput = xmlBuilder.ToString();
+
+Console.WriteLine("\n--- Example 6.4: Generating XML with StringBuilder ---");
+Console.WriteLine(xmlOutput);
+// Expected Output:
+// <Configuration>
+//   <Setting Name="LogLevel" Value="Debug" />
+//   <Features>
+//     <Feature Enabled="true">FeatureA</Feature>
+//     <Feature Enabled="false">FeatureB</Feature>
+//   </Features>
+// </Configuration>
+```
+
+## Performance Comparison
+
+Choosing the right method for multiline strings can sometimes impact performance, especially when dealing with very large strings or frequent string constructions in performance-critical applications.
+
+| Method                                  | Readability (Code) | Readability (Output) | Performance (Small Strings) | Performance (Large/Many Strings) | C# Version | Persona Fit                                   | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        

@@ -1,0 +1,151 @@
+{
+  "ai_generator_output": {
+    "output_location": "data/json_output/ready/",
+    "file_naming": "{timestamp}_{stackoverflow_id}.json",
+    "timestamp_format": "YYYYMMDD_HHMMSS",
+    "json_structure": {
+      "metadata": {
+        "title": "string",
+        "slug": "string", 
+        "uniqueId": "string (8-char hex from SHA256)",
+        "category": "string",
+        "subcategory": "string",
+        "description": "string",
+        "tags": "array",
+        "difficulty": "enum",
+        "readTime": "number",
+        "publishedAt": "string",
+        "featured": "boolean",
+        "technology": "string",
+        "votes": "number",
+        "answersCount": "number",
+        "sourceStackOverflowId": "string",
+        "generatedAt": "ISO8601",
+        "workflowVersion": "string",
+        "qualityMetrics": {
+          "wordCount": "number",
+          "codeBlocks": "number",
+          "sections": "number",
+          "personaIntegration": "number",
+          "practicalFocusScore": "number"
+        }
+      },
+      "content": "markdown string",
+      "source_file": "string",
+      "generation_stats": "object",
+      "workflow_version": "string"
+    },
+    "id_mapping": {
+      "algorithm": "SHA256(salt + stackoverflow_id)[:8]",
+      "salt": "deepv-content-2025",
+      "example": "stackoverflow_id: '12345' -> unique_article_id: 'abc12345'"
+    },
+    "content_quality_hints": {
+      "structure": {
+        "heading_pattern": "# Title, ## Overview, ## Solution, ## Best Practices, ## Conclusion",
+        "code_examples": "Multiple language examples (Python, JavaScript, SQL, etc.)",
+        "diagrams": "Mermaid flowcharts for complex processes"
+      },
+      "quality_indicators": {
+        "word_count_range": "1500-7000 words",
+        "code_blocks_range": "3-20 blocks",
+        "sections_expected": "4-8 main sections",
+        "completeness_markers": "Has conclusion, has practical examples"
+      }
+    },
+    "validation_rules": {
+      "metadata.title": {
+        "type": "string",
+        "min_length": 5,
+        "max_length": 100,
+        "required": true
+      },
+      "metadata.slug": {
+        "type": "string",
+        "pattern": "kebab-case",
+        "required": true
+      },
+      "metadata.category": {
+        "type": "string", 
+        "enum": ["web-frontend", "system-devops", "databases", "mobile", "programming-languages"],
+        "required": true
+      },
+      "metadata.subcategory": {
+        "type": "string",
+        "required": true
+      },
+      "metadata.description": {
+        "type": "string",
+        "min_length": 20,
+        "max_length": 200,
+        "required": true
+      },
+      "content": {
+        "type": "string",
+        "format": "markdown",
+        "min_length": 100,
+        "required": true
+      },
+      "metadata.tags": {
+        "type": "array",
+        "items": "string",
+        "min_items": 1,
+        "max_items": 10,
+        "required": true
+      },
+      "metadata.difficulty": {
+        "type": "enum",
+        "values": ["beginner", "intermediate", "advanced"],
+        "required": true
+      },
+      "metadata.readTime": {
+        "type": "number",
+        "min": 1,
+        "max": 60,
+        "required": true
+      },
+      "metadata.featured": {
+        "type": "boolean",
+        "default": false,
+        "required": false
+      },
+      "metadata.uniqueId": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{8}$",
+        "description": "8-character hex ID for filename generation",
+        "required": true
+      }
+    },
+    "downstream_requirements": {
+      "validation_schemas": {
+        "content_schema_url": "https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/config/content-schema.json",
+        "categories_url": "https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/content/config/categories.json"
+      },
+      "code_language_mapping": {
+        "js": "javascript",
+        "py": "python", 
+        "sh": "bash"
+      }
+    },
+    "error_files": {
+      "location": "data/failed/",
+      "naming": "{timestamp}_{stackoverflow_id}_error.json"
+    },
+    "mdx_conversion": {
+      "target_filename_pattern": "{slug}-{uniqueId}.mdx",
+      "target_location": "staging/guides/",
+      "frontmatter_mapping": {
+        "title": "metadata.title",
+        "slug": "metadata.slug",
+        "category": "metadata.category", 
+        "subcategory": "metadata.subcategory",
+        "description": "metadata.description",
+        "tags": "metadata.tags",
+        "difficulty": "metadata.difficulty",
+        "readTime": "metadata.readTime",
+        "lastUpdated": "metadata.generatedAt",
+        "featured": "metadata.featured"
+      }
+    }
+  }
+}

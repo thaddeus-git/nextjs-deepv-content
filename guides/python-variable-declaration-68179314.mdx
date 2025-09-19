@@ -1,0 +1,897 @@
+---
+title: "Python Variable Declaration: Complete Guide with 0 Solutions"
+slug: "python-variable-declaration"
+category: "programming-languages"
+subcategory: "python"
+description: "In Python, variables are declared and initialized in a single step through assignment. There is no separate \"declaration\" keyword like var or let in JavaScri..."
+tags: ["python","variable-declaration"]
+difficulty: "intermediate"
+readTime: 24
+lastUpdated: "2025-09-18T17:07:28.900Z"
+featured: false
+---
+
+# Python Variable Declaration: The Complete Guide to Modern Practices
+
+## Quick Answer
+
+In Python, variables are declared and initialized in a single step through assignment. There is no separate "declaration" keyword like `var` or `let` in JavaScript, or `int`, `string` in C++/Java. When you assign a value to a name, that name becomes a variable holding a reference to that value.
+
+```python
+# Simplest variable declaration and initialization
+my_variable = "Hello, Python!"
+another_number = 123
+is_active = True
+
+# For class-level variables (attributes)
+class MyClass:
+    class_variable = "I belong to the class" # Declared at class level
+
+    def __init__(self, instance_data):
+        self.instance_variable = instance_data # Declared at instance level via __init__
+
+# Example usage
+obj = MyClass("Instance specific data")
+print(my_variable)
+print(MyClass.class_variable)
+print(obj.instance_variable)
+```
+
+## Choose Your Method
+
+This decision tree helps you quickly identify the best way to declare and use variables based on your specific needs and persona.
+
+```mermaid
+graph TD
+    A[Start: Need to declare a variable in Python?] --> B{Where will this variable be used?};
+
+    B -- Inside a function/method? --> C{Is it temporary, local to the function?};
+    C -- Yes --> D[Declare and assign directly: `my_var = value`];
+    D -- 🚀 Speed Seeker, 📚 Learning Explorer, 🔧 Problem Solver --> E[Local Variable];
+
+    C -- No, needs to be accessible outside or across calls? --> F{Does it need to persist across function calls or be shared?};
+    F -- Yes, within a class instance --> G[Declare in `__init__` as `self.my_var = value`];
+    G -- 🏗️ Architecture Builder, 📚 Learning Explorer --> H[Instance Variable];
+
+    F -- Yes, shared across all instances of a class --> I[Declare directly in class body: `class MyClass: class_var = value`];
+    I -- 🏗️ Architecture Builder, 📚 Learning Explorer --> J[Class Variable];
+
+    F -- Yes, globally accessible (use sparingly) --> K[Declare outside all functions/classes: `GLOBAL_VAR = value`];
+    K -- 🔧 Problem Solver (for quick scripts), ⚡ Legacy Maintainer --> L[Global Variable];
+
+    B -- Outside any function/class (top-level script)? --> M[Declare and assign directly: `my_var = value`];
+    M -- 🚀 Speed Seeker, 📚 Learning Explorer, 🔧 Problem Solver --> N[Global Variable (Script Scope)];
+
+    B -- As a parameter to a function? --> O[Define in function signature: `def func(param_name):`];
+    O -- 📚 Learning Explorer, 🏗️ Architecture Builder --> P[Function Parameter];
+
+    B -- To hold a custom object? --> Q[Assign an instance of your custom class: `my_obj = MyCustomClass(...)`];
+    Q -- 🏗️ Architecture Builder, 🎨 Output Focused --> R[Custom Object Variable];
+
+    E --> S[End];
+    H --> S;
+    J --> S;
+    L --> S;
+    N --> S;
+    P --> S;
+    R --> S;
+```
+
+## Table of Contents
+- [Quick Answer](#quick-answer)
+- [Choose Your Method](#choose-your-method)
+- [Ready-to-Use Code](#ready-to-use-code)
+- [Method 1: Basic Assignment (Implicit Declaration)](#method-1-basic-assignment-implicit-declaration)
+- [Method 2: Instance Variables in Classes](#method-2-instance-variables-in-classes)
+- [Method 3: Class Variables (Static Attributes)](#method-3-class-variables-static-attributes)
+- [Method 4: Global Variables](#method-4-global-variables)
+- [Method 5: Function Parameters](#method-5-function-parameters)
+- [Method 6: Declaring Variables for Custom Types](#method-6-declaring-variables-for-custom-types)
+- [Performance Comparison](#performance-comparison)
+- [Python Version Support](#python-version-support)
+- [Common Problems & Solutions](#common-problems--solutions)
+- [Real-World Use Cases](#real-world-use-cases)
+- [Related: Other Python Operations](#related-other-python-operations)
+- [Summary](#summary)
+- [Frequently Asked Questions](#frequently-asked-questions)
+- [Test Your Code](#test-your-code)
+
+## Ready-to-Use Code
+
+Here are the most common and practical ways to declare variables in Python, ready for you to copy and paste.
+
+**1. Simple Local Variable:**
+For quick, temporary storage within a function or script.
+
+```python
+# 🚀 Speed Seeker, 🔧 Problem Solver
+def calculate_area(length, width):
+    area = length * width # 'area' is a local variable
+    return area
+
+result = calculate_area(10, 5)
+print(f"The area is: {result}")
+```
+
+**2. Instance Variable in a Class:**
+For data specific to an object, initialized when the object is created.
+
+```python
+# 🏗️ Architecture Builder, 📚 Learning Explorer
+class Car:
+    def __init__(self, make, model, year):
+        self.make = make    # 'make' is an instance variable
+        self.model = model  # 'model' is an instance variable
+        self.year = year    # 'year' is an instance variable
+
+    def display_info(self):
+        print(f"Car: {self.year} {self.make} {self.model}")
+
+my_car = Car("Toyota", "Camry", 2023)
+my_car.display_info()
+
+another_car = Car("Honda", "Civic", 2024)
+another_car.display_info()
+```
+
+**3. Class Variable (Shared across all instances):**
+For data that all objects of a class should share, like a constant or a counter.
+
+```python
+# 🏗️ Architecture Builder, 📚 Learning Explorer
+class Employee:
+    company_name = "Tech Solutions Inc." # 'company_name' is a class variable
+    employee_count = 0 # Another class variable
+
+    def __init__(self, name, employee_id):
+        self.name = name
+        self.employee_id = employee_id
+        Employee.employee_count += 1 # Increment class variable
+
+    def display_employee_info(self):
+        print(f"Name: {self.name}, ID: {self.employee_id}, Company: {Employee.company_name}")
+
+emp1 = Employee("Alice", "E001")
+emp2 = Employee("Bob", "E002")
+
+emp1.display_employee_info()
+emp2.display_employee_info()
+print(f"Total Employees: {Employee.employee_count}")
+```
+
+## Method 1: Basic Assignment (Implicit Declaration)
+
+**Persona:** 🚀 Speed Seeker, 📚 Learning Explorer, 🔧 Problem Solver
+
+Python's approach to variable declaration is often called "implicit declaration" because you don't use a special keyword to declare a variable's existence or type before assigning a value. The moment you assign a value to a name, that name becomes a variable, and its type is inferred from the value it holds. This dynamic typing is a core feature of Python, making it highly flexible and reducing boilerplate code.
+
+### How it Works
+
+When you write `variable_name = value`, Python performs two main actions:
+1.  **Creates a name (variable):** If `variable_name` doesn't exist, Python creates it.
+2.  **Assigns a reference:** It makes `variable_name` point to the `value` object in memory.
+
+The type of the variable is determined by the type of the object it references. This means you can reassign a variable to a value of a different type later, though this is generally discouraged for code clarity.
+
+### Examples
+
+#### Basic Data Types
+
+```python
+# Integer
+age = 30
+print(f"age: {age}, type: {type(age)}") # Output: age: 30, type: <class 'int'>
+
+# Float
+price = 19.99
+print(f"price: {price}, type: {type(price)}") # Output: price: 19.99, type: <class 'float'>
+
+# String
+name = "Alice"
+print(f"name: {name}, type: {type(name)}") # Output: name: Alice, type: <class 'str'>
+
+# Boolean
+is_active = True
+print(f"is_active: {is_active}, type: {type(is_active)}") # Output: is_active: True, type: <class 'bool'>
+
+# NoneType (representing absence of a value)
+data = None
+print(f"data: {data}, type: {type(data)}") # Output: data: None, type: <class 'NoneType'>
+```
+
+#### Collections
+
+```python
+# List
+my_list = [1, 2, 3, "four"]
+print(f"my_list: {my_list}, type: {type(my_list)}") # Output: my_list: [1, 2, 3, 'four'], type: <class 'list'>
+
+# Tuple
+my_tuple = (10, 20, "thirty")
+print(f"my_tuple: {my_tuple}, type: {type(my_tuple)}") # Output: my_tuple: (10, 20, 'thirty'), type: <class 'tuple'>
+
+# Dictionary
+my_dict = {"key1": "value1", "key2": 123}
+print(f"my_dict: {my_dict}, type: {type(my_dict)}") # Output: my_dict: {'key1': 'value1', 'key2': 123}, type: <class 'dict'>
+
+# Set
+my_set = {1, 2, 3, 3} # Duplicates are automatically removed
+print(f"my_set: {my_set}, type: {type(my_set)}") # Output: my_set: {1, 2, 3}, type: <class 'set'>
+```
+
+#### Multiple Assignments
+
+Python allows assigning multiple variables in a single line, which can be concise but should be used judiciously for readability.
+
+```python
+# Assigning the same value to multiple variables
+x = y = z = 0
+print(f"x: {x}, y: {y}, z: {z}") # Output: x: 0, y: 0, z: 0
+
+# Assigning different values to multiple variables (tuple unpacking)
+a, b, c = 1, 2, "hello"
+print(f"a: {a}, b: {b}, c: {c}") # Output: a: 1, b: 2, c: hello
+
+# Swapping variables (a common use case for tuple unpacking)
+val1 = 10
+val2 = 20
+val1, val2 = val2, val1
+print(f"After swap: val1: {val1}, val2: {val2}") # Output: After swap: val1: 20, val2: 10
+```
+
+#### Type Hinting (Optional but Recommended)
+
+While Python is dynamically typed, you can add type hints (introduced in PEP 484) to improve code readability, enable static analysis tools (like MyPy), and help IDEs provide better autocompletion and error checking. Type hints do not affect runtime behavior.
+
+```python
+# 📚 Learning Explorer, 🏗️ Architecture Builder
+name: str = "Charlie"
+age: int = 25
+is_admin: bool = False
+user_data: dict[str, str] = {"email": "charlie@example.com"} # Python 3.9+ for dict[str, str]
+
+# For older Python versions (pre 3.9) or more complex types, use `typing` module
+from typing import List, Dict, Optional
+
+numbers: List[int] = [1, 2, 3]
+config: Dict[str, str] = {"host": "localhost", "port": "8080"}
+optional_value: Optional[str] = None # Can be a string or None
+
+print(f"name: {name}, type: {type(name)}")
+print(f"numbers: {numbers}, type: {type(numbers)}")
+```
+
+## Method 2: Instance Variables in Classes
+
+**Persona:** 🏗️ Architecture Builder, 📚 Learning Explorer, 🎨 Output Focused
+
+Instance variables are attributes that belong to a specific instance (object) of a class. Each object created from the class will have its own independent copy of these variables. They are typically declared and initialized within the `__init__` method of a class using the `self` keyword.
+
+### How it Works
+
+The `__init__` method is a special method (constructor) that Python calls automatically when you create a new instance of a class. The `self` parameter refers to the instance being created. By assigning attributes to `self` within `__init__` (e.g., `self.attribute_name = value`), you are creating instance variables.
+
+### Examples
+
+#### Basic Class with Instance Variables
+
+```python
+class Dog:
+    def __init__(self, name, breed, age):
+        # These are instance variables
+        self.name = name
+        self.breed = breed
+        self.age = age
+        self.is_hungry = True # Default instance variable
+
+    def bark(self):
+        print(f"{self.name} says Woof!")
+
+    def feed(self):
+        self.is_hungry = False
+        print(f"{self.name} has been fed.")
+
+# Create instances (objects)
+my_dog = Dog("Buddy", "Golden Retriever", 5)
+your_dog = Dog("Lucy", "Labrador", 3)
+
+# Access instance variables
+print(f"My dog's name: {my_dog.name}, breed: {my_dog.breed}, hungry: {my_dog.is_hungry}")
+print(f"Your dog's name: {your_dog.name}, breed: {your_dog.breed}, hungry: {your_dog.is_hungry}")
+
+# Call instance methods
+my_dog.bark()
+your_dog.feed()
+print(f"My dog's hungry status after feeding your dog: {my_dog.is_hungry}") # Still True
+print(f"Your dog's hungry status after feeding: {your_dog.is_hungry}") # False
+```
+
+#### Adding Instance Variables Dynamically (Use with Caution)
+
+While possible, adding instance variables outside of `__init__` can make code harder to read and maintain, as it's not immediately clear which attributes an object is expected to have. It's generally best practice to define all expected instance variables in `__init__`.
+
+```python
+class Product:
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
+# Create an instance
+item = Product("Laptop", 1200)
+print(f"Initial item: {item.name}, Price: {item.price}")
+
+# Dynamically add a new instance variable
+item.category = "Electronics"
+print(f"Item with new category: {item.name}, Category: {item.category}")
+
+# Another instance won't have 'category' unless explicitly added
+another_item = Product("Keyboard", 75)
+# print(another_item.category) # This would raise an AttributeError
+```
+
+#### Type Hinting for Instance Variables
+
+Type hints can also be applied to instance variables for better code clarity and static analysis.
+
+```python
+class User:
+    user_id: int
+    username: str
+    email: str
+    is_active: bool
+
+    def __init__(self, user_id: int, username: str, email: str):
+        self.user_id = user_id
+        self.username = username
+        self.email = email
+        self.is_active = True # Default value
+
+    def deactivate(self) -> None:
+        self.is_active = False
+
+# Create a user
+admin_user = User(101, "admin_user", "admin@example.com")
+print(f"User: {admin_user.username}, Active: {admin_user.is_active}")
+admin_user.deactivate()
+print(f"User: {admin_user.username}, Active: {admin_user.is_active}")
+```
+
+## Method 3: Class Variables (Static Attributes)
+
+**Persona:** 🏗️ Architecture Builder, 📚 Learning Explorer, ⚡ Legacy Maintainer
+
+Class variables (also known as static attributes) are attributes that are shared by all instances of a class. They are defined directly within the class body, outside of any methods. They are useful for storing data that is common to all objects of a particular class, such as constants, counters, or default values.
+
+### How it Works
+
+When you define a variable directly within the class scope, it becomes a class variable. All instances of that class will share the same single copy of this variable. If you modify a class variable using the class name (e.g., `ClassName.variable_name = new_value`), the change will be reflected across all instances. If you modify it using an instance (e.g., `instance.variable_name = new_value`), it typically creates a new *instance variable* with the same name, shadowing the class variable for that specific instance.
+
+### Examples
+
+#### Basic Class Variable
+
+```python
+class Configuration:
+    # This is a class variable, shared by all instances
+    DEFAULT_THEME = "dark"
+    MAX_CONNECTIONS = 100
+    _instance_count = 0 # Conventionally, leading underscore for internal use
+
+    def __init__(self, user_id):
+        self.user_id = user_id
+        Configuration._instance_count += 1 # Access class variable via class name
+
+    def display_config(self):
+        print(f"User ID: {self.user_id}, Theme: {Configuration.DEFAULT_THEME}, Max Connections: {Configuration.MAX_CONNECTIONS}")
+
+# Access class variables directly via the class
+print(f"Initial default theme: {Configuration.DEFAULT_THEME}")
+print(f"Initial instance count: {Configuration._instance_count}")
+
+# Create instances
+user_config1 = Configuration("user_a")
+user_config2 = Configuration("user_b")
+
+user_config1.display_config()
+user_config2.display_config()
+
+print(f"Current instance count: {Configuration._instance_count}")
+
+# Modify a class variable via the class
+Configuration.DEFAULT_THEME = "light"
+print(f"New default theme: {Configuration.DEFAULT_THEME}")
+
+# The change is reflected in all instances
+user_config1.display_config()
+user_config2.display_config()
+```
+
+#### Shadowing Class Variables with Instance Variables
+
+Understanding how instance variables can "shadow" class variables is crucial.
+
+```python
+class Item:
+    discount_rate = 0.10 # Class variable
+
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
+    def get_discounted_price(self):
+        return self.price * (1 - self.discount_rate) # Accesses instance.discount_rate first, then class.discount_rate
+
+# Create instances
+item1 = Item("Book", 50)
+item2 = Item("Pen", 5)
+
+print(f"Item1 discounted price: {item1.get_discounted_price()}") # Uses Item.discount_rate (0.10)
+print(f"Item2 discounted price: {item2.get_discounted_price()}") # Uses Item.discount_rate (0.10)
+
+# Modify the class variable
+Item.discount_rate = 0.15
+print(f"\nAfter changing class discount_rate to {Item.discount_rate}:")
+print(f"Item1 discounted price: {item1.get_discounted_price()}") # Now uses 0.15
+print(f"Item2 discounted price: {item2.get_discounted_price()}") # Now uses 0.15
+
+# Modify the discount_rate for a specific instance
+item1.discount_rate = 0.25 # This creates an *instance variable* 'discount_rate' for item1
+print(f"\nAfter setting item1's instance discount_rate to {item1.discount_rate}:")
+print(f"Item1 discounted price: {item1.get_discounted_price()}") # Uses item1's instance variable (0.25)
+print(f"Item2 discounted price: {item2.get_discounted_price()}") # Still uses Item.discount_rate (0.15)
+
+# The class variable remains unchanged
+print(f"Class discount_rate: {Item.discount_rate}") # Still 0.15
+```
+
+#### Use Cases for Class Variables
+
+*   **Constants:** Values that should not change and are common to all objects.
+*   **Counters:** Tracking the number of instances created.
+*   **Default Values:** Providing a default for an attribute that can be overridden by instance variables.
+*   **Shared Resources:** A common pool of resources or a cache.
+
+## Method 4: Global Variables
+
+**Persona:** 🔧 Problem Solver (for quick scripts), ⚡ Legacy Maintainer, 📚 Learning Explorer (to understand scope)
+
+Global variables are variables defined outside of any function or class. They can be accessed and modified from anywhere within the module (file) where they are defined. While convenient for small scripts, excessive use of global variables can lead to code that is hard to maintain, debug, and test due to their wide scope and potential for unintended side effects.
+
+### How it Works
+
+A variable defined at the top level of a Python script or module is a global variable.
+*   **Reading:** You can read a global variable from within any function or class without any special keywords.
+*   **Modifying:** To modify a global variable from within a function, you *must* use the `global` keyword. If you assign a new value to a name that's also a global variable *without* `global`, Python will create a new *local* variable with that name, shadowing the global one.
+
+### Examples
+
+#### Basic Global Variable Usage
+
+```python
+# Global variable declaration
+GLOBAL_COUNT = 0
+APP_NAME = "My Python App"
+
+def increment_count():
+    global GLOBAL_COUNT # Declare intent to modify the global variable
+    GLOBAL_COUNT += 1
+    print(f"Inside function: GLOBAL_COUNT = {GLOBAL_COUNT}")
+
+def display_app_info():
+    # Can read global variables without 'global' keyword
+    print(f"App Name: {APP_NAME}")
+    print(f"Current Global Count: {GLOBAL_COUNT}")
+
+print(f"Initial GLOBAL_COUNT: {GLOBAL_COUNT}")
+display_app_info()
+
+increment_count()
+increment_count()
+
+display_app_info()
+print(f"Final GLOBAL_COUNT: {GLOBAL_COUNT}")
+```
+
+#### The `global` Keyword Explained
+
+```python
+global_message = "Hello from global scope!"
+
+def try_to_change_global():
+    # Without 'global' keyword, this creates a NEW LOCAL variable 'global_message'
+    global_message = "This is a local message."
+    print(f"Inside function (local): {global_message}")
+
+def really_change_global():
+    global global_message # Explicitly state intent to modify the global variable
+    global_message = "Global message changed!"
+    print(f"Inside function (global): {global_message}")
+
+print(f"Before function calls: {global_message}")
+try_to_change_global()
+print(f"After try_to_change_global: {global_message}") # Global variable is unchanged
+
+really_change_global()
+print(f"After really_change_global: {global_message}") # Global variable is changed
+```
+
+#### Global Variables in Modules
+
+When you import a module, its top-level variables become accessible as attributes of the module object.
+
+```python
+# Assuming you have a file named 'config_module.py' with the following content:
+# # config_module.py
+# API_KEY = "your_secret_api_key_123"
+# DEBUG_MODE = True
+# VERSION = "1.0.0"
+
+# In your main script:
+import config_module
+
+print(f"API Key: {config_module.API_KEY}")
+print(f"Debug Mode: {config_module.DEBUG_MODE}")
+
+# You can modify them, but it's generally not recommended for imported modules
+config_module.DEBUG_MODE = False
+print(f"Debug Mode (modified): {config_module.DEBUG_MODE}")
+```
+
+#### When to Use (and Avoid) Global Variables
+
+**Use sparingly for:**
+*   **Constants:** Values that truly don't change throughout the application's lifecycle (e.g., `PI`, `MAX_RETRIES`).
+*   **Configuration:** Simple, application-wide settings (though often better managed with configuration files or dedicated config objects).
+*   **Singletons:** If you truly need a single instance of an object accessible everywhere.
+
+**Avoid for:**
+*   **State management:** When multiple parts of your code modify a global variable, it becomes difficult to track changes and predict behavior.
+*   **Complex data structures:** Passing complex data around via globals makes dependencies implicit and testing harder.
+*   **Scalability:** In larger applications, globals can lead to "spaghetti code" and make refactoring a nightmare.
+
+**Better Alternatives:**
+*   **Function arguments and return values:** Pass data explicitly.
+*   **Class attributes (instance or class variables):** Encapsulate related data within objects.
+*   **Configuration objects/modules:** Centralize settings in a structured way.
+*   **Dependency Injection:** Pass dependencies (like configuration or services) to objects that need them.
+
+## Method 5: Function Parameters
+
+**Persona:** 📚 Learning Explorer, 🏗️ Architecture Builder, 🎨 Output Focused
+
+Function parameters are variables that are declared in the function's definition and receive values (arguments) when the function is called. They are local to the function's scope, meaning they only exist and are accessible within that function. This is the primary and most recommended way to pass data into functions, promoting modularity and reusability.
+
+### How it Works
+
+When you define a function like `def my_function(param1, param2):`, `param1` and `param2` are parameters. When you call `my_function(arg1, arg2)`, `arg1`'s value is assigned to `param1`, and `arg2`'s value is assigned to `param2`. These assignments happen at the start of the function's execution.
+
+### Examples
+
+#### Positional and Keyword Arguments
+
+```python
+def greet_user(name, greeting="Hello"): # 'name' is positional, 'greeting' has a default value
+    """Greets a user with a customizable greeting."""
+    message = f"{greeting}, {name}!" # 'message' is a local variable
+    print(message)
+
+# Positional arguments
+greet_user("Alice")
+greet_user("Bob", "Hi")
+
+# Keyword arguments (order doesn't matter)
+greet_user(name="Charlie", greeting="Good morning")
+greet_user(greeting="Good evening", name="David")
+
+# Mixing positional and keyword (positional must come first)
+greet_user("Eve", greeting="Hey there")
+# greet_user(greeting="Yo", "Frank") # This would be a SyntaxError
+```
+
+#### Arbitrary Arguments (`*args` and `**kwargs`)
+
+These allow functions to accept a variable number of arguments.
+
+```python
+def sum_all_numbers(*args):
+    """Sums an arbitrary number of positional arguments."""
+    total = 0
+    for num in args:
+        total += num
+    return total
+
+print(f"Sum of 1, 2, 3: {sum_all_numbers(1, 2, 3)}")
+print(f"Sum of 10, 20, 30, 40: {sum_all_numbers(10, 20, 30, 40)}")
+print(f"Sum of no numbers: {sum_all_numbers()}")
+
+def display_profile(**kwargs):
+    """Displays user profile information from keyword arguments."""
+    print("User Profile:")
+    for key, value in kwargs.items():
+        print(f"  {key.replace('_', ' ').title()}: {value}")
+
+display_profile(name="Grace", age=28, city="New York")
+display_profile(username="hacker_man", role="admin", last_login="2025-01-15")
+```
+
+#### Type Hinting for Parameters
+
+Type hints are especially valuable for function parameters, improving clarity and enabling static analysis.
+
+```python
+from typing import List, Dict, Tuple, Optional
+
+def process_data(data: List[int], threshold: int) -> List[int]:
+    """Filters a list of integers, returning only those above the threshold."""
+    filtered_data: List[int] = [x for x in data if x > threshold]
+    return filtered_data
+
+def create_user(username: str, email: str, age: Optional[int] = None) -> Dict[str, str]:
+    """Creates a user dictionary."""
+    user_info: Dict[str, str] = {"username": username, "email": email}
+    if age is not None:
+        user_info["age"] = str(age) # Store as string for simplicity in dict
+    return user_info
+
+numbers_list = [10, 5, 20, 8, 15]
+filtered = process_data(numbers_list, 10)
+print(f"Filtered numbers: {filtered}")
+
+new_user = create_user("john_doe", "john@example.com", 30)
+print(f"New user with age: {new_user}")
+
+guest_user = create_user("guest", "guest@example.com")
+print(f"New user without age: {guest_user}")
+```
+
+#### Scope of Parameters
+
+Parameters are local to the function. Changes made to mutable parameters (like lists or dictionaries) *inside* the function will affect the original object *outside* the function, because both the parameter and the original argument refer to the same object. However, reassigning the parameter itself within the function will not affect the original argument.
+
+```python
+def modify_list(my_list_param):
+    my_list_param.append(4) # Modifies the original list
+    print(f"Inside function (modified): {my_list_param}")
+
+def reassign_list(my_list_param):
+    my_list_param = [5, 6, 7] # Creates a new local list, does not affect original
+    print(f"Inside function (reassigned): {my_list_param}")
+
+original_list = [1, 2, 3]
+print(f"Original list before modify: {original_list}")
+modify_list(original_list)
+print(f"Original list after modify: {original_list}") # Output: [1, 2, 3, 4]
+
+original_list_2 = [10, 11, 12]
+print(f"Original list 2 before reassign: {original_list_2}")
+reassign_list(original_list_2)
+print(f"Original list 2 after reassign: {original_list_2}") # Output: [10, 11, 12] (unchanged)
+```
+
+## Method 6: Declaring Variables for Custom Types
+
+**Persona:** 🏗️ Architecture Builder, 🎨 Output Focused, 📚 Learning Explorer
+
+Python's object-oriented nature means that every piece of data, including custom objects you create, is an instance of a type (class). Declaring a variable to hold a custom type is no different from declaring a variable for a built-in type: you simply assign an instance of your custom class to a variable name.
+
+### How it Works
+
+1.  **Define a Custom Class:** First, you define your own class, which acts as a blueprint for your custom type.
+2.  **Create an Instance:** You then create an object (an instance) of that class by calling the class name as if it were a function (e.g., `MyClass()`). This invokes the `__init__` method if defined.
+3.  **Assign to a Variable:** Assign the newly created instance to a variable name. This variable now holds a reference to your custom object.
+
+### Examples
+
+#### Basic Custom Class
+
+```python
+class Point:
+    """A simple class to represent a 2D point."""
+    def __init__(self, x_coord: float, y_coord: float):
+        self.x = x_coord
+        self.y = y_coord
+
+    def distance_from_origin(self) -> float:
+        return (self.x**2 + self.y**2)**0.5
+
+    def __str__(self) -> str:
+        return f"Point({self.x}, {self.y})"
+
+# Declare variables to hold instances of the custom type 'Point'
+point1: Point = Point(3.0, 4.0)
+point2: Point = Point(1.0, 1.0)
+point3: Point = Point(0.0, 0.0) # Origin
+
+print(f"Point 1: {point1}, Type: {type(point1)}")
+print(f"Point 2: {point2}, Type: {type(point2)}")
+
+print(f"Distance of point1 from origin: {point1.distance_from_origin()}")
+print(f"Distance of point3 from origin: {point3.distance_from_origin()}")
+
+# You can also assign custom objects to variables within other objects or collections
+points_list: list[Point] = [point1, point2, point3]
+print(f"List of points: {points_list}")
+```
+
+#### Custom Type as an Attribute
+
+Custom objects can also be attributes of other custom objects, creating more complex data structures.
+
+```python
+class Address:
+    def __init__(self, street: str, city: str, zip_code: str):
+        self.street = street
+        self.city = city
+        self.zip_code = zip_code
+
+    def __str__(self) -> str:
+        return f"{self.street}, {self.city} {self.zip_code}"
+
+class Person:
+    def __init__(self, name: str, age: int, address: Address):
+        self.name = name
+        self.age = age
+        self.address = address # 'address' is an instance variable holding an 'Address' object
+
+    def display_info(self) -> None:
+        print(f"Name: {self.name}, Age: {self.age}")
+        print(f"Address: {self.address}") # Uses Address.__str__
+
+# Create an Address object
+home_address: Address = Address("123 Main St", "Anytown", "12345")
+
+# Create a Person object, passing the Address object as an argument
+john: Person = Person("John Doe", 30, home_address)
+
+# Access attributes, including the custom object attribute
+print(f"John's name: {john.name}")
+print(f"John's city: {john.address.city}") # Accessing attribute of the nested custom object
+
+john.display_info()
+```
+
+#### Using `dataclasses` for Simple Custom Types
+
+For classes primarily used to hold data, Python's `dataclasses` module (Python 3.7+) can simplify declaration by automatically generating `__init__`, `__repr__`, `__eq__`, etc.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class Book:
+    title: str
+    author: str
+    isbn: str
+    publication_year: int
+    is_available: bool = True # Default value
+
+# Declare variables to hold instances of the custom type 'Book'
+book1: Book = Book("The Hitchhiker's Guide to the Galaxy", "Douglas Adams", "978-0345391803", 1979)
+book2: Book = Book("Pride and Prejudice", "Jane Austen", "978-0141439518", 1813, is_available=False)
+
+print(f"Book 1: {book1}") # __repr__ is automatically generated
+print(f"Book 2 title: {book2.title}, Available: {book2.is_available}")
+
+# Dataclasses are great for type hinting
+def check_book_availability(book: Book) -> str:
+    if book.is_available:
+        return f"{book.title} by {book.author} is currently available."
+    else:
+        return f"{book.title} by {book.author} is currently checked out."
+
+print(check_book_availability(book1))
+print(check_book_availability(book2))
+```
+
+#### Custom Types from External Libraries
+
+The same principle applies when using custom types defined in external libraries (e.g., `datetime` objects, `Path` objects from `pathlib`, custom ORM models).
+
+```python
+from datetime import datetime, timedelta
+from pathlib import Path
+
+# Declare a variable to hold a datetime object
+current_time: datetime = datetime.now()
+print(f"Current time: {current_time}, Type: {type(current_time)}")
+
+# Declare a variable to hold a Path object
+file_path: Path = Path("/usr/local/bin/python")
+print(f"File path: {file_path}, Type: {type(file_path)}")
+
+# Perform operations specific to the custom type
+future_time: datetime = current_time + timedelta(days=7)
+print(f"Time next week: {future_time}")
+
+if file_path.exists():
+    print(f"File exists: {file_path.name}")
+```
+
+## Performance Comparison
+
+When it comes to "variable declaration" in Python, performance isn't typically a bottleneck. Python's dynamic nature means that variable creation (assignment) is a fundamental and highly optimized operation. The performance differences between the various "methods" discussed are negligible in terms of the actual assignment process itself.
+
+However, the *context* in which variables are declared can have performance implications, primarily related to memory usage, scope lookups, and object creation overhead.
+
+| Feature/Method           | Speed (Declaration) | Memory Footprint | Complexity (Lookup) | Best For                                   | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+## Python Version Support
+| Method                      | Python 3.6+ | Python 3.7+ | Python 3.9+ | Python 3.10+ | Python 3.11+ | Python 3.12+ |
+| :-------------------------- | :---------- | :---------- | :---------- | :----------- | :----------- | :----------- |
+| Basic Assignment            | ✅          | ✅          | ✅          | ✅           | ✅           | ✅           |
+| Instance Variables          | ✅          | ✅          | ✅           | ✅           | ✅           | ✅           |
+| Class Variables             | ✅          | ✅          | ✅           | ✅           | ✅           | ✅           |
+| Global Variables            | ✅          | ✅          | ✅           | ✅           | ✅           | ✅           |
+| Function Parameters         | ✅          | ✅          | ✅           | ✅           | ✅           | ✅           |
+| Custom Types                | ✅          | ✅          | ✅           | ✅           | ✅           | ✅           |
+| Type Hinting (Basic)        | ✅          | ✅          | ✅           | ✅           | ✅           | ✅           |
+| Type Hinting (Generics e.g. `list[int]`) | ❌          | ❌          | ✅           | ✅           | ✅           | ✅           |
+| `dataclasses`               | ❌          | ✅          | ✅           | ✅           | ✅           | ✅           |
+| `typing.TypeAlias`          | ❌          | ❌          | ❌           | ✅           | ✅           | ✅           |
+| `typing.Self`               | ❌          | ❌          | ❌           | ❌           | ✅           | ✅           |
+
+**Explanation:**
+
+*   **Basic Assignment, Instance/Class/Global Variables, Function Parameters, Custom Types:** These core concepts of Python variable handling have been fundamental since Python 2 and remain fully compatible across all Python 3 versions.
+*   **Type Hinting (Basic):** Introduced in PEP 484 (Python 3.5), basic type hints (`name: str`, `def func(arg: int) -> bool:`) are fully supported from Python 3.6 onwards.
+*   **Type Hinting (Generics e.g. `list[int]`):** Prior to Python 3.9, generic types like `list`, `dict`, `tuple` used to require importing from the `typing` module (e.g., `from typing import List; my_list: List[int]`). Python 3.9 introduced built-in generic types, allowing `list[int]` directly. The `typing` module versions still work for backward compatibility.
+*   **`dataclasses`:** Introduced in Python 3.7 (PEP 557), this module simplifies creating data-holding classes.
+*   **`typing.TypeAlias`:** Introduced in Python 3.10 (PEP 613), this allows for clearer definition of type aliases. Before 3.10, `MyType = Union[str, int]` was common.
+*   **`typing.Self`:** Introduced in Python 3.11 (PEP 673), this allows for more precise type hinting in methods that return an instance of the class they belong to.
+
+## Common Problems & Solutions
+
+### 1. `NameError: name 'variable' is not defined`
+
+**Problem:** Attempting to use a variable before it has been assigned a value. This is Python's way of saying "I don't know what this name refers to."
+
+```python
+# Problematic code
+def my_function():
+    print(my_variable) # NameError here
+
+# my_function()
+```
+
+**Solution:** Always ensure a variable is assigned a value before its first use.
+
+```python
+# Solution
+def my_function():
+    my_variable = "Hello" # Assign a value
+    print(my_variable)
+
+my_function()
+
+# Another common scenario: conditional assignment
+value = None # Initialize with None
+if some_condition:
+    value = "Condition met"
+else:
+    value = "Condition not met"
+print(value)
+```
+
+### 2. Unintended Local Variable vs. Global Variable Modification
+
+**Problem:** Inside a function, assigning to a variable with the same name as a global variable creates a new local variable, rather than modifying the global one, unless `global` is used.
+
+```python
+# Problematic code
+global_counter = 0
+
+def increment_bad():
+    global_counter = 1 # This creates a NEW local variable named global_counter
+    print(f"Inside bad function (local): {global_counter}")
+
+increment_bad()
+print(f"Outside function (global): {global_counter}") # Still 0
+```
+
+**Solution:** Use the `global` keyword explicitly when you intend to modify a global variable from within a function.
+
+```python
+# Solution
+global_counter = 0
+
+def increment_good():
+    

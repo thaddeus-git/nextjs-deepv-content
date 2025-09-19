@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "Content repository for DeepV Code technical articles",
   "scripts": {
+    "convert": "node json-to-mdx-converter.js",
     "validate": "node validate-content.js staging/guides content-schema.json",
-    "promote": "node promote.js"
+    "promote": "node promote.js",
+    "workflow": "npm run convert && npm run validate && npm run promote"
   },
   "dependencies": {
     "gray-matter": "^4.0.3"

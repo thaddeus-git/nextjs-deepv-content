@@ -1,0 +1,760 @@
+---
+title: "java.nio.file: Where is the Path interface actually implemented?:"
+slug: "javaniofile-where-is-the-path-interface-actually-implemented"
+category: "programming-languages"
+subcategory: "java"
+description: "The Path interface in java.nio.file is implemented by concrete classes that are specific to the underlying operating system and file system. You don't direct..."
+tags: ["java","java-7","java.nio.file"]
+difficulty: "intermediate"
+readTime: 20
+lastUpdated: "2025-09-18T07:55:12.157Z"
+featured: false
+---
+
+# java.nio.file: Where is the Path interface actually implemented?: Complete Guide with 2 Solutions
+
+## Quick Answer
+
+The `Path` interface in `java.nio.file` is implemented by concrete classes that are specific to the underlying operating system and file system. You don't directly instantiate these implementation classes. Instead, you obtain `Path` instances through factory methods, primarily `Paths.get()` or `FileSystem.getPath()`. For example, on a Linux system, `Paths.get()` will typically return an instance of `sun.nio.fs.UnixPath`, while on Windows, it would be `sun.nio.fs.WindowsPath`. These specific implementation classes are part of the JDK's internal implementation and are not intended for direct use or instantiation by application developers.
+
+## Choose Your Method
+
+```mermaid
+graph TD
+    A[Start: Need to understand Path implementation?] --> B{Are you debugging or just curious?};
+
+    B -- Debugging/Deep Dive --> C{Do you have access to JDK source code or an IDE with 'Step Into' functionality?};
+    B -- Just Curious/Conceptual Understanding --> D[Focus on the Factory Pattern and OS-Specific Implementations];
+
+    C -- Yes, IDE/Source Access --> E[Use IDE's "Step Into" (F7) on `Paths.get()` or `FileSystem.getPath()`];
+    C -- No, limited access --> F[Consult OpenJDK source code online (e.g., `UnixFileSystem`, `WindowsFileSystem`)];
+
+    E --> G[Observe the concrete `Path` implementation class (e.g., `UnixPath`, `WindowsPath`)];
+    F --> G;
+
+    D --> H[Understand that `Paths.get()` delegates to `FileSystems.getDefault().getPath()`];
+    H --> I[Recognize that `FileSystems.getDefault()` returns an OS-specific `FileSystem` implementation];
+    I --> J[Conclude that the `FileSystem` implementation's `getPath()` method provides the concrete `Path` instance];
+    J --> K[Example: Linux -> `UnixFileSystem` -> `UnixPath`; Windows -> `WindowsFileSystem` -> `WindowsPath`];
+
+    G --> L[End: You've identified the concrete implementation];
+    K --> L;
+
+    subgraph User Personas
+        E -- 📚 Learning Explorer, 🔧 Problem Solver --> G;
+        F -- 📚 Learning Explorer, 🏗️ Architecture Builder --> G;
+        D -- 🚀 Speed Seeker, 🎨 Output Focused --> H;
+        H -- 📚 Learning Explorer, 🏗️ Architecture Builder --> I;
+        I -- 📚 Learning Explorer, 🏗️ Architecture Builder --> J;
+        J -- 📚 Learning Explorer, 🏗️ Architecture Builder --> K;
+    end
+```
+
+## Table of Contents
+- [Method 1: Understanding the Factory Pattern and OS-Specific Implementations](#method-1-understanding-the-factory-pattern-and-os-specific-implementations)
+- [Method 2: Debugging with an IDE to Discover the Concrete Class](#method-2-debugging-with-an-ide-to-discover-the-concrete-class)
+- [Ready-to-Use Code](#ready-to-use-code)
+- [Performance Comparison](#performance-comparison)
+- [Java Version Support](#java-version-support)
+- [Common Problems & Solutions](#common-problems-solutions)
+- [Real-World Use Cases](#real-world-use-cases)
+- [Related Technology Functions](#related-technology-functions)
+- [Summary](#summary)
+- [Frequently Asked Questions](#frequently-asked-questions)
+- [Tools & Resources](#tools-resources)
+
+## Ready-to-Use Code
+
+Here are two quick code snippets to demonstrate how `Path` instances are obtained and how you can inspect their concrete types.
+
+### Solution 1: Inspecting the `Path` Implementation Class
+
+This code snippet allows you to print the actual class name of the `Path` object returned by `Paths.get()`. This is useful for quickly understanding the underlying implementation without deep diving into source code.
+
+```java
+// 🚀 Speed Seeker, 🎨 Output Focused
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+public class PathImplementationInspector {
+    public static void main(String[] args) {
+        // Get a Path instance for a common directory
+        Path path = Paths.get("C:\\Users"); // On Windows
+        // Path path = Paths.get("/home/user"); // On Linux/macOS
+
+        // Print the concrete class name of the Path object
+        System.out.println("The concrete class implementing Path is: " + path.getClass().getName());
+
+        // You can also inspect the FileSystem
+        System.out.println("The concrete class implementing FileSystem is: " + path.getFileSystem().getClass().getName());
+    }
+}
+```
+
+**Expected Output (on Windows):**
+```
+The concrete class implementing Path is: sun.nio.fs.WindowsPath
+The concrete class implementing FileSystem is: sun.nio.fs.WindowsFileSystem
+```
+
+**Expected Output (on Linux/macOS):**
+```
+The concrete class implementing Path is: sun.nio.fs.UnixPath
+The concrete class implementing FileSystem is: sun.nio.fs.UnixFileSystem
+```
+
+### Solution 2: Demonstrating `Path` Usage with Basic Operations
+
+This example shows how to use the `Path` interface for common file system operations, reinforcing that you interact with the interface, not its concrete implementation.
+
+```java
+// 🔧 Problem Solver, 📚 Learning Explorer
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.List;
+
+public class PathBasicOperations {
+    public static void main(String[] args) {
+        // Define a path to a file
+        Path filePath = Paths.get("temp", "myFile.txt");
+        Path directoryPath = Paths.get("temp");
+
+        try {
+            // 1. Create the directory if it doesn't exist
+            if (!Files.exists(directoryPath)) {
+                Files.createDirectories(directoryPath);
+                System.out.println("Created directory: " + directoryPath.toAbsolutePath());
+            }
+
+            // 2. Write some content to the file
+            String content = "Hello, nio.file Path!\nThis is a test line.";
+            Files.write(filePath, content.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            System.out.println("Wrote content to file: " + filePath.toAbsolutePath());
+
+            // 3. Read content from the file
+            List<String> lines = Files.readAllLines(filePath);
+            System.out.println("\nContent of the file:");
+            for (String line : lines) {
+                System.out.println(line);
+            }
+
+            // 4. Get file information
+            System.out.println("\nFile Name: " + filePath.getFileName());
+            System.out.println("Parent Directory: " + filePath.getParent());
+            System.out.println("Is Absolute: " + filePath.isAbsolute());
+            System.out.println("Size: " + Files.size(filePath) + " bytes");
+
+            // 5. Delete the file
+            Files.delete(filePath);
+            System.out.println("\nDeleted file: " + filePath.toAbsolutePath());
+
+            // 6. Delete the directory (only if empty)
+            Files.delete(directoryPath);
+            System.out.println("Deleted directory: " + directoryPath.toAbsolutePath());
+
+        } catch (IOException e) {
+            System.err.println("An I/O error occurred: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+**Expected Output:**
+```
+Created directory: /path/to/your/project/temp
+Wrote content to file: /path/to/your/project/temp/myFile.txt
+
+Content of the file:
+Hello, nio.file Path!
+This is a test line.
+
+File Name: myFile.txt
+Parent Directory: temp
+Is Absolute: false
+Size: 45 bytes
+
+Deleted file: /path/to/your/project/temp/myFile.txt
+Deleted directory: /path/to/your/project/temp
+```
+
+## Method 1: Understanding the Factory Pattern and OS-Specific Implementations
+
+**Persona:** 📚 Learning Explorer, 🏗️ Architecture Builder, ⚡ Legacy Maintainer
+
+The core of understanding `java.nio.file.Path` implementation lies in recognizing the **Factory Pattern** and the **Operating System-specific nature** of Java's New I/O (NIO.2) file system providers.
+
+### The `Path` Interface: An Abstraction
+
+First, let's reiterate that `Path` is indeed an interface. This means it defines a contract for how a path to a file or directory should behave (e.g., `getFileName()`, `getParent()`, `resolve()`, `toAbsolutePath()`, etc.) but provides no concrete implementation itself. This abstraction is crucial for portability, as your application code can work with `Path` objects without needing to know the intricacies of how different operating systems handle file paths.
+
+### The Role of `Paths.get()`
+
+You typically obtain a `Path` instance using `Paths.get()`. Let's break down what happens under the hood:
+
+```java
+// Simplified view of Paths.get()
+public static Path get(String first, String... more) {
+    // This is the crucial step: it delegates to the default FileSystem
+    return FileSystems.getDefault().getPath(first, more);
+}
+```
+
+As you can see, `Paths.get()` is a convenience method that delegates the actual creation of the `Path` object to the default `FileSystem`.
+
+### The `FileSystems.getDefault()` Method
+
+This is where the magic of OS-specific implementation begins. `FileSystems.getDefault()` returns an instance of the default `FileSystem` provider for the current Java Virtual Machine (JVM) environment.
+
+```java
+// Simplified view of FileSystems.getDefault()
+public static FileSystem getDefault() {
+    // This method internally looks up and initializes the appropriate FileSystemProvider
+    // based on the operating system and other system properties.
+    // It's typically a singleton instance.
+    return DefaultFileSystemProvider.create(); // Conceptual, actual implementation is more complex
+}
+```
+
+The `FileSystem` interface represents a file system and provides factory methods for creating `Path` objects, `FileStore` objects, and other file system-related objects. Just like `Path`, `FileSystem` is an interface, and its concrete implementation is also OS-dependent.
+
+### The `FileSystem.getPath()` Method
+
+Once you have an instance of `FileSystem` (obtained via `FileSystems.getDefault()`), you call its `getPath()` method. This is the method that *actually* constructs and returns a concrete `Path` object.
+
+```java
+// Simplified view of FileSystem.getPath()
+public interface FileSystem extends Closeable {
+    // ... other methods ...
+    Path getPath(String first, String... more);
+    // ... other methods ...
+}
+```
+
+The concrete implementation of `FileSystem` (e.g., `UnixFileSystem` on Linux, `WindowsFileSystem` on Windows) will provide its own implementation of `getPath()`, which in turn creates and returns an instance of its corresponding concrete `Path` class (e.g., `UnixPath`, `WindowsPath`).
+
+### The Concrete Implementations: `UnixPath`, `WindowsPath`, etc.
+
+These are the classes that truly implement the `Path` interface. They are part of the JDK's internal `sun.nio.fs` package (or similar internal packages) and are **not part of the public API**. This means you should not directly instantiate them or rely on their specific methods, as they can change between Java versions without warning.
+
+**Example Architecture Diagram:**
+
+```mermaid
+graph TD
+    A[Your Application Code] --> B[Paths.get("path/to/file")];
+
+    B --> C[FileSystems.getDefault()];
+    C -- Returns OS-Specific FileSystem --> D{Concrete FileSystem Implementation};
+
+    D -- On Linux --> D1[sun.nio.fs.UnixFileSystem];
+    D -- On Windows --> D2[sun.nio.fs.WindowsFileSystem];
+    D -- On macOS --> D3[sun.nio.fs.MacOSXFileSystem];
+
+    D1 -- Calls getPath() --> E1[new sun.nio.fs.UnixPath(...)];
+    D2 -- Calls getPath() --> E2[new sun.nio.fs.WindowsPath(...)];
+    D3 -- Calls getPath() --> E3[new sun.nio.fs.MacOSXPath(...)];
+
+    E1 -- Implements Path --> F[Path Interface];
+    E2 -- Implements Path --> F;
+    E3 -- Implements Path --> F;
+
+    F --> G[Your Application Code (receives Path object)];
+
+    subgraph Internal JDK Implementation
+        C; D; D1; D2; D3; E1; E2; E3;
+    end
+
+    subgraph Public API
+        A; B; F; G;
+    end
+```
+
+**Detailed Explanation of the Flow:**
+
+1.  **`Paths.get("C:\\Users")`**: Your code calls this static factory method.
+2.  **`FileSystems.getDefault()`**: `Paths.get()` internally calls this to get the default `FileSystem` for the current environment.
+3.  **OS Detection**: The JVM determines the operating system (e.g., Windows, Linux, macOS).
+4.  **`FileSystemProvider`**: An appropriate `FileSystemProvider` (e.g., `WindowsFileSystemProvider`, `UnixFileSystemProvider`) is loaded. This provider is responsible for creating `FileSystem` instances.
+5.  **Concrete `FileSystem` Instance**: The `FileSystemProvider` creates and returns a concrete `FileSystem` implementation (e.g., `sun.nio.fs.WindowsFileSystem` or `sun.nio.fs.UnixFileSystem`). This object represents the native file system.
+6.  **`FileSystem.getPath(String, String...)`**: The `getPath()` method of this concrete `FileSystem` instance is invoked.
+7.  **Concrete `Path` Instance**: This `getPath()` method then constructs and returns a concrete `Path` object (e.g., `sun.nio.fs.WindowsPath` or `sun.nio.fs.UnixPath`), which implements the `java.nio.file.Path` interface. This concrete `Path` object encapsulates the OS-specific representation of the file path.
+
+**Why this design?**
+
+*   **Abstraction and Portability:** Your code interacts with the `Path` interface, making it independent of the underlying OS file system details.
+*   **Encapsulation:** The complex, OS-specific logic for handling paths (e.g., path separators, root directories, normalization rules) is hidden within the concrete implementations.
+*   **Flexibility:** This design allows for different `FileSystem` providers (e.g., for ZIP files, in-memory file systems, or network file systems) to be plugged in, each providing its own `Path` implementation, without changing your application code that uses the `Path` interface.
+
+**Code Examples for Method 1:**
+
+```java
+// 📚 Learning Explorer, 🏗️ Architecture Builder
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+public class PathImplementationDeepDive {
+
+    public static void main(String[] args) {
+        System.out.println("--- Understanding Path Implementation ---");
+
+        // 1. Get a Path instance using Paths.get()
+        Path pathFromPaths = Paths.get("documents", "report.pdf");
+        System.out.println("\nPath obtained via Paths.get(): " + pathFromPaths);
+        System.out.println("Concrete class of Path: " + pathFromPaths.getClass().getName());
+
+        // 2. Get the default FileSystem
+        FileSystem defaultFs = FileSystems.getDefault();
+        System.out.println("\nDefault FileSystem instance: " + defaultFs);
+        System.out.println("Concrete class of FileSystem: " + defaultFs.getClass().getName());
+
+        // 3. Obtain a Path instance directly from the FileSystem
+        Path pathFromFs = defaultFs.getPath("data", "users", "profile.json");
+        System.out.println("\nPath obtained via FileSystem.getPath(): " + pathFromFs);
+        System.out.println("Concrete class of Path: " + pathFromFs.getClass().getName());
+
+        // 4. Demonstrate different path components
+        Path absolutePath = Paths.get("/var/log/app.log"); // Example for Unix-like
+        // Path absolutePath = Paths.get("C:\\Program Files\\Java\\jdk-17\\bin"); // Example for Windows
+        System.out.println("\nAbsolute Path: " + absolutePath);
+        System.out.println("Root: " + absolutePath.getRoot());
+        System.out.println("File Name: " + absolutePath.getFileName());
+        System.out.println("Parent: " + absolutePath.getParent());
+        System.out.println("Number of elements: " + absolutePath.getNameCount());
+        for (int i = 0; i < absolutePath.getNameCount(); i++) {
+            System.out.println("  Element " + i + ": " + absolutePath.getName(i));
+        }
+
+        // 5. Path resolution and relativization
+        Path baseDir = Paths.get("/home/user/app");
+        Path relativeFile = Paths.get("config/settings.xml");
+        Path resolvedPath = baseDir.resolve(relativeFile);
+        System.out.println("\nBase Dir: " + baseDir);
+        System.out.println("Relative File: " + relativeFile);
+        System.out.println("Resolved Path (baseDir.resolve(relativeFile)): " + resolvedPath);
+
+        Path anotherPath = Paths.get("/home/user/app/data/temp.txt");
+        Path relativizedPath = baseDir.relativize(anotherPath);
+        System.out.println("Another Path: " + anotherPath);
+        System.out.println("Relativized Path (baseDir.relativize(anotherPath)): " + relativizedPath);
+
+        // 6. Normalization
+        Path messyPath = Paths.get("/home/./user/../app/./data/file.txt");
+        Path normalizedPath = messyPath.normalize();
+        System.out.println("\nMessy Path: " + messyPath);
+        System.out.println("Normalized Path: " + normalizedPath);
+
+        // 7. Converting to URI and File
+        try {
+            System.out.println("\nPath to URI: " + pathFromPaths.toUri());
+            System.out.println("Path to File: " + pathFromPaths.toFile());
+        } catch (UnsupportedOperationException e) {
+            System.err.println("Conversion to File/URI not supported by this FileSystem: " + e.getMessage());
+        }
+    }
+}
+```
+
+**Expected Output (on Linux/macOS):**
+```
+--- Understanding Path Implementation ---
+
+Path obtained via Paths.get(): documents/report.pdf
+Concrete class of Path: sun.nio.fs.UnixPath
+
+Default FileSystem instance: sun.nio.fs.UnixFileSystem@...
+Concrete class of FileSystem: sun.nio.fs.UnixFileSystem
+
+Path obtained via FileSystem.getPath(): data/users/profile.json
+Concrete class of Path: sun.nio.fs.UnixPath
+
+Absolute Path: /var/log/app.log
+Root: /
+File Name: app.log
+Parent: /var/log
+Number of elements: 3
+  Element 0: var
+  Element 1: log
+  Element 2: app.log
+
+Base Dir: /home/user/app
+Relative File: config/settings.xml
+Resolved Path (baseDir.resolve(relativeFile)): /home/user/app/config/settings.xml
+Another Path: /home/user/app/data/temp.txt
+Relativized Path (baseDir.relativize(anotherPath)): data/temp.txt
+
+Messy Path: /home/./user/../app/./data/file.txt
+Normalized Path: /home/app/data/file.txt
+
+Path to URI: file:///path/to/your/project/documents/report.pdf
+Path to File: /path/to/your/project/documents/report.pdf
+```
+
+## Method 2: Debugging with an IDE to Discover the Concrete Class
+
+**Persona:** 🔧 Problem Solver, 📚 Learning Explorer, 🚀 Speed Seeker
+
+For those who prefer a hands-on approach or need to verify the implementation in their specific environment, using an Integrated Development Environment (IDE) to step through the code is an excellent method. This allows you to see the exact concrete class being instantiated at runtime.
+
+### Steps to Debug in an IDE (e.g., IntelliJ IDEA, Eclipse, NetBeans)
+
+1.  **Set a Breakpoint:** Open your Java project in your IDE. Navigate to a line where you call `Paths.get()`. For example:
+    ```java
+    Path myPath = Paths.get("some", "directory", "file.txt"); // Set breakpoint here
+    ```
+    Click in the left margin next to this line to set a breakpoint.
+
+2.  **Start Debugging:** Run your application in debug mode. In most IDEs, this is done by clicking the "Debug" button (often a bug icon) or selecting "Debug 'YourMainClass'" from the Run menu.
+
+3.  **Step Into (`F7` / `F5`):** When the execution pauses at your breakpoint, you'll need to "step into" the `Paths.get()` method.
+    *   In IntelliJ IDEA, the shortcut is typically `F7`.
+    *   In Eclipse, it's `F5`.
+    *   In NetBeans, it's `F7`.
+
+    Keep stepping into the methods. You'll likely go through:
+    *   `Paths.get(String, String...)`
+    *   `FileSystems.getDefault()`
+    *   The internal `FileSystemProvider` logic
+    *   The concrete `FileSystem` implementation's `getPath()` method (e.g., `UnixFileSystem.getPath()` or `WindowsFileSystem.getPath()`)
+    *   Finally, you'll see the constructor of the concrete `Path` implementation (e.g., `UnixPath` or `WindowsPath`).
+
+4.  **Observe the Object Type:** Once the `Path` object is created and assigned to your `myPath` variable, you can inspect its runtime type in the debugger's "Variables" or "Watches" window. It will clearly show the concrete class name (e.g., `sun.nio.fs.WindowsPath` or `sun.nio.fs.UnixPath`).
+
+**Visualizing the Debugging Process:**
+
+```mermaid
+graph TD
+    A[Your Code: Path myPath = Paths.get("...");] --> B{Set Breakpoint};
+    B --> C[Start Debugger];
+    C --> D[Execution Pauses at Breakpoint];
+    D --> E[Step Into (F7/F5) Paths.get()];
+    E --> F[Step Into FileSystems.getDefault()];
+    F --> G[Step Into Internal FileSystemProvider Logic];
+    G --> H[Step Into Concrete FileSystem.getPath() (e.g., UnixFileSystem.getPath())];
+    H --> I[Observe Constructor of Concrete Path (e.g., new UnixPath(...))];
+    I --> J[Path Object Created: Inspect 'myPath' variable in debugger];
+    J --> K[Result: See concrete class name (e.g., sun.nio.fs.UnixPath)];
+
+    subgraph Debugger Flow
+        B; C; D; E; F; G; H; I; J; K;
+    end
+```
+
+**Code Examples for Method 2 (for debugging):**
+
+```java
+// 🔧 Problem Solver, 📚 Learning Explorer
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+public class DebugPathImplementation {
+    public static void main(String[] args) {
+        System.out.println("Starting Path creation...");
+
+        // Set a breakpoint on the following line and step into it.
+        Path myPath = Paths.get("temp", "debug_file.txt");
+
+        System.out.println("Path created: " + myPath);
+        System.out.println("Concrete class of myPath: " + myPath.getClass().getName());
+
+        // You can also inspect the FileSystem object
+        Path anotherPath = Paths.get("/another/path");
+        System.out.println("Concrete class of anotherPath's FileSystem: " + anotherPath.getFileSystem().getClass().getName());
+
+        System.out.println("Path creation finished.");
+    }
+}
+```
+
+When you run this code in debug mode and step into `Paths.get("temp", "debug_file.txt");`, your IDE will guide you through the internal calls, eventually showing you the instantiation of `sun.nio.fs.WindowsPath` (on Windows) or `sun.nio.fs.UnixPath` (on Linux/macOS).
+
+This method is particularly useful for:
+*   **Verifying behavior:** Confirming which specific implementation is used in a given environment.
+*   **Learning:** Gaining a deeper understanding of how the Java platform interacts with the underlying operating system for file system operations.
+*   **Troubleshooting:** Identifying if an unexpected `FileSystemProvider` or `Path` implementation is being used (though this is rare for the default file system).
+
+## Performance Comparison
+
+When discussing the "implementation" of `Path`, performance isn't typically a direct concern of *which* concrete class is used, as you don't choose it. The choice is made by the JVM based on the OS. However, we can compare the performance implications of using `Path` (NIO.2) versus older `java.io.File` APIs.
+
+| Feature/Metric           | `java.nio.file.Path` (NIO.2)                               | `java.io.File` (Legacy)                                    | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           to be a very detailed with a lot of details.
+
+### Java Version Support
+
+The `java.nio.file` package was introduced in Java 7. All methods and concepts discussed here are fully supported from Java 7 onwards.
+
+| Method/Concept                               | Java 7 | Java 8 | Java 11 | Java 17 | Java 21+ |
+| :------------------------------------------- | :----- | :----- | :------ | :------ | :------- |
+| `Path` interface                             | Yes    | Yes    | Yes     | Yes     | Yes      |
+| `Paths.get()`                                | Yes    | Yes    | Yes     | Yes     | Yes      |
+| `FileSystems.getDefault()`                   | Yes    | Yes    | Yes     | Yes     | Yes      |
+| `FileSystem.getPath()`                       | Yes    | Yes    | Yes     | Yes     | Yes      |
+| `Files` utility class (for operations)       | Yes    | Yes    | Yes     | Yes     | Yes      |
+| OS-specific `Path` implementations (internal)| Yes    | Yes    | Yes     | Yes     | Yes      |
+| Debugging `Path` implementation              | Yes    | Yes    | Yes     | Yes     | Yes      |
+
+**Note for Legacy Maintainer (⚡):** If you are working with Java 6 or earlier, `java.nio.file` is not available. You would need to use the `java.io.File` API. However, upgrading to Java 7+ is highly recommended for modern file system operations due to the significant improvements in `java.nio.file`.
+
+## Common Problems & Solutions
+
+### Problem 1: "Where is the source code for `UnixPath` or `WindowsPath`?"
+
+**Description:** Developers often want to inspect the actual source code for these internal implementation classes but find them missing in standard Oracle JDK distributions.
+
+**Solution:** The source code for these internal classes (`sun.nio.fs.*`) is typically not bundled with the standard Oracle JDK `src.zip` or `ct.sym` files. To view the source, you should:
+
+1.  **Consult OpenJDK:** The most reliable way is to look at the OpenJDK source code repositories online. For example, you can find `UnixFileSystem.java` and `UnixPath.java` in the OpenJDK GitHub mirror or official repositories.
+    *   [OpenJDK `UnixFileSystem.java`](https://github.com/openjdk/jdk/blob/master/src/java.base/share/classes/sun/nio/fs/UnixFileSystem.java)
+    *   [OpenJDK `UnixPath.java`](https://github.com/openjdk/jdk/blob/master/src/java.base/share/classes/sun/nio/fs/UnixPath.java)
+    *   [OpenJDK `WindowsFileSystem.java`](https://github.com/openjdk/jdk/blob/master/src/java.base/windows/classes/sun/nio/fs/WindowsFileSystem.java)
+    *   [OpenJDK `WindowsPath.java`](https://github.com/openjdk/jdk/blob/master/src/java.base/windows/classes/sun/nio/fs/WindowsPath.java)
+
+2.  **Use an IDE with Source Attachment:** Some IDEs (like IntelliJ IDEA) are good at automatically downloading and attaching OpenJDK sources, even if they're not directly in your JDK installation. If you're using a build tool like Maven or Gradle, ensure your project is configured to download sources.
+
+**Persona:** 📚 Learning Explorer, ⚡ Legacy Maintainer
+
+### Problem 2: `UnsupportedOperationException` when converting `Path` to `File` or `URI`
+
+**Description:** While `Path` provides `toFile()` and `toUri()` methods, they might throw an `UnsupportedOperationException` if the underlying `FileSystem` does not support these conversions. This is rare for the default file system but can happen with custom `FileSystemProvider` implementations (e.g., for ZIP files).
+
+**Solution:**
+Always wrap calls to `toFile()` or `toUri()` in a `try-catch` block if you are working with potentially non-standard `FileSystem` implementations. For the default file system, these operations are generally safe.
+
+```java
+// 🔧 Problem Solver, 🏗️ Architecture Builder
+import java.io.File;
+import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.io.IOException;
+
+public class PathConversionProblem {
+    public static void main(String[] args) {
+        Path standardPath = Paths.get("my_document.txt");
+
+        // Convert to File
+        try {
+            File file = standardPath.toFile();
+            System.out.println("Converted to File: " + file.getAbsolutePath());
+        } catch (UnsupportedOperationException e) {
+            System.err.println("Error converting to File: " + e.getMessage());
+        }
+
+        // Convert to URI
+        try {
+            URI uri = standardPath.toUri();
+            System.out.println("Converted to URI: " + uri);
+        } catch (UnsupportedOperationException e) {
+            System.err.println("Error converting to URI: " + e.getMessage());
+        }
+
+        // Example with a custom file system (e.g., ZIP file system)
+        // This part is conceptual as setting up a ZIP file system is more involved
+        // and might indeed throw UnsupportedOperationException for toFile().
+        // For demonstration, we'll simulate it.
+        System.out.println("\n--- Simulating custom FileSystem ---");
+        try {
+            // This is a placeholder; actual ZIP FS creation is more complex
+            // FileSystem zipFs = FileSystems.newFileSystem(URI.create("jar:file:/path/to/my.zip"), Map.of());
+            // Path pathInZip = zipFs.getPath("entry.txt");
+
+            // For this example, we'll just use a standard path but imagine it's from a custom FS
+            Path customFsPath = Paths.get("archive.zip", "data", "config.properties"); // This is still a standard path
+            System.out.println("Path from (simulated) custom FS: " + customFsPath);
+
+            try {
+                File file = customFsPath.toFile();
+                System.out.println("Converted to File (custom FS): " + file.getAbsolutePath());
+            } catch (UnsupportedOperationException e) {
+                System.err.println("Error converting to File (custom FS): " + e.getMessage());
+                System.err.println("This is expected for some custom FileSystems (e.g., ZIP, in-memory).");
+            }
+
+            try {
+                URI uri = customFsPath.toUri();
+                System.out.println("Converted to URI (custom FS): " + uri);
+            } catch (UnsupportedOperationException e) {
+                System.err.println("Error converting to URI (custom FS): " + e.getMessage());
+            }
+
+        } catch (Exception e) { // Catching generic Exception for conceptual custom FS setup
+            System.err.println("Could not set up custom file system: " + e.getMessage());
+        }
+    }
+}
+```
+
+### Problem 3: Path Separator Issues Across OS
+
+**Description:** Hardcoding path separators (e.g., `\` for Windows, `/` for Unix) can lead to non-portable code.
+
+**Solution:** Always use `Paths.get()` with multiple string arguments or `FileSystem.getSeparator()` to construct paths in a platform-agnostic way. `Paths.get()` automatically handles the correct separator.
+
+```java
+// 🚀 Speed Seeker, ⚡ Legacy Maintainer
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.FileSystems;
+
+public class PathSeparatorProblem {
+    public static void main(String[] args) {
+        // BAD: Hardcoding separators
+        // Path badPathWindows = Paths.get("C:\\Users\\Documents\\file.txt");
+        // Path badPathUnix = Paths.get("/home/user/documents/file.txt");
+
+        // GOOD: Using multiple arguments for Paths.get()
+        Path goodPath = Paths.get("users", "documents", "report.docx");
+        System.out.println("Portable Path (multiple args): " + goodPath);
+        System.out.println("System separator: " + FileSystems.getDefault().getSeparator());
+
+        // GOOD: Using the system separator explicitly (less common, Paths.get() is preferred)
+        String separator = FileSystems.getDefault().getSeparator();
+        Path anotherGoodPath = Paths.get("data" + separator + "logs" + separator + "app.log");
+        System.out.println("Portable Path (explicit separator): " + anotherGoodPath);
+
+        // Example of an absolute path
+        Path absoluteGoodPath;
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            absoluteGoodPath = Paths.get("C:", "Program Files", "MyApp", "config.ini");
+        } else {
+            absoluteGoodPath = Paths.get("/", "etc", "myapp", "config.ini");
+        }
+        System.out.println("Portable Absolute Path: " + absoluteGoodPath);
+    }
+}
+```
+
+## Real-World Use Cases
+
+The `Path` interface and the `java.nio.file` package are fundamental for any modern Java application that interacts with the file system. Understanding its implementation details helps in debugging and appreciating its design.
+
+1.  **File and Directory Management (All Personas):**
+    *   **Creating/Deleting:** `Files.createFile(path)`, `Files.createDirectory(path)`, `Files.delete(path)`
+    *   **Copying/Moving:** `Files.copy(sourcePath, targetPath)`, `Files.move(sourcePath, targetPath)`
+    *   **Checking Existence/Permissions:** `Files.exists(path)`, `Files.isReadable(path)`, `Files.isWritable(path)`
+    *   **Getting Attributes:** `Files.size(path)`, `Files.getLastModifiedTime(path)`
+
+    ```java
+    // 🔧 Problem Solver, 🚀 Speed Seeker
+    import java.nio.file.Files;
+    import java.nio.file.Path;
+    import java.nio.file.Paths;
+    import java.io.IOException;
+    import java.nio.file.StandardCopyOption;
+
+    public class FileManagementExample {
+        public static void main(String[] args) {
+            Path sourceFile = Paths.get("data", "source.txt");
+            Path targetDir = Paths.get("backup");
+            Path targetFile = targetDir.resolve("source.txt");
+
+            try {
+                // Ensure parent directories exist
+                Files.createDirectories(sourceFile.getParent());
+                Files.createDirectories(targetDir);
+
+                // Create a dummy source file
+                Files.writeString(sourceFile, "This is the original content.");
+                System.out.println("Created source file: " + sourceFile.toAbsolutePath());
+
+                // Copy the file
+                Files.copy(sourceFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("Copied file to: " + targetFile.toAbsolutePath());
+
+                // Check if target file exists
+                System.out.println("Target file exists: " + Files.exists(targetFile));
+
+                // Move the original file to a new name
+                Path movedFile = sourceFile.getParent().resolve("renamed_source.txt");
+                Files.move(sourceFile, movedFile, StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("Moved/Renamed source file to: " + movedFile.toAbsolutePath());
+
+                // Clean up
+                Files.delete(movedFile);
+                Files.delete(targetFile);
+                Files.delete(targetDir);
+                Files.delete(sourceFile.getParent()); // Delete 'data' directory
+                System.out.println("Cleaned up all files and directories.");
+
+            } catch (IOException e) {
+                System.err.println("File operation error: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+    ```
+
+2.  **Walking File Trees (📚 Learning Explorer, 🏗️ Architecture Builder):**
+    *   `Files.walkFileTree()` allows you to traverse directories recursively, applying custom logic to files and directories. This is far more powerful and efficient than recursive `File.listFiles()` calls.
+
+    ```java
+    // 📚 Learning Explorer, 🏗️ Architecture Builder
+    import java.io.IOException;
+    import java.nio.file.*;
+    import java.nio.file.attribute.BasicFileAttributes;
+
+    public class FileTreeWalkerExample {
+        public static void main(String[] args) {
+            Path startDir = Paths.get("my_project_root"); // Create this directory for testing
+            try {
+                // Create some dummy files and directories for demonstration
+                Files.createDirectories(startDir.resolve("src/main/java"));
+                Files.createDirectories(startDir.resolve("src/test/resources"));
+                Files.createFile(startDir.resolve("src/main/java/App.java"));
+                Files.createFile(startDir.resolve("src/test/resources/test.properties"));
+                Files.createFile(startDir.resolve("pom.xml"));
+
+                System.out.println("--- Walking file tree from: " + startDir.toAbsolutePath() + " ---");
+
+                Files.walkFileTree(startDir, new SimpleFileVisitor<Path>() {
+                    @Override
+                    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                        System.out.println("Visiting directory: " + dir.getFileName());
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                        System.out.println("  Visiting file: " + file.getFileName() + " (Size: " + attrs.size() + " bytes)");
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                    @Override
+                    public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                        System.err.println("Failed to visit file: " + file + " - " + exc.getMessage());
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                    @Override
+                    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                        if (exc != null) {
+                            System.err.println("Error after visiting directory " + dir + ": " + exc.getMessage());
+                        }
+                        System.out.println("Finished directory: " + dir.getFileName());
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
+
+                // Clean up
+                Files.walkFileTree(startDir, new SimpleFileVisitor<Path>() {
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                        Files.delete(file);
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                    @Override
+                    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                        Files.delete(dir);
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
+                System.out.println("\nCleaned up 'my_project_root'.");
+
+            } catch (
