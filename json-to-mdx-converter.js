@@ -19,21 +19,112 @@ class JsonToMdxConverter {
       stagingIndexPath: './staging/config/article-index-update.json',
       categoriesPath: './config/categories.json',
       processedDir: './staging/json/processed',
-      errorDir: './staging/json/errors'
+      errorDir: './staging/json/errors',
+      // GitHub URLs for latest schemas
+      githubUrls: {
+        contentSchema: 'https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/config/content-schema.json',
+        categories: 'https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/content/config/categories.json'
+      }
     };
     
-    this.categories = this.loadCategories();
+    this.categories = null;
+    this.contentSchema = null;
     this.articleIndex = this.loadArticleIndex();
     this.processedFiles = [];
     this.errorFiles = [];
+    
+    // Code block language mappings (matches upstream)
+    this.languageMappings = {
+      'js': 'javascript',
+      'jsx': 'jsx', 
+      'ts': 'typescript',
+      'tsx': 'tsx',
+      'py': 'python',
+      'python3': 'python',
+      'sh': 'bash',
+      'shell': 'bash',
+      'zsh': 'bash',
+      'cmd': 'powershell',
+      'yml': 'yaml',
+      'yaml': 'yaml',
+      'dockerfile': 'docker',
+      'html': 'html',
+      'css': 'css',
+      'scss': 'scss',
+      'sql': 'sql',
+      'json': 'json',
+      'xml': 'xml',
+      'md': 'markdown',
+      'markdown': 'markdown',
+      'mermaid': 'mermaid',
+      'text': 'text',
+      'plain': 'text',
+      'txt': 'text',
+      'output': 'output',
+      'console': 'output', 
+      'config': 'config',
+      'conf': 'config'
+    };
   }
 
-  loadCategories() {
+  async fetchFromGitHub(url, fallbackPath) {
     try {
-      const categoriesFile = fs.readFileSync(this.config.categoriesPath, 'utf8');
-      return JSON.parse(categoriesFile);
+      const https = require('https');
+      return new Promise((resolve, reject) => {
+        https.get(url, (response) => {
+          let data = '';
+          response.on('data', (chunk) => data += chunk);
+          response.on('end', () => {
+            try {
+              resolve(JSON.parse(data));
+            } catch (parseError) {
+              reject(parseError);
+            }
+          });
+        }).on('error', reject);
+      });
     } catch (error) {
-      console.error('❌ Failed to load categories.json:', error.message);
+      console.log(`⚠️  Failed to fetch from GitHub: ${url}, using local fallback`);
+      try {
+        const localFile = fs.readFileSync(fallbackPath, 'utf8');
+        return JSON.parse(localFile);
+      } catch (localError) {
+        console.error(`❌ Failed to load local fallback: ${fallbackPath}:`, localError.message);
+        throw localError;
+      }
+    }
+  }
+
+  async loadCategories() {
+    if (this.categories) return this.categories;
+    
+    try {
+      console.log('🔄 Fetching latest categories from GitHub...');
+      this.categories = await this.fetchFromGitHub(
+        this.config.githubUrls.categories, 
+        this.config.categoriesPath
+      );
+      console.log('✅ Categories loaded successfully');
+      return this.categories;
+    } catch (error) {
+      console.error('❌ Failed to load categories:', error.message);
+      process.exit(1);
+    }
+  }
+
+  async loadContentSchema() {
+    if (this.contentSchema) return this.contentSchema;
+    
+    try {
+      console.log('🔄 Fetching latest content schema from GitHub...');
+      this.contentSchema = await this.fetchFromGitHub(
+        this.config.githubUrls.contentSchema,
+        './content-schema.json'
+      );
+      console.log('✅ Content schema loaded successfully');
+      return this.contentSchema;
+    } catch (error) {
+      console.error('❌ Failed to load content schema:', error.message);
       process.exit(1);
     }
   }
@@ -42,7 +133,16 @@ class JsonToMdxConverter {
     try {
       if (fs.existsSync(this.config.articleIndexPath)) {
         const indexFile = fs.readFileSync(this.config.articleIndexPath, 'utf8');
-        return JSON.parse(indexFile);
+        const index = JSON.parse(indexFile);
+        
+        // Ensure backward compatibility by filtering articles with required fields
+        if (index.articles) {
+          index.articles = index.articles.filter(article => 
+            article.id && article.technology && article.publishedAt
+          );
+        }
+        
+        return index;
       }
       return { articles: [], lastUpdated: new Date().toISOString() };
     } catch (error) {
@@ -154,6 +254,32 @@ class JsonToMdxConverter {
     return subcategory;
   }
 
+  generateUniqueId(stackoverflowId) {
+    // SHA256-based unique ID generation (matches upstream algorithm)
+    const salt = "deepv-content-2025";
+    const hashInput = `${salt}-${stackoverflowId}`;
+    return crypto.createHash('sha256').update(hashInput).digest('hex').substring(0, 8);
+  }
+
+  processCodeBlocks(content) {
+    // Apply language mappings to code blocks for better syntax highlighting
+    let processedContent = content.replace(/```(\w+)/g, (match, language) => {
+      const mappedLanguage = this.languageMappings[language.toLowerCase()] || language.toLowerCase();
+      return '```' + mappedLanguage;
+    });
+
+    // Detect potential Mermaid diagrams (basic heuristic)
+    processedContent = processedContent.replace(/```\n(graph|flowchart|sequenceDiagram|classDiagram|gitgraph)/g, '```mermaid\n$1');
+    
+    return processedContent;
+  }
+
+  processImagePlaceholders(content) {
+    // Convert standard markdown images to PLACEHOLDER format for upstream compatibility
+    // This helps maintain consistency with the expected schema format
+    return content.replace(/!\[([^\]]+)\]\((?!PLACEHOLDER:)([^)]+)\)/g, '![$1](PLACEHOLDER: $1 - $2)');
+  }
+
   validateJsonStructure(jsonData, filename) {
     const errors = [];
     
@@ -186,6 +312,21 @@ class JsonToMdxConverter {
         
         // Update the jsonData reference
         jsonData.metadata = meta;
+      }
+
+      // Validate/generate unique ID using consistent algorithm
+      if (meta.sourceStackOverflowId) {
+        const expectedUniqueId = this.generateUniqueId(meta.sourceStackOverflowId);
+        
+        if (!meta.uniqueId) {
+          console.log(`  🔧 Generated missing uniqueId: ${expectedUniqueId}`);
+          meta.uniqueId = expectedUniqueId;
+          jsonData.metadata = meta;
+        } else if (meta.uniqueId !== expectedUniqueId) {
+          console.log(`  🔧 Corrected uniqueId: ${meta.uniqueId} → ${expectedUniqueId}`);
+          meta.uniqueId = expectedUniqueId;
+          jsonData.metadata = meta;
+        }
       }
       
       // Required fields validation
@@ -229,15 +370,46 @@ class JsonToMdxConverter {
           }
         }
       }
+
+      // Quality metrics validation (simple checks)
+      if (meta.qualityMetrics) {
+        const metrics = meta.qualityMetrics;
+        
+        if (metrics.wordCount && metrics.wordCount < 100) {
+          errors.push('Content appears too short (< 100 words)');
+        }
+        
+        if (metrics.codeBlocks && metrics.codeBlocks === 0) {
+          console.log(`  ⚠️  No code blocks found - may not be technical content`);
+        }
+        
+        if (metrics.wordCount && metrics.codeBlocks) {
+          const codeToWordRatio = metrics.codeBlocks / (metrics.wordCount / 100);
+          if (codeToWordRatio > 50) {
+            console.log(`  ⚠️  Very high code-to-text ratio (${codeToWordRatio.toFixed(1)}%)`);
+          }
+        }
+      } else {
+        console.log(`  ⚠️  No quality metrics provided`);
+      }
     }
 
     return errors;
   }
 
-  truncateTitle(title, maxLength = 70) {
+  truncateTitle(title, maxLength = null) {
+    // Schema v3.2.0: No character limit for titles
+    // Google indexes entire title. For optimal SERP display, consider ~50-60 chars
+    // but longer titles still provide SEO value
+    
+    if (maxLength === null) {
+      // No truncation needed - return as is
+      return title;
+    }
+    
     if (title.length <= maxLength) return title;
     
-    // Try to truncate at a natural break point
+    // Optional truncation if maxLength specified
     const truncated = title.substring(0, maxLength);
     const lastSpaceIndex = truncated.lastIndexOf(' ');
     
@@ -271,7 +443,7 @@ class JsonToMdxConverter {
   }
 
   generateMdxFrontmatter(metadata) {
-    // Clean and validate fields
+    // Clean and validate fields (v3.2.0: no title length limit)
     const title = this.truncateTitle(metadata.title);
     const slug = this.normalizeSlug(metadata.slug);
     const lastUpdated = this.formatISODate(metadata.generatedAt || metadata.publishedAt);
@@ -294,9 +466,15 @@ featured: ${metadata.featured || false}
 
   convertJsonToMdx(jsonData, filename) {
     let metadata = jsonData.metadata;
-    const content = jsonData.content;
+    let content = jsonData.content;
     
-    // Apply all transformations to metadata
+    // Process code blocks for proper language mapping
+    content = this.processCodeBlocks(content);
+    
+    // Process images to use PLACEHOLDER format
+    content = this.processImagePlaceholders(content);
+    
+    // Apply all transformations to metadata (v3.2.0: no title truncation)
     metadata.title = this.truncateTitle(metadata.title);
     metadata.slug = this.normalizeSlug(metadata.slug);
     
@@ -319,6 +497,7 @@ featured: ${metadata.featured || false}
       metadata: {
         title: metadata.title,
         slug: metadata.slug,
+        uniqueId: metadata.uniqueId,
         category: metadata.category,
         subcategory: metadata.subcategory,
         description: metadata.description,
@@ -329,7 +508,10 @@ featured: ${metadata.featured || false}
         featured: metadata.featured || false,
         filename: mdxFilename,
         sourceStackOverflowId: metadata.sourceStackOverflowId,
-        qualityMetrics: metadata.qualityMetrics
+        qualityMetrics: metadata.qualityMetrics,
+        technology: metadata.technology,
+        publishedAt: metadata.publishedAt,
+        generatedAt: metadata.generatedAt
       }
     };
   }
@@ -340,16 +522,37 @@ featured: ${metadata.featured || false}
       !newArticles.some(newArticle => newArticle.metadata.slug === article.slug)
     );
     
-    // Add new articles
+    // Add new articles with proper schema format
     const updatedArticles = [
       ...existingArticles,
-      ...newArticles.map(article => article.metadata)
+      ...newArticles.map(article => ({
+        id: article.metadata.uniqueId,
+        title: article.metadata.title,
+        slug: article.metadata.slug,
+        category: article.metadata.category,
+        subcategory: article.metadata.subcategory,
+        difficulty: article.metadata.difficulty,
+        technology: article.metadata.technology || this.getTechnologyFromTags(article.metadata.tags),
+        readTime: article.metadata.readTime,
+        publishedAt: article.metadata.publishedAt || article.metadata.generatedAt || new Date().toISOString(),
+        featured: article.metadata.featured || false,
+        description: article.metadata.description,
+        tags: article.metadata.tags,
+        filename: `${article.metadata.slug}-${article.metadata.uniqueId}.mdx`,
+        lastUpdated: article.metadata.generatedAt || new Date().toISOString()
+      }))
     ];
+
+    // Extract unique categories and technologies
+    const categories = [...new Set(updatedArticles.map(article => article.category))].sort();
+    const technologies = [...new Set(updatedArticles.map(article => article.technology).filter(Boolean))].sort();
     
     const updatedIndex = {
-      articles: updatedArticles,
       lastUpdated: new Date().toISOString(),
-      totalArticles: updatedArticles.length
+      totalArticles: updatedArticles.length,
+      categories: categories,
+      technologies: technologies,
+      articles: updatedArticles
     };
     
     // Write staging index
@@ -361,6 +564,41 @@ featured: ${metadata.featured || false}
     
     console.log(`📊 Updated article index: ${updatedArticles.length} total articles`);
     return updatedIndex;
+  }
+
+  getTechnologyFromTags(tags) {
+    // Map tags to human-readable technology names
+    const technologyMappings = {
+      'javascript': 'JavaScript',
+      'js': 'JavaScript',
+      'python': 'Python',
+      'py': 'Python',
+      'java': 'Java',
+      'sql': 'SQL',
+      'sql-server': 'SQL Server',
+      'mysql': 'MySQL',
+      'postgresql': 'PostgreSQL',
+      'mongodb': 'MongoDB',
+      'bash': 'Bash',
+      'shell': 'Shell',
+      'linux': 'Linux',
+      'windows': 'Windows',
+      'docker': 'Docker',
+      'aws': 'AWS',
+      'html': 'HTML',
+      'css': 'CSS',
+      'react': 'React',
+      'node': 'Node.js',
+      'npm': 'npm'
+    };
+
+    for (const tag of tags) {
+      const tech = technologyMappings[tag.toLowerCase()];
+      if (tech) return tech;
+    }
+    
+    // Default fallback
+    return 'Programming';
   }
 
   moveProcessedFile(filename, success = true) {
@@ -399,11 +637,15 @@ featured: ${metadata.featured || false}
     fs.writeFileSync(errorLogPath, JSON.stringify(errorLog, null, 2), 'utf8');
   }
 
-  processJsonFiles() {
+  async processJsonFiles() {
     this.ensureDirectories();
     
     console.log('🚀 DeepV Code JSON to MDX Converter');
     console.log('=====================================');
+    
+    // Load latest schemas from GitHub
+    await this.loadCategories();
+    await this.loadContentSchema();
     
     // Get all JSON files (excluding metadata files and error files)
     const jsonFiles = fs.readdirSync(this.config.jsonInputDir)
@@ -496,15 +738,15 @@ featured: ${metadata.featured || false}
   }
 
   // Static method for CLI usage
-  static run() {
+  static async run() {
     const converter = new JsonToMdxConverter();
-    converter.processJsonFiles();
+    await converter.processJsonFiles();
   }
 }
 
 // CLI execution
 if (require.main === module) {
-  JsonToMdxConverter.run();
+  JsonToMdxConverter.run().catch(console.error);
 }
 
 module.exports = JsonToMdxConverter;
