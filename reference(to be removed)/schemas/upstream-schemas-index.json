@@ -1,0 +1,164 @@
+{
+  "_metadata": {
+    "version": "1.0.0",
+    "description": "Master index of essential schemas for upstream content generation",
+    "purpose": "Single entry point for all required schemas - hand this to your upstream",
+    "lastUpdated": "2025-09-18",
+    "total_schemas": 5
+  },
+  "essential_schemas": {
+    "content_requirements": {
+      "name": "Content Schema",
+      "file": "content-schema.json",
+      "version": "3.0.0",
+      "url": "https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/config/content-schema.json",
+      "purpose": "Complete content requirements: frontmatter, code languages, Mermaid, SEO optimization",
+      "critical_for": [
+        "MDX article structure",
+        "Code block language specifications", 
+        "Mermaid diagram support",
+        "SEO title/description requirements",
+        "Content validation rules"
+      ],
+      "must_read": true
+    },
+    "content_templates": {
+      "name": "Content Templates",
+      "file": "content-templates.json", 
+      "version": "1.0.0",
+      "url": "https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/config/content-templates.json",
+      "purpose": "Ready-to-use templates and examples for consistent content generation",
+      "critical_for": [
+        "Complete MDX article templates",
+        "Code examples for major languages",
+        "Frontmatter examples by category",
+        "Quality standards and best practices"
+      ],
+      "must_read": true
+    },
+    "article_indexing": {
+      "name": "Article Index Schema", 
+      "file": "article-index-schema.json",
+      "version": "1.0.0",
+      "url": "https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/config/article-index-schema.json",
+      "purpose": "Article index structure, URL patterns, consistency requirements",
+      "critical_for": [
+        "Article index generation",
+        "URL structure (/guides/{slug}-{id})",
+        "Metadata consistency",
+        "ISR navigation support"
+      ],
+      "must_read": true
+    },
+    "categories_navigation": {
+      "name": "Categories Configuration",
+      "file": "categories.json",
+      "version": "stable",
+      "url": "https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/content/config/categories.json", 
+      "purpose": "Valid category/subcategory combinations for site navigation",
+      "critical_for": [
+        "Category validation",
+        "Navigation structure",
+        "Article classification",
+        "UI color schemes"
+      ],
+      "must_read": true
+    },
+    "project_configuration": {
+      "name": "Project Configuration",
+      "file": "project.json",
+      "version": "1.0.0", 
+      "url": "https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/config/project.json",
+      "purpose": "Project metadata, architecture, environment variables",
+      "critical_for": [
+        "Deployment target (Vercel ISR)",
+        "Repository structure",
+        "Environment requirements",
+        "Architecture understanding"
+      ],
+      "must_read": false,
+      "note": "Read for context, not content generation"
+    }
+  },
+  "integration_workflow": {
+    "step_1": {
+      "action": "Download all schemas",
+      "commands": [
+        "curl -s https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/config/content-schema.json > content-schema.json",
+        "curl -s https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/config/content-templates.json > content-templates.json",
+        "curl -s https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/config/article-index-schema.json > article-index-schema.json",
+        "curl -s https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/content/config/categories.json > categories.json"
+      ]
+    },
+    "step_2": {
+      "action": "Understand requirements", 
+      "focus": [
+        "Code blocks MUST have language specified (content-schema.json)",
+        "Mermaid diagrams use 'mermaid' language tag",
+        "SEO requirements for titles (5-70 chars) and descriptions (20-200 chars)",
+        "Categories must exist in categories.json",
+        "Article URLs follow /guides/{slug}-{id} pattern"
+      ]
+    },
+    "step_3": {
+      "action": "Use templates for consistency",
+      "focus": [
+        "Copy MDX structure from content-templates.json",
+        "Use provided code examples as reference",
+        "Follow frontmatter examples by category",
+        "Apply quality checklist standards"
+      ]
+    },
+    "step_4": {
+      "action": "Generate content following schemas",
+      "output_location": "/nextjs-deepv-content/staging/guides/",
+      "filename_pattern": "{slug}-{8-char-hex-id}.mdx",
+      "validation": "All content MUST pass validation against schemas"
+    },
+    "step_5": {
+      "action": "Generate complete article index",
+      "output_location": "/nextjs-deepv-content/staging/config/article-index-update.json",
+      "requirement": "Include ALL articles (existing + new)",
+      "format": "Follow article-index-schema.json exactly"
+    }
+  },
+  "validation_tools": {
+    "content_validator": {
+      "url": "https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/scripts/validate-content.js",
+      "usage": "node validate-content.js staging/guides content-schema.json",
+      "catches": ["Missing code languages", "Invalid frontmatter", "SEO issues"]
+    },
+    "index_validator": {
+      "url": "https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/scripts/validate-article-index.js",
+      "usage": "node validate-article-index.js staging/config/article-index-update.json", 
+      "catches": ["Index inconsistencies", "Missing articles", "Invalid URLs"]
+    }
+  },
+  "critical_success_factors": {
+    "zero_tolerance": [
+      "Code blocks without language specification",
+      "Invalid category/subcategory combinations", 
+      "Malformed article URLs",
+      "Missing or invalid frontmatter fields"
+    ],
+    "seo_optimization": [
+      "Titles 50-60 characters with keywords",
+      "Descriptions 150-160 characters with value proposition",
+      "4-6 relevant tags including technology and difficulty",
+      "SEO-friendly URL slugs"
+    ],
+    "content_quality": [
+      "Mermaid diagrams for complex processes",
+      "Practical code examples with explanations",
+      "Logical content structure with clear headings",
+      "Proper conclusion and next steps"
+    ]
+  },
+  "deployment_architecture": {
+    "platform": "Vercel with ISR (Incremental Static Regeneration)",
+    "content_source": "External GitHub repository (nextjs-deepv-content)",
+    "revalidation": "5 minutes automatic + on-demand via git push",
+    "scalability": "Designed for 10K+ articles",
+    "performance": "Pre-rendered pages with edge caching"
+  }
+}

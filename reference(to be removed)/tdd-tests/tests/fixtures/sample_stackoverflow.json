@@ -1,0 +1,122 @@
+{
+  "high_value_question": {
+    "question_id": "12345",
+    "title": "How to optimize database queries in Django",
+    "question_text": "I have a Django application with complex database relationships and I'm experiencing performance issues. The queries are taking too long and I need to optimize them. Here's my current model structure and the problematic queries...",
+    "question_code_snippets": [
+      "class User(models.Model):\n    name = models.CharField(max_length=100)\n    email = models.EmailField()",
+      "# Problematic query\nusers = User.objects.select_related('profile').prefetch_related('orders__items')"
+    ],
+    "tags": ["python", "django", "database", "optimization"],
+    "votes": 150,
+    "answers_count": 5,
+    "answers": [
+      {
+        "text": "The best approach is to use select_related and prefetch_related strategically. Here's how to optimize your queries...",
+        "votes": 85,
+        "is_accepted": true,
+        "code_snippets": [
+          "# Optimized approach\nusers = User.objects.select_related('profile').prefetch_related(\n    Prefetch('orders', queryset=Order.objects.select_related('customer'))\n)",
+          "# For even better performance\nfrom django.db import connection\nwith connection.cursor() as cursor:\n    cursor.execute('SELECT ...')"
+        ]
+      },
+      {
+        "text": "Another approach is to use database indexing and query optimization at the database level...",
+        "votes": 45,
+        "is_accepted": false,
+        "code_snippets": [
+          "# Add database indexes\nclass Meta:\n    indexes = [\n        models.Index(fields=['email', 'created_at']),\n    ]"
+        ]
+      },
+      {
+        "text": "You should also consider using Django Debug Toolbar to analyze your queries...",
+        "votes": 30,
+        "is_accepted": false,
+        "code_snippets": [
+          "# settings.py\nINSTALLED_APPS = [\n    'debug_toolbar',\n]\n\nMIDDLEWARE = [\n    'debug_toolbar.middleware.DebugToolbarMiddleware',\n]"
+        ]
+      }
+    ]
+  },
+  "medium_value_question": {
+    "question_id": "67890",
+    "title": "JavaScript array methods comparison",
+    "question_text": "What's the difference between map, filter, and reduce in JavaScript? When should I use each one?",
+    "question_code_snippets": [
+      "const numbers = [1, 2, 3, 4, 5];\n// Which method should I use here?"
+    ],
+    "tags": ["javascript", "arrays"],
+    "votes": 45,
+    "answers_count": 3,
+    "answers": [
+      {
+        "text": "Map transforms each element, filter selects elements, reduce accumulates values...",
+        "votes": 25,
+        "is_accepted": true,
+        "code_snippets": [
+          "// Map example\nconst doubled = numbers.map(n => n * 2);",
+          "// Filter example\nconst evens = numbers.filter(n => n % 2 === 0);",
+          "// Reduce example\nconst sum = numbers.reduce((acc, n) => acc + n, 0);"
+        ]
+      },
+      {
+        "text": "Here's a performance comparison of these methods...",
+        "votes": 15,
+        "is_accepted": false,
+        "code_snippets": [
+          "// Performance test\nconsole.time('map');\nlargeArray.map(fn);\nconsole.timeEnd('map');"
+        ]
+      }
+    ]
+  },
+  "simple_question": {
+    "question_id": "11111",
+    "title": "How to center a div",
+    "question_text": "I need to center a div horizontally and vertically on the page. What's the best way to do this?",
+    "question_code_snippets": [
+      "<div class=\"container\">\n  <div class=\"centered\">Content</div>\n</div>"
+    ],
+    "tags": ["css", "html"],
+    "votes": 12,
+    "answers_count": 2,
+    "answers": [
+      {
+        "text": "Use flexbox for modern browsers...",
+        "votes": 8,
+        "is_accepted": true,
+        "code_snippets": [
+          ".container {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 100vh;\n}"
+        ]
+      },
+      {
+        "text": "Alternative using CSS Grid...",
+        "votes": 3,
+        "is_accepted": false,
+        "code_snippets": [
+          ".container {\n  display: grid;\n  place-items: center;\n  height: 100vh;\n}"
+        ]
+      }
+    ]
+  },
+  "minimal_question": {
+    "question_id": "22222",
+    "title": "Python syntax error",
+    "question_text": "Getting syntax error, what's wrong?",
+    "question_code_snippets": [
+      "print \"Hello World\""
+    ],
+    "tags": ["python"],
+    "votes": 3,
+    "answers_count": 1,
+    "answers": [
+      {
+        "text": "Python 3 requires parentheses for print function",
+        "votes": 5,
+        "is_accepted": true,
+        "code_snippets": [
+          "print(\"Hello World\")"
+        ]
+      }
+    ]
+  }
+}

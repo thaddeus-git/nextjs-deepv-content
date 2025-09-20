@@ -1,0 +1,90 @@
+{
+  "_metadata": {
+    "version": "1.0.0",
+    "description": "Ready-to-use templates for content generation",
+    "purpose": "Standardized templates to ensure consistency across all generated articles",
+    "lastUpdated": "2025-09-18"
+  },
+  "mdx_article_template": {
+    "frontmatter_template": {
+      "title": "Example Article Title (5-70 chars)",
+      "slug": "example-article-title",
+      "category": "web-frontend",
+      "subcategory": "javascript", 
+      "description": "SEO-optimized description explaining what readers will learn (20-200 chars)",
+      "tags": ["javascript", "tutorial", "beginner"],
+      "difficulty": "beginner",
+      "readTime": 10,
+      "lastUpdated": "2025-09-18T12:00:00.000Z",
+      "featured": false
+    },
+    "content_structure_template": "---\n{frontmatter}\n---\n\n# {title}\n\n## Overview\n\nBrief introduction explaining what this article covers and why it's important.\n\n## Prerequisites\n\n- Basic knowledge requirement 1\n- Basic knowledge requirement 2\n\n## Main Content Section\n\n### Subsection with Code Example\n\nExplanation of the concept.\n\n```javascript\n// Always specify language for code blocks\nconst example = 'This shows proper syntax highlighting';\nconsole.log(example);\n```\n\n### Subsection with Diagram\n\nFor process flows, use Mermaid diagrams:\n\n```mermaid\nflowchart TD\n    A[Start] --> B[Process]\n    B --> C[Decision]\n    C -->|Yes| D[Success]\n    C -->|No| E[Error]\n```\n\n## Conclusion\n\nSummarize what was covered and next steps.\n\n## Related Articles\n\n- [Related Article 1](/guides/related-article-1)\n- [Related Article 2](/guides/related-article-2)",
+    "filename_template": "{slug}-{8-char-hex-id}.mdx"
+  },
+  "common_code_examples": {
+    "javascript_function": "```javascript\nfunction calculateSum(a, b) {\n    return a + b;\n}\n\nconst result = calculateSum(5, 3);\nconsole.log(result); // Output: 8\n```",
+    "python_class": "```python\nclass DataProcessor:\n    def __init__(self, data):\n        self.data = data\n    \n    def process(self):\n        return [item.upper() for item in self.data]\n\n# Usage\nprocessor = DataProcessor(['hello', 'world'])\nresult = processor.process()\nprint(result)  # ['HELLO', 'WORLD']\n```",
+    "sql_query": "```sql\nSELECT \n    u.name,\n    u.email,\n    COUNT(o.id) as order_count\nFROM users u\nLEFT JOIN orders o ON u.id = o.user_id\nWHERE u.active = 1\nGROUP BY u.id\nORDER BY order_count DESC\nLIMIT 10;\n```",
+    "bash_script": "```bash\n#!/bin/bash\n\n# Process log files\nfor logfile in /var/log/*.log; do\n    if [[ -f \"$logfile\" ]]; then\n        echo \"Processing: $logfile\"\n        gzip \"$logfile\"\n    fi\ndone\n\necho \"Log compression completed\"\n```",
+    "yaml_config": "```yaml\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: web-app\n  labels:\n    app: web\nspec:\n  replicas: 3\n  selector:\n    matchLabels:\n      app: web\n  template:\n    metadata:\n      labels:\n        app: web\n    spec:\n      containers:\n      - name: web\n        image: nginx:latest\n        ports:\n        - containerPort: 80\n```",
+    "mermaid_flowchart": "```mermaid\nflowchart TD\n    A[User Request] --> B{Authentication}\n    B -->|Valid| C[Process Request]\n    B -->|Invalid| D[Return 401]\n    C --> E{Data Validation}\n    E -->|Valid| F[Execute Operation]\n    E -->|Invalid| G[Return 400]\n    F --> H[Return Success]\n    D --> I[End]\n    G --> I\n    H --> I\n```"
+  },
+  "frontmatter_examples_by_category": {
+    "web-frontend": {
+      "category": "web-frontend",
+      "subcategory": "javascript",
+      "tags": ["javascript", "frontend", "web-development"],
+      "technology": "JavaScript"
+    },
+    "databases": {
+      "category": "databases", 
+      "subcategory": "mysql",
+      "tags": ["mysql", "sql", "database", "queries"],
+      "technology": "MySQL"
+    },
+    "system-devops": {
+      "category": "system-devops",
+      "subcategory": "containerization", 
+      "tags": ["docker", "containers", "devops"],
+      "technology": "Docker"
+    },
+    "mobile": {
+      "category": "mobile",
+      "subcategory": "android",
+      "tags": ["android", "mobile", "java", "kotlin"],
+      "technology": "Android"
+    },
+    "programming-languages": {
+      "category": "programming-languages",
+      "subcategory": "python",
+      "tags": ["python", "programming", "tutorial"],
+      "technology": "Python"
+    }
+  },
+  "article_quality_checklist": {
+    "required_elements": [
+      "Clear title (5-70 characters)",
+      "SEO description (20-200 characters)",
+      "Main heading (# Title)",
+      "At least 2-3 subheadings (## Section)",
+      "Minimum 100 words of content",
+      "All code blocks have language specified",
+      "Proper conclusion section"
+    ],
+    "best_practices": [
+      "Use Mermaid diagrams for process flows",
+      "Include practical code examples",
+      "Add related articles section",
+      "Use consistent heading structure",
+      "Explain code examples thoroughly",
+      "Include prerequisites when needed"
+    ],
+    "common_mistakes_to_avoid": [
+      "Code blocks without language (``` instead of ```javascript)",
+      "Titles too long (>70 characters)",
+      "Descriptions too short (<20 characters)",
+      "Missing main heading",
+      "No practical examples"
+    ]
+  }
+}

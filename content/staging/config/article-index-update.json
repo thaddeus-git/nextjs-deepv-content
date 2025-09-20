@@ -1,185 +1,14 @@
 {
-  "lastUpdated": "2025-09-18T15:07:57.000Z",
-  "totalArticles": 11,
+  "lastUpdated": "2025-09-20T02:32:21.000Z",
+  "totalArticles": 2,
   "categories": [
-    "programming",
-    "system-devops",
-    "programming-languages",
-    "web-frontend"
+    "web-frontend",
+    "system-devops"
   ],
   "technologies": [
-    "RPM/Linux",
-    "File",
-    "Amazon-Redshift",
-    "Python-2.7",
-    "Python",
-    "JavaScript",
-    "Rest",
-    "Sql-Server",
     "Programming"
   ],
   "articles": [
-    {
-      "id": "faa9b536",
-      "title": "How to calculate median in AWS Redshift?: 3 Methods + Performance Guide",
-      "slug": "how-to-calculate-median-in-aws-redshift",
-      "category": "programming",
-      "subcategory": "general",
-      "difficulty": "intermediate",
-      "technology": "Amazon-Redshift",
-      "readTime": 18,
-      "publishedAt": "2025-09-18",
-      "featured": false,
-      "description": "Calculating the median in AWS Redshift can be achieved efficiently using several methods, primarily leveraging window functions. The most direct and recommen...",
-      "tags": [
-        "amazon-redshift"
-      ],
-      "filename": "how-to-calculate-median-in-aws-redshift-faa9b536.mdx",
-      "lastUpdated": "2025-09-18T15:07:57.000Z"
-    },
-    {
-      "id": "dc385f3c",
-      "title": "Representational state transfer (REST) and Simple Object Access Protocol (SOAP): Complete Guide with 6 Solutions",
-      "slug": "representational-state-transfer-rest-and-simple-object",
-      "category": "programming",
-      "subcategory": "general",
-      "difficulty": "intermediate",
-      "technology": "Rest",
-      "readTime": 29,
-      "publishedAt": "2025-09-18",
-      "featured": true,
-      "description": "For modern web service development, REST (Representational State Transfer) is generally preferred due to its simplicity, lightweight nature, and direct use o...",
-      "tags": [
-        "rest",
-        "soap"
-      ],
-      "filename": "representational-state-transfer-rest-and-simple-object-dc385f3c.mdx",
-      "lastUpdated": "2025-09-18T15:07:57.000Z"
-    },
-    {
-      "id": "bbd1fbd5",
-      "title": "logit regression and singular Matrix error in Python: Complete Guide with 3 Solutions",
-      "slug": "logit-regression-and-singular-matrix-error-in-python",
-      "category": "programming",
-      "subcategory": "general",
-      "difficulty": "intermediate",
-      "technology": "Python-2.7",
-      "readTime": 27,
-      "publishedAt": "2025-09-18",
-      "featured": false,
-      "description": "The most common cause of a Singular Matrix Error in statsmodels.Logit in Python, especially with the German Credit Data, is an incorrectly formatted depend...",
-      "tags": [
-        "python-2.7",
-        "regression",
-        "statsmodels"
-      ],
-      "filename": "logit-regression-and-singular-matrix-error-in-python-bbd1fbd5.mdx",
-      "lastUpdated": "2025-09-18T15:07:57.000Z"
-    },
-    {
-      "id": "ae1d627b",
-      "title": "How can Apache Camel be used to monitor file changes?: 5 Methods + Performance Guide",
-      "slug": "how-can-apache-camel-be-used-to-monitor-file-changes",
-      "category": "programming",
-      "subcategory": "general",
-      "difficulty": "intermediate",
-      "technology": "File",
-      "readTime": 27,
-      "publishedAt": "2025-09-18",
-      "featured": false,
-      "description": "For the fastest and most straightforward way to monitor file changes in Apache Camel without consuming or deleting the files, especially for modern Camel ver...",
-      "tags": [
-        "file",
-        "apache-camel"
-      ],
-      "filename": "how-can-apache-camel-be-used-to-monitor-file-changes-ae1d627b.mdx",
-      "lastUpdated": "2025-09-18T15:07:57.000Z"
-    },
-    {
-      "id": "d0cc8ebb",
-      "title": "Why does my JavaScript code receive a \\\"No 'Access-Control-Allow-Ori...",
-      "slug": "why-does-my-javascript-code-receive-a-no-access-control",
-      "category": "web-frontend",
-      "subcategory": "javascript",
-      "difficulty": "beginner",
-      "technology": "Programming",
-      "readTime": 16,
-      "publishedAt": "2025-09-18",
-      "featured": true,
-      "description": "The \\\"No 'Access-Control-Allow-Origin' header is present on the requested resource\\\" error occurs in browsers due to the Same-Origin Policy (SOP), a fundamenta...",
-      "tags": [
-        "javascript",
-        "jquery",
-        "cors",
-        "postman",
-        "same-origin-policy",
-        "frontend",
-        "web",
-        "js"
-      ],
-      "filename": "why-does-my-javascript-code-receive-a-no-access-control-d0cc8ebb.mdx",
-      "lastUpdated": "2025-09-18T15:07:57.000Z"
-    },
-    {
-      "id": "c335a59c",
-      "title": "Retrieve data from stored procedure which has multiple result sets: Complete Guide with 6 Solutions",
-      "slug": "retrieve-data-from-stored-procedure-which-has-multiple",
-      "category": "programming",
-      "subcategory": "general",
-      "difficulty": "intermediate",
-      "technology": "Sql-Server",
-      "readTime": 30,
-      "publishedAt": "2025-09-18",
-      "featured": false,
-      "description": "For immediate T-SQL consumption of multiple result sets, the most direct and recommended approach is to refactor the stored procedure into smaller, single-pu...",
-      "tags": [
-        "sql-server",
-        "stored-procedures"
-      ],
-      "filename": "retrieve-data-from-stored-procedure-which-has-multiple-c335a59c.mdx",
-      "lastUpdated": "2025-09-18T15:07:57.000Z"
-    },
-    {
-      "id": "30e24d02",
-      "title": "size of NumPy array: Complete Guide with 3 Solutions",
-      "slug": "size-of-numpy-array",
-      "category": "programming-languages",
-      "subcategory": "python",
-      "difficulty": "intermediate",
-      "technology": "Python",
-      "readTime": 13,
-      "publishedAt": "2025-09-18",
-      "featured": false,
-      "description": "In NumPy, the equivalent of MATLAB's size() command is primarily achieved through the .shape attribute for dimensions and the .size attribute for the total n...",
-      "tags": [
-        "python",
-        "arrays",
-        "numpy",
-        "size"
-      ],
-      "filename": "size-of-numpy-array-30e24d02.mdx",
-      "lastUpdated": "2025-09-18T15:07:57.000Z"
-    },
-    {
-      "id": "5eb2a04f",
-      "title": "How to change font and size of buttons and frame in tkinter using python?: 4 Methods + Performance Guide",
-      "slug": "how-to-change-font-and-size-of-buttons-and-frame-in-tkinter",
-      "category": "programming-languages",
-      "subcategory": "python",
-      "difficulty": "beginner",
-      "technology": "Python",
-      "readTime": 24,
-      "publishedAt": "2025-09-18",
-      "featured": false,
-      "description": "For a modern, Python 3-compatible approach to changing button font and size, the most direct method involves creating a tkinter.font.Font object and assignin...",
-      "tags": [
-        "python",
-        "tkinter",
-        "tk-toolkit"
-      ],
-      "filename": "how-to-change-font-and-size-of-buttons-and-frame-in-tkinter-5eb2a04f.mdx",
-      "lastUpdated": "2025-09-18T15:07:57.000Z"
-    },
     {
       "id": "3749489f",
       "title": "Parse query string in JavaScript: Complete Guide with 6 Solutions",
@@ -187,62 +16,42 @@
       "category": "web-frontend",
       "subcategory": "javascript",
       "difficulty": "intermediate",
-      "technology": "JavaScript",
-      "readTime": 35,
-      "publishedAt": "2025-09-17",
+      "technology": "Programming",
+      "readTime": 26,
+      "publishedAt": "2025-09-20",
       "featured": true,
-      "description": "For a fast, modern, and reliable way to parse query strings, especially when dealing with the current page's URL, the URLSearchParams API is the recommended ...",
+      "description": "For modern browsers (IE11+), the most robust and straightforward way to parse a query string is using the built-in URLSearchParams API. This provides a clean...",
       "tags": [
         "javascript",
         "parsing",
-        "query-string"
+        "query-string",
+        "frontend",
+        "web",
+        "js"
       ],
       "filename": "parse-query-string-in-javascript-3749489f.mdx",
-      "lastUpdated": "2025-09-18T15:07:57.000Z"
+      "lastUpdated": "2025-09-20T02:32:21.000Z"
     },
     {
       "id": "debc8982",
-      "title": "Dependency Resolution Fails on Installed Library: Complete Guide with 5 Solutions",
+      "title": "Dependency Resolution Fails on Installed Library: Complete Guide wi...",
       "slug": "dependency-resolution-fails-on-installed-library",
       "category": "system-devops",
       "subcategory": "package-management",
       "difficulty": "intermediate",
-      "technology": "RPM/Linux",
-      "readTime": 30,
-      "publishedAt": "2025-09-17",
+      "technology": "Programming",
+      "readTime": 28,
+      "publishedAt": "2025-09-20",
       "featured": false,
-      "description": "Problem: You're trying to install an RPM package (e.g., geramer-server.x8664) and it fails with a dependency error like Requires: libcrypto.so.10(libcrypto.s...",
+      "description": "The most common reason for \\\"Dependency Resolution Fails\\\" when a library like libcrypto.so.10 appears to be installed is a mismatch in the module names or ver...",
       "tags": [
         "rpm",
-        "linux",
-        "dependency-resolution",
-        "package-management",
-        "troubleshooting"
+        "devops",
+        "system",
+        "package"
       ],
       "filename": "dependency-resolution-fails-on-installed-library-debc8982.mdx",
-      "lastUpdated": "2025-09-18T15:07:57.000Z"
-    },
-    {
-      "id": "171c50c3",
-      "title": "How to do word counts for a mixture of English and Chinese in Javascript: 3 Methods + Performance Guide",
-      "slug": "how-to-do-word-counts-for-a-mixture-of-english-and-chinese",
-      "category": "web-frontend",
-      "subcategory": "javascript",
-      "difficulty": "beginner",
-      "technology": "JavaScript",
-      "readTime": 22,
-      "publishedAt": "2025-09-17",
-      "featured": false,
-      "description": "(Persona: Speed Seeker, Problem Solver, Output Focused)",
-      "tags": [
-        "javascript",
-        "jquery",
-        "character",
-        "counter",
-        "word-count"
-      ],
-      "filename": "how-to-do-word-counts-for-a-mixture-of-english-and-chinese-171c50c3.mdx",
-      "lastUpdated": "2025-09-18T15:07:57.000Z"
+      "lastUpdated": "2025-09-20T02:32:21.000Z"
     }
   ]
 }

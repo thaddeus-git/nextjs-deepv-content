@@ -1,0 +1,37 @@
+{
+  "project": {
+    "name": "DeepV Code",
+    "description": "AI-powered technical documentation platform",
+    "domain": "https://deepvcode.com/",
+    "framework": "Next.js 15",
+    "deployment": "Vercel"
+  },
+  "repositories": {
+    "main": {
+      "url": "git@github.com:thaddeus-git/nextjs-deepv-docs.git",
+      "purpose": "Application code and deployment",
+      "size_limit": "50MB"
+    },
+    "content": {
+      "url": "git@github.com:thaddeus-git/nextjs-deepv-content.git", 
+      "purpose": "MDX articles and configuration",
+      "scalability": "100,000+ articles"
+    }
+  },
+  "architecture": {
+    "strategy": "ISR (Incremental Static Regeneration)",
+    "content_separation": true,
+    "build_pages": 5,
+    "revalidation": "5 minutes",
+    "external_content": "GitHub API"
+  },
+  "environment_variables": {
+    "required": [
+      "CONTENT_REPO_URL",
+      "GITHUB_TOKEN"
+    ],
+    "optional": [
+      "NEXT_PUBLIC_APP_URL"
+    ]
+  }
+}

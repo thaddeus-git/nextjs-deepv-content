@@ -1,0 +1,63 @@
+{
+  "categories": [
+    {
+      "id": "web-frontend",
+      "title": "Web Frontend",
+      "description": "HTML, CSS, JavaScript, and modern frontend",
+      "subcategories": [
+        { "id": "css", "title": "CSS", "color": "#1572B6" },
+        { "id": "html", "title": "HTML", "color": "#E34F26" },
+        { "id": "javascript", "title": "JavaScript", "color": "#F7DF1E" }
+      ]
+    },
+    {
+      "id": "system-devops",
+      "title": "System & DevOps", 
+      "description": "Linux, shell scripting, system administration",
+      "subcategories": [
+        { "id": "cloud", "title": "Cloud", "color": "#4285F4" },
+        { "id": "containerization", "title": "Containerization", "color": "#2496ED" },
+        { "id": "linux", "title": "Linux", "color": "#FCC624" },
+        { "id": "package-management", "title": "Package Management", "color": "#FF6B35" },
+        { "id": "shell", "title": "Shell Scripting", "color": "#89E051" },
+        { "id": "version-control", "title": "Version Control", "color": "#F05032" }
+      ]
+    },
+    {
+      "id": "databases",
+      "title": "Databases",
+      "description": "Database management and query languages",
+      "subcategories": [
+        { "id": "mongodb", "title": "MongoDB", "color": "#47A248" },
+        { "id": "mysql", "title": "MySQL", "color": "#4479A1" },
+        { "id": "postgresql", "title": "PostgreSQL", "color": "#336791" },
+        { "id": "sql", "title": "SQL", "color": "#336791" }
+      ]
+    },
+    {
+      "id": "mobile",
+      "title": "Mobile Development",
+      "description": "Mobile app development for iOS and Android",
+      "subcategories": [
+        { "id": "android", "title": "Android", "color": "#3DDC84" },
+        { "id": "ios", "title": "iOS", "color": "#000000" }
+      ]
+    },
+    {
+      "id": "programming-languages",
+      "title": "Programming Languages",
+      "description": "Comprehensive programming language guides",
+      "subcategories": [
+        { "id": "c", "title": "C", "color": "#A8B9CC" },
+        { "id": "cpp", "title": "C++", "color": "#00599C" },
+        { "id": "csharp", "title": "C#", "color": "#239120" },
+        { "id": "go", "title": "Go", "color": "#00ADD8" },
+        { "id": "java", "title": "Java", "color": "#ED8B00" },
+        { "id": "php", "title": "PHP", "color": "#777BB4" },
+        { "id": "python", "title": "Python", "color": "#3776AB" },
+        { "id": "ruby", "title": "Ruby", "color": "#CC342D" },
+        { "id": "rust", "title": "Rust", "color": "#000000" }
+      ]
+    }
+  ]
+}
