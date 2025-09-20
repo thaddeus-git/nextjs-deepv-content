@@ -70,8 +70,13 @@ class ContentValidator {
     if (frontmatter.title && typeof frontmatter.title !== 'string') {
       errors.push('title must be a string');
     }
-    if (frontmatter.title && (frontmatter.title.length < 5 || frontmatter.title.length > 70)) {
-      errors.push('title must be 5-70 characters (SEO optimized)');
+    if (frontmatter.title && frontmatter.title.length < 5) {
+      errors.push('title must be at least 5 characters (too short for SEO)');
+    }
+
+    // Informational note for display optimization (not an error)
+    if (frontmatter.title && frontmatter.title.length > 60) {
+      this.warnings.push(`${filename}: Title is ${frontmatter.title.length} characters - may be truncated in SERP display (~60 char limit), but full title still provides SEO value`);
     }
 
     if (frontmatter.slug && !/^[a-z0-9-]+$/.test(frontmatter.slug)) {
@@ -125,25 +130,88 @@ class ContentValidator {
   }
 
   validateContent(content, filename) {
-    const warnings = [];
 
     // Check for minimum content length
     if (content.length < 100) {
-      warnings.push('Content is very short (< 100 characters)');
+      this.warnings.push(`${filename}: Content is very short (< 100 characters)`);
     }
 
     // Check for proper heading structure
     if (!content.match(/^#[^#]/m)) {
-      warnings.push('Missing main heading (# Title)');
+      this.warnings.push(`${filename}: Missing main heading (# Title)`);
     }
 
     // Check for code blocks without language specification
-    const codeBlocks = content.match(/```\s*\n/g);
-    if (codeBlocks && codeBlocks.length > 0) {
-      warnings.push('Found code blocks without language specification');
+    const codeBlocksWithoutLang = content.match(/```\s*\n/g);
+    if (codeBlocksWithoutLang && codeBlocksWithoutLang.length > 0) {
+      this.warnings.push(`${filename}: Found ${codeBlocksWithoutLang.length} code block(s) without language specification - use \`\`\`javascript, \`\`\`sql, \`\`\`mermaid, or \`\`\`text for generic content`);
     }
 
-    return warnings;
+    // Check for Mermaid diagrams that might be missing proper language tag
+    const potentialMermaidBlocks = content.match(/```\s*\n\s*(flowchart|graph|sequenceDiagram)/gm);
+    if (potentialMermaidBlocks && potentialMermaidBlocks.length > 0) {
+      this.warnings.push(`${filename}: Found ${potentialMermaidBlocks.length} potential Mermaid diagram(s) without 'mermaid' language tag - use \`\`\`mermaid`);
+    }
+
+    // Check for common language specification mistakes
+    const commonMistakes = [
+      { pattern: /```js\n/g, correct: 'javascript', wrong: 'js' },
+      { pattern: /```py\n/g, correct: 'python', wrong: 'py' },
+      { pattern: /```shell\n/g, correct: 'bash', wrong: 'shell' },
+      { pattern: /```yml\n/g, correct: 'yaml', wrong: 'yml' },
+      { pattern: /```md\n/g, correct: 'markdown', wrong: 'md' },
+      { pattern: /```node\n/g, correct: 'javascript', wrong: 'node' }
+    ];
+
+    commonMistakes.forEach(mistake => {
+      const matches = content.match(mistake.pattern);
+      if (matches && matches.length > 0) {
+        this.warnings.push(`${filename}: Found ${matches.length} code block(s) using '${mistake.wrong}' - use '${mistake.correct}' instead for better syntax highlighting`);
+      }
+    });
+
+    // Check for good practices
+    const allCodeBlocks = content.match(/```(\w+)/g);
+    if (allCodeBlocks && allCodeBlocks.length > 0) {
+      const langCount = allCodeBlocks.length;
+      const uniqueLangs = [...new Set(allCodeBlocks.map(block => block.replace('```', '')))];
+      // This is actually good - just for info
+      if (langCount >= 3) {
+        this.warnings.push(`${filename}: ✅ Good: Found ${langCount} properly tagged code blocks with ${uniqueLangs.length} different languages`);
+      }
+    }
+
+    // Check for image placeholders and validate format
+    const imagePlaceholders = content.match(/!\[([^\]]+)\]\(PLACEHOLDER:\s*([^)]+)\)/g);
+    if (imagePlaceholders && imagePlaceholders.length > 0) {
+      imagePlaceholders.forEach(placeholder => {
+        const match = placeholder.match(/!\[([^\]]+)\]\(PLACEHOLDER:\s*([^)]+)\)/);
+        if (match) {
+          const title = match[1];
+          const description = match[2];
+          
+          // Check if title is descriptive enough
+          if (title.length < 5) {
+            this.warnings.push(`${filename}: Image placeholder title too short: "${title}" - should be more descriptive`);
+          }
+          
+          // Check if description is detailed enough
+          if (description.length < 20) {
+            this.warnings.push(`${filename}: Image placeholder description too short: "${description}" - should explain what the image shows`);
+          }
+        }
+      });
+      
+      this.warnings.push(`${filename}: ✅ Found ${imagePlaceholders.length} properly formatted image placeholder(s)`);
+    }
+
+    // Check for standard markdown images (should use placeholders instead)
+    const standardImages = content.match(/!\[([^\]]*)\]\((?!PLACEHOLDER:)([^)]+)\)/g);
+    if (standardImages && standardImages.length > 0) {
+      this.warnings.push(`${filename}: Found ${standardImages.length} standard markdown image(s) - consider using PLACEHOLDER format for upstream generation`);
+    }
+
+    return []; // Warnings are added to this.warnings
   }
 
   isValidISODate(dateString) {
