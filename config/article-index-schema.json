@@ -1,0 +1,153 @@
+{
+  "_metadata": {
+    "version": "1.1.0",
+    "description": "Article index schema for DeepV Code content management",
+    "lastUpdated": "2025-09-18"
+  },
+  "structure": {
+    "required_fields": [
+      "lastUpdated", "totalArticles", "categories", "technologies", "articles"
+    ],
+    "validation_rules": {
+      "lastUpdated": {
+        "type": "string",
+        "format": "ISO 8601 with 3-digit milliseconds + Z",
+        "example": "2025-09-18T07:31:17.000Z",
+        "validation": "Must match JavaScript new Date().toISOString()"
+      },
+      "totalArticles": {
+        "type": "number",
+        "validation": "Must equal articles.length"
+      },
+      "categories": {
+        "type": "array",
+        "items": "string",
+        "validation": "Must be valid category IDs from categories.json"
+      },
+      "technologies": {
+        "type": "array", 
+        "items": "string",
+        "validation": "Human-readable technology names (e.g., 'JavaScript', 'Python')"
+      },
+      "articles": {
+        "type": "array",
+        "items": {
+          "required_fields": [
+            "id", "title", "slug", "category", "subcategory", 
+            "difficulty", "technology", "readTime", "publishedAt", 
+            "featured", "description", "tags", "filename", "lastUpdated"
+          ],
+          "validation_rules": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{8}$",
+              "description": "8-character hex ID matching filename"
+            },
+            "title": {
+              "type": "string",
+              "min_length": 5,
+              "max_length": null,
+              "description": "Must match frontmatter title - no character limit per Google SEO guidelines"
+            },
+            "slug": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]+$",
+              "description": "Must match frontmatter slug"
+            },
+            "category": {
+              "type": "string",
+              "validation": "Must exist in categories.json"
+            },
+            "subcategory": {
+              "type": "string", 
+              "validation": "Must be valid for category in categories.json"
+            },
+            "difficulty": {
+              "type": "enum",
+              "values": ["beginner", "intermediate", "advanced"]
+            },
+            "technology": {
+              "type": "string",
+              "description": "Human-readable name (e.g., 'JavaScript', not 'javascript')"
+            },
+            "readTime": {
+              "type": "number",
+              "min": 1,
+              "max": 60
+            },
+            "publishedAt": {
+              "type": "string",
+              "format": "YYYY-MM-DD"
+            },
+            "featured": {
+              "type": "boolean"
+            },
+            "description": {
+              "type": "string",
+              "min_length": 20,
+              "max_length": 200,
+              "description": "Must match frontmatter description"
+            },
+            "tags": {
+              "type": "array",
+              "items": "string",
+              "description": "Must match frontmatter tags"
+            },
+            "filename": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]+-[a-f0-9]{8}\\.mdx$",
+              "description": "Must match actual filename"
+            },
+            "lastUpdated": {
+              "type": "string",
+              "format": "ISO 8601 with 3-digit milliseconds + Z",
+              "description": "Must match frontmatter lastUpdated"
+            }
+          }
+        }
+      }
+    }
+  },
+  "consistency_requirements": {
+    "article_count": "articles.length must equal totalArticles",
+    "category_consistency": "All article.category values must be in categories array",
+    "technology_mapping": "All article.technology values must be in technologies array",
+    "filename_id_match": "article.id must match the hex ID in article.filename",
+    "frontmatter_sync": "All article fields must match corresponding MDX frontmatter"
+  },
+  "url_structure_requirements": {
+    "mandatory_pattern": "/guides/{slug}-{id}",
+    "description": "CRITICAL: All article URLs MUST follow this exact pattern",
+    "slug_source": "article.slug field (kebab-case)",
+    "id_source": "article.id field (8-char hex from filename)",
+    "example_url": "/guides/javascript-guide-beginners-abc12345",
+    "next_js_route": "app/guides/[slug-id]/page.tsx",
+    "parsing_function": "getArticleBySlugId(slugId: string)",
+    "link_generation": "href={`/guides/${article.slug}-${article.id}`}",
+    "validation": "URL must parse to valid slug and 8-char hex ID"
+  },
+  "example_format": {
+    "lastUpdated": "2025-09-18T07:31:17.000Z",
+    "totalArticles": 2,
+    "categories": ["web-frontend", "databases"],
+    "technologies": ["JavaScript", "MySQL"],
+    "articles": [
+      {
+        "id": "abc12345",
+        "title": "JavaScript Guide for Beginners",
+        "slug": "javascript-guide-beginners",
+        "category": "web-frontend",
+        "subcategory": "javascript",
+        "difficulty": "beginner",
+        "technology": "JavaScript",
+        "readTime": 15,
+        "publishedAt": "2025-09-18",
+        "featured": false,
+        "description": "Complete JavaScript guide for beginners with examples and exercises.",
+        "tags": ["javascript", "tutorial", "beginner"],
+        "filename": "javascript-guide-beginners-abc12345.mdx",
+        "lastUpdated": "2025-09-18T07:31:17.000Z"
+      }
+    ]
+  }
+}

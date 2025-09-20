@@ -1,55 +1,446 @@
 {
   "_metadata": {
-    "version": "1.0.0",
-    "source": "nextjs-deepv-docs/config/content-schema.json",
-    "lastUpdated": "2024-09-18",
-    "description": "Authoritative content schema for DeepV Code articles"
+    "version": "3.4.0",
+    "lastUpdated": "2025-09-18",
+    "description": "DeepV Code Content Schema - Complete upstream integration API with Mermaid, code language, image support, text/config blocks, and accurate SEO guidelines",
+    "api_urls": {
+      "schema": "https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/config/content-schema.json",
+      "categories": "https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/content/config/categories.json",
+      "article_index_schema": "https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/config/article-index-schema.json",
+      "validator": "https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/scripts/validate-content.js",
+      "index_validator": "https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/scripts/validate-article-index.js"
+    }
   },
   "article_schema": {
-    "filename_format": "{descriptive-title}-{uniqueId}.mdx",
     "frontmatter_required": [
-      "title",
-      "slug", 
-      "category",
-      "subcategory",
-      "description",
-      "tags",
-      "difficulty",
-      "readTime",
-      "lastUpdated"
-    ],
-    "frontmatter_optional": [
-      "featured",
-      "filename"
+      "title", "slug", "category", "subcategory", 
+      "description", "tags", "difficulty", "readTime", "lastUpdated"
     ],
     "frontmatter_types": {
-      "title": "string (5-70 characters)",
-      "slug": "string",
-      "category": "string", 
+      "title": "string (minimum 5 characters, no upper limit)",
+      "slug": "string (kebab-case)",
+      "category": "enum",
       "subcategory": "string",
-      "description": "string (for SEO)",
-      "tags": "string[] | string",
-      "difficulty": "'beginner' | 'intermediate' | 'advanced'",
-      "readTime": "number",
+      "description": "string (20-200 characters)",
+      "tags": "array|string",
+      "difficulty": "enum (beginner|intermediate|advanced)",
+      "readTime": "number (1-60)",
       "lastUpdated": "ISO date string",
-      "featured": "boolean",
-      "filename": "string"
+      "featured": "boolean"
     }
   },
-  "workflow_paths": {
-    "staging": {
-      "articles": "/nextjs-deepv-content/staging/guides/",
-      "index": "/nextjs-deepv-content/staging/config/article-index-update.json"
+  "requirements": {
+    "frontmatter": {
+      "required_fields": [
+        "title", "slug", "category", "subcategory", 
+        "description", "tags", "difficulty", "readTime", "lastUpdated"
+      ],
+      "optional_fields": ["featured"],
+      "validation_rules": {
+        "title": {
+          "type": "string",
+          "min_length": 5,
+          "max_length": null,
+          "description": "No character limit - Google indexes entire title. For optimal display in SERPs, consider ~50-60 characters, but longer titles still provide SEO value."
+        },
+        "slug": {
+          "type": "string", 
+          "pattern": "^[a-z0-9-]+$",
+          "description": "kebab-case format"
+        },
+        "category": {
+          "type": "enum",
+          "values": ["databases", "mobile", "programming-languages", "system-devops", "web-frontend"],
+          "description": "Must exist in categories.json"
+        },
+        "subcategory": {
+          "type": "string",
+          "description": "Must be valid for chosen category (see categories.json)"
+        },
+        "description": {
+          "type": "string",
+          "min_length": 20,
+          "max_length": 200,
+          "description": "Essential for SEO"
+        },
+        "tags": {
+          "type": ["array", "string"],
+          "description": "Array of strings OR comma-separated string"
+        },
+        "difficulty": {
+          "type": "enum",
+          "values": ["beginner", "intermediate", "advanced"]
+        },
+        "readTime": {
+          "type": "number",
+          "min": 1,
+          "max": 60,
+          "description": "Minutes to read"
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "ISO 8601 with 3-digit milliseconds + Z",
+          "example": "2024-09-18T12:30:00.000Z",
+          "validation": "Must match JavaScript new Date().toISOString()"
+        },
+        "featured": {
+          "type": "boolean",
+          "default": false
+        }
+      }
     },
-    "production": {
-      "articles": "/nextjs-deepv-content/guides/",
-      "index": "/nextjs-deepv-content/config/article-index.json"
+    "filename": {
+      "pattern": "^[a-z0-9-]+-[a-f0-9]{8}\\.mdx$",
+      "format": "{descriptive-title}-{8-char-hex-id}.mdx",
+      "examples": [
+        "how-to-parse-json-javascript-abc12345.mdx",
+        "react-hooks-guide-def67890.mdx"
+      ]
+    },
+    "content": {
+      "min_length": 100,
+      "required_heading": "# Main Title",
+      "images": {
+        "placeholder_format": {
+          "syntax": "![Image Title](PLACEHOLDER: Detailed description)",
+          "examples": [
+            "![Dependency Resolution Process](PLACEHOLDER: A technical diagram illustrating the RPM dependency resolution process)",
+            "![Command Line Workflow](PLACEHOLDER: Three terminal windows showing step-by-step commands)"
+          ],
+          "requirements": [
+            "Image Title must be descriptive (used for filename generation)",
+            "PLACEHOLDER: prefix is mandatory for automated conversion",
+            "Detailed description explains what image should show"
+          ]
+        },
+        "file_naming": {
+          "pattern": "{8-char-hex-id}-{kebab-case-title}.png",
+          "conversion_rule": "Image Title → kebab-case (lowercase, hyphens, no special chars)",
+          "examples": [
+            "Dependency Resolution Process → abc12345-dependency-resolution-process.png",
+            "Command Line Workflow → abc12345-command-line-workflow.png",
+            "Database Schema Diagram → def67890-database-schema-diagram.png"
+          ]
+        },
+        "storage_structure": {
+          "staging": "staging/images/",
+          "production": "images/",
+          "url_pattern": "/images/{filename}",
+          "next_js_optimization": "Automatic WebP conversion and responsive sizing"
+        },
+        "technical_requirements": {
+          "format": "PNG (preferred for technical diagrams)",
+          "width": "800px (standard for articles)",
+          "aspect_ratio": "16:9 for diagrams, variable for screenshots",
+          "file_size": "< 500KB per image for optimal loading",
+          "accessibility": "Alt text required for screen readers"
+        },
+        "conversion_process": {
+          "step_1": "Upstream generates placeholder: ![Title](PLACEHOLDER: description)",
+          "step_2": "Upstream generates image file: {id}-{title}.png in staging/images/",
+          "step_3": "Script converts placeholder → <Image src=\"/images/{filename}\" alt=\"Title\" />",
+          "step_4": "Promotion script moves images: staging/images/ → images/"
+        },
+        "next_js_image_component": {
+          "width": 800,
+          "height": 450,
+          "sizes": "(max-width: 768px) 100vw, 800px",
+          "priority": "true for first image in article",
+          "className": "rounded-lg shadow-lg",
+          "style": "width: 100%, height: auto, maxWidth: 800px"
+        }
+      },
+      "code_blocks": {
+        "requirement": "MUST specify language for ALL code blocks - no exceptions",
+        "format": "```{language}",
+        "critical_rule": "NEVER use ``` without language - always specify the language",
+        "supported_languages": {
+          "web_frontend": [
+            "javascript", "typescript", "html", "css", "scss", "less", 
+            "jsx", "tsx", "vue", "svelte", "json", "xml"
+          ],
+          "backend": [
+            "python", "java", "csharp", "php", "ruby", "go", "rust", "kotlin", 
+            "scala", "nodejs", "express", "fastapi", "spring", "django", "flask"
+          ],
+          "mobile": [
+            "swift", "kotlin", "dart", "flutter", "react-native", "objective-c",
+            "java", "xamarin"
+          ],
+          "databases": [
+            "sql", "mysql", "postgresql", "mongodb", "redis", "cassandra",
+            "plsql", "tsql", "sqlite", "nosql"
+          ],
+          "system_devops": [
+            "bash", "shell", "powershell", "dockerfile", "docker-compose",
+            "yaml", "yml", "terraform", "ansible", "kubernetes", "helm"
+          ],
+          "data_config": [
+            "json", "yaml", "yml", "xml", "toml", "ini", "env", "properties"
+          ],
+          "other_languages": [
+            "c", "cpp", "c++", "r", "matlab", "perl", "lua", "haskell", 
+            "clojure", "erlang", "elixir", "f#", "vb", "assembly"
+          ],
+          "diagrams": [
+            "mermaid", "plantuml", "graphviz", "dot"
+          ],
+          "markup": [
+            "markdown", "md", "html", "latex", "tex", "rst"
+          ],
+          "fallback": [
+            "text", "plain", "txt", "output", "console", "config", "conf"
+          ]
+        },
+        "language_examples": {
+          "javascript": "```javascript\nconst users = await fetch('/api/users').then(res => res.json());\nconsole.log(users);\n```",
+          "python": "```python\ndef process_data(items):\n    return [item.upper() for item in items if item]\n\nresult = process_data(['hello', 'world'])\nprint(result)\n```",
+          "java": "```java\npublic class UserService {\n    public List<User> getActiveUsers() {\n        return userRepository.findByActiveTrue();\n    }\n}\n```",
+          "sql": "```sql\nSELECT u.name, u.email, COUNT(o.id) as order_count\nFROM users u\nLEFT JOIN orders o ON u.id = o.user_id\nWHERE u.active = 1\nGROUP BY u.id\nORDER BY order_count DESC;\n```",
+          "bash": "```bash\n#!/bin/bash\nfor file in *.log; do\n    echo \"Processing $file\"\n    gzip \"$file\"\ndone\n```",
+          "json": "```json\n{\n  \"name\": \"DeepV Code\",\n  \"version\": \"1.0.0\",\n  \"dependencies\": {\n    \"next\": \"^15.0.0\"\n  }\n}\n```",
+          "yaml": "```yaml\napiVersion: v1\nkind: Service\nmetadata:\n  name: web-service\nspec:\n  selector:\n    app: web\n  ports:\n  - port: 80\n    targetPort: 3000\n```",
+          "mermaid": "```mermaid\nflowchart TD\n    A[User Request] --> B{Authentication}\n    B -->|Valid| C[Process Request]\n    B -->|Invalid| D[Return Error]\n    C --> E[Return Response]\n```",
+          "html": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>DeepV Code</title>\n</head>\n<body>\n    <h1>Welcome to DeepV Code</h1>\n</body>\n</html>\n```",
+          "css": "```css\n.container {\n    max-width: 1200px;\n    margin: 0 auto;\n    padding: 20px;\n}\n\n.button {\n    background: #007bff;\n    color: white;\n    border: none;\n    padding: 10px 20px;\n    border-radius: 4px;\n}\n```",
+          "dockerfile": "```dockerfile\nFROM node:18-alpine\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci --only=production\nCOPY . .\nEXPOSE 3000\nCMD [\"npm\", \"start\"]\n```",
+          "markdown": "```markdown\n# Article Title\n\n## Section\n\nThis is **bold** and *italic* text.\n\n- List item 1\n- List item 2\n\n[Link](https://example.com)\n```",
+          "text": "```text\nexclude=openssl* kernel*\n# Configuration example\nkey=value\nstatus=enabled\n```",
+          "output": "```output\nLoading dependencies...\nInstallation complete!\nServer starting on port 3000\n✓ Ready for connections\n```",
+          "config": "```config\n[database]\nhost=localhost\nport=5432\nname=myapp\n\n[cache]\nredis_url=redis://localhost:6379\n```"
+        },
+        "special_cases": {
+          "mermaid_diagrams": {
+            "language": "mermaid",
+            "supported_types": [
+              "flowchart TD", "flowchart LR", "graph TD", "graph LR",
+              "sequenceDiagram", "classDiagram", "erDiagram", "pie", "gitgraph"
+            ],
+            "renders_as": "Visual interactive diagrams on the website"
+          },
+          "terminal_commands": {
+            "language": "bash",
+            "alternatives": ["shell", "sh", "zsh", "fish"],
+            "usage": "For command line instructions"
+          },
+          "configuration_files": {
+            "languages": ["yaml", "json", "toml", "ini", "env"],
+            "usage": "For config files, environment variables, etc."
+          },
+          "generic_content": {
+            "language": "text",
+            "usage": "For configuration snippets, command output, generic examples",
+            "examples": [
+              "Configuration file contents (exclude=openssl* kernel*)",
+              "Terminal/console output",
+              "Generic text examples",
+              "Plain text that doesn't fit specific languages"
+            ],
+            "note": "Preferred over unlabeled blocks - follows Next.js documentation patterns"
+          }
+        }
+      }
     }
   },
-  "validation_rules": {
-    "unique_id": "deterministic from Stack Overflow ID",
-    "slug_format": "kebab-case",
-    "category_validation": "must exist in categories.json",
-    "description_seo": "essential for search engines"
+  "output_structure": {
+    "content_repository": "nextjs-deepv-content",
+    "staging_paths": {
+      "articles": "staging/guides/",
+      "index": "staging/config/article-index-update.json"
+    },
+    "production_paths": {
+      "articles": "guides/",
+      "index": "config/article-index.json"
+    },
+    "article_index_format": {
+      "lastUpdated": "ISO 8601 string",
+      "totalArticles": "number (existing + new)",
+      "categories": "array of category IDs used",
+      "technologies": "array of technology names", 
+      "articles": [
+        {
+          "id": "8-char hex ID",
+          "title": "article title",
+          "slug": "kebab-case-slug",
+          "category": "category ID",
+          "subcategory": "subcategory ID", 
+          "difficulty": "beginner|intermediate|advanced",
+          "technology": "human-readable tech name",
+          "readTime": "number",
+          "publishedAt": "YYYY-MM-DD",
+          "featured": "boolean",
+          "description": "SEO description",
+          "tags": "array of strings",
+          "filename": "article-filename.mdx",
+          "lastUpdated": "ISO 8601 string"
+        }
+      ]
+    }
+  },
+  "integration_workflow": {
+    "step_1": "curl -s {api_urls.schema} > content-schema.json",
+    "step_2": "curl -s {api_urls.categories} > categories.json", 
+    "step_3": "Generate content following requirements",
+    "step_4": "Create complete article-index-update.json (existing + new)",
+    "step_5": "Output to staging_paths",
+    "step_6": "Optional: curl -s {api_urls.validator} > validate.js && node validate.js staging/guides content-schema.json"
+  },
+  "content_quality_standards": {
+    "code_blocks": {
+      "mandatory_rule": "EVERY code block MUST specify a language - zero exceptions",
+      "correct_examples": [
+        "```javascript\nconst api = await fetch('/users');\n```",
+        "```python\ndef calculate(x, y):\n    return x + y\n```",
+        "```sql\nSELECT name FROM users WHERE active = 1;\n```",
+        "```bash\nnpm install package-name\n```",
+        "```json\n{\"key\": \"value\"}\n```",
+        "```yaml\nname: value\nlist:\n  - item1\n  - item2\n```",
+        "```mermaid\nflowchart TD\n    A --> B\n```"
+      ],
+      "incorrect_examples": [
+        "```\nconsole.log('Hello');\n```",
+        "```\nSELECT * FROM users;\n```",
+        "```\ndef my_function():\n    pass\n```"
+      ],
+      "validation": "Content will be rejected if ANY code block lacks language specification"
+    },
+    "language_selection_guide": {
+      "programming_code": "Use exact language name: javascript, python, java, etc.",
+      "shell_commands": "Use 'bash' for terminal commands",
+      "config_files": "Use 'json', 'yaml', 'xml' for configuration",
+      "markup": "Use 'html', 'css', 'markdown' for markup languages",
+      "databases": "Use 'sql' for general SQL, 'mysql', 'postgresql' for specific dialects",
+      "diagrams": "Use 'mermaid' for all Mermaid diagrams",
+      "unknown": "Use 'text' only if truly no specific language applies"
+    },
+    "mermaid_diagrams": {
+      "when_to_use": "Process flows, system architecture, database relationships, decision trees",
+      "language": "mermaid",
+      "supported_types": [
+        "flowchart TD (top-down flow)",
+        "flowchart LR (left-right flow)", 
+        "sequenceDiagram (interaction diagrams)",
+        "classDiagram (object relationships)",
+        "erDiagram (database schemas)",
+        "pie (data visualization)",
+        "gitgraph (version control flows)"
+      ],
+      "rendering": "Automatically converted to interactive visual diagrams",
+      "benefits": "Much better user experience than plain text descriptions"
+    },
+    "inline_code": {
+      "format": "`code`",
+      "usage": "Variable names, function names, file paths, short commands",
+      "examples": [
+        "`useState` hook",
+        "`package.json` file", 
+        "`npm install` command",
+        "`user.id` property"
+      ]
+    },
+    "syntax_highlighting": {
+      "languages_with_full_support": [
+        "javascript", "typescript", "python", "java", "sql", "bash", 
+        "json", "yaml", "html", "css", "php", "ruby", "go", "rust"
+      ],
+      "result": "Proper syntax highlighting improves readability by 300%",
+      "user_experience": "Colored syntax makes code much easier to understand"
+    }
+  },
+  "seo_optimization_requirements": {
+    "title_seo": {
+      "character_limit": "No limit - Google indexes entire title for SEO",
+      "display_optimization": "~50-60 characters for full SERP visibility",
+      "seo_truth": [
+        "Google has NO character limit for indexing titles",
+        "Longer titles still provide SEO value beyond display",
+        "Truncation in SERPs ≠ reduced SEO effectiveness", 
+        "Focus on clarity and keyword relevance over length"
+      ],
+      "requirements": [
+        "Include primary keyword near beginning",
+        "Use action words (How to, Guide, Tutorial)",
+        "Be specific and descriptive", 
+        "Avoid clickbait or misleading titles",
+        "Write for users first, length second"
+      ],
+      "patterns": {
+        "tutorial": "How to {action} in {technology}: {outcome}",
+        "guide": "{Technology} {Topic}: Complete Guide for {audience}",
+        "comparison": "{Technology A} vs {Technology B}: {aspect} Comparison"
+      }
+    },
+    "description_seo": {
+      "min_length": 20,
+      "max_length": 200,
+      "optimal_length": "150-160 characters",
+      "structure": "{what_readers_learn} + {key_benefit} + {target_audience}",
+      "requirements": [
+        "Include primary keyword naturally",
+        "State what readers will learn",
+        "Mention key benefit or outcome",
+        "Specify target audience level"
+      ]
+    },
+    "tags_seo": {
+      "min_tags": 3,
+      "max_tags": 8,
+      "optimal_count": "4-6 tags",
+      "required_types": [
+        "Primary technology (javascript, python, sql)",
+        "Content type (tutorial, guide, reference)",
+        "Skill level (beginner, intermediate, advanced)",
+        "Topic category (web-development, devops)"
+      ]
+    },
+    "url_seo": {
+      "pattern": "/guides/{slug}-{id}",
+      "slug_requirements": [
+        "Use kebab-case (lowercase with hyphens)",
+        "Include primary keyword",
+        "Keep concise and descriptive (~50-60 characters optimal, but no hard limit)",
+        "Avoid stop words when possible"
+      ]
+    }
+  },
+  "critical_fixes_required": {
+    "date_format": {
+      "problem": "Upstream generates 6-digit microseconds",
+      "solution": "Use JavaScript: new Date().toISOString()",
+      "correct_format": "2024-09-18T12:30:00.000Z (3-digit milliseconds)"
+    },
+    "title_display_optimization": {
+      "note": "Google has NO character limit for title indexing",
+      "display_consideration": "~50-60 characters for full SERP visibility",
+      "seo_reality": "Longer titles still provide SEO value beyond display truncation",
+      "recommendation": "Prioritize clarity and keyword relevance over arbitrary length limits"
+    },
+    "code_block_languages": {
+      "problem": "Code blocks without language specification",
+      "solution": "Always specify language: ```javascript not ```",
+      "reason": "Enables syntax highlighting and better user experience"
+    }
+  },
+  "quick_reference": {
+    "common_languages": {
+      "web": "javascript, typescript, html, css, json",
+      "backend": "python, java, php, ruby, go, sql",
+      "mobile": "swift, kotlin, dart, java",
+      "devops": "bash, yaml, dockerfile, terraform",
+      "data": "json, yaml, xml, csv, sql",
+      "diagrams": "mermaid"
+    },
+    "code_block_template": "```{language}\n{your_code_here}\n```",
+    "most_common_mistakes": [
+      "Using ``` without language",
+      "Using wrong language name (e.g., 'js' instead of 'javascript')",
+      "Not using 'mermaid' for flowcharts",
+      "Using 'shell' instead of 'bash' for commands"
+    ],
+    "validation_will_catch": [
+      "Any ``` without language specification",
+      "Potential Mermaid diagrams without 'mermaid' tag",
+      "Code blocks that could have better language specification"
+    ]
   }
 }
