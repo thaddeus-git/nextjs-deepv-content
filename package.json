@@ -5,8 +5,11 @@
   "scripts": {
     "convert": "node json-to-mdx-converter.js",
     "validate": "node validate-content.js staging/guides content-schema.json",
+    "validate-index": "node validate-article-index.js staging/config/article-index-update.json config/article-index-schema.json config/categories.json",
+    "validate-all": "npm run validate && npm run validate-index",
     "promote": "node promote.js",
-    "workflow": "npm run convert && npm run validate && npm run promote"
+    "workflow": "npm run convert && npm run validate-all && npm run promote",
+    "update-schemas": "curl -s https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/config/content-schema.json > content-schema.json && curl -s https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/config/content-templates.json > config/content-templates.json && curl -s https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/config/article-index-schema.json > config/article-index-schema.json && curl -s https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/scripts/validate-content.js > validate-content.js && curl -s https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/scripts/validate-article-index.js > validate-article-index.js"
   },
   "dependencies": {
     "gray-matter": "^4.0.3"
