@@ -1,0 +1,65 @@
+{
+  "metadata": {
+    "title": "Git Equivalent to Mercurial's hg update: Understanding Detached HEAD and Branching",
+    "slug": "git-equivalent-to-hg-update",
+    "uniqueId": "cc858a78",
+    "category": "system-devops",
+    "subcategory": "version-control",
+    "description": "Learn how Git's `checkout` command differs from Mercurial's `hg update` and how to manage detached HEAD states or create new branches.",
+    "tags": [
+      "git",
+      "mercurial",
+      "version-control",
+      "detached-head",
+      "branching"
+    ],
+    "difficulty": "intermediate",
+    "readTime": 8,
+    "lastUpdated": "2024-09-21T12:30:00.000Z",
+    "sourceStackOverflowId": "20505176",
+    "votes": 10
+  },
+  "content": "# Git Equivalent to Mercurial's hg update: Understanding Detached HEAD and Branching\n\nWhen migrating from Mercurial (Hg) to Git, a common point of confusion arises with the `hg update` command. In Mercurial, `hg update -r <revision>` moves your working directory to a specific revision and automatically creates a new \"head\" if you commit from there, allowing you to continue development on that point in history. Git's `git checkout <commit-hash>` behaves differently, often leading to a \"detached HEAD\" state. This article clarifies these differences and provides Git equivalents for various scenarios.\n\n## Quick Answer\n\nThe direct equivalent of `hg update -r <revision>` in Git is `git checkout <commit-hash>`. However, this often results in a **detached HEAD** state. To achieve a similar workflow to Mercurial where you can commit from that point and retain your changes on a new branch, use `git checkout -b <new-branch-name> <commit-hash>`.\n\n## Choose Your Method\n\nDeciding how to \"update\" to a past commit in Git depends on your intention.\n\n```mermaid\ngraph TD\n    A[Start: Need to go to a past commit?] --> B{Do you want to commit from there?};\n    B -- Yes --> C{Do you want to keep the new commits on a branch?};\n    C -- Yes --> D[git checkout -b new_branch_name <commit-hash>];\n    C -- No --> E[git checkout <commit-hash> (Detached HEAD)];\n    B -- No --> F{Do you just want to inspect the files?};\n    F -- Yes --> E;\n    F -- No --> G[git reset --hard <commit-hash> (CAUTION: Destructive)];\n```\n\n## Table of Contents\n1. Quick Answer\n2. Choose Your Method\n3. Understanding Detached HEAD in Git\n4. Creating a New Branch from a Past Commit\n5. Viewing All Commits (Mercurial `hg log` vs. Git `git log`)\n6. Git Alias for \"Restore\" (Advanced)\n7. Common Problems & Solutions\n8. Summary\n\n## Understanding Detached HEAD in Git\n\nWhen you run `git checkout <commit-hash>`, Git moves your `HEAD` pointer directly to that specific commit, rather than to a branch name. This is known as a **detached HEAD** state.\n\nIn this state:\n*   Your working directory and index match the chosen commit.\n*   You can inspect files, compile, and even make new commits.\n*   However, any new commits you make are not associated with any branch. If you then `git checkout` to another branch (e.g., `master`), those new commits might become unreachable and eventually garbage-collected unless you explicitly create a branch for them.\n\nLet's illustrate with the original example:\n\n```bash\n# Initialize Git and create 4 commits\ngit init\necho \"1\" > a.txt; git add a.txt; git commit -m \"1. commit\"\necho \"2\" >> a.txt; git commit -m \"2. commit\"\necho \"3\" >> a.txt; git commit -m \"3. commit\"\necho \"4\" >> a.txt; git commit -m \"4. commit\"\n\n# View log (example output)\ngit log --graph --pretty=format:'%h -%d %s (%cr) <%an>'\n```\n```output\n* 57bb375 - (HEAD, master) 4. commit (X minutes ago) <Peter Toft>\n* 724a493 - 3. commit (X minutes ago) <Peter Toft>\n* bb38732 - 2. commit (X minutes ago) <Peter Toft>\n* 879c593 - 1. commit (X minutes ago) <Peter Toft>\n```\n\nNow, checking out a past commit:\n\n```bash\ngit checkout 724a493 # Replace with your actual commit hash for \"3. commit\"\n```\n\nGit will output a message similar to this:\n\n```text\nNote: checking out '724a493'.\n\nYou are in 'detached HEAD' state. You can look around, make experimental\nchanges and commit them, and you can discard any commits you make in this\nstate without impacting any branches by performing another checkout.\n\nIf you want to create a new branch to retain commits you create, you may\ndo so (now or later) by using -b with the checkout command again. Example:\n\n  git checkout -b new_branch_name\n```\n\nIf you then run `git log`, it will only show commits reachable from the detached HEAD, which means the \"4. commit\" will appear to be gone from the log, but it still exists in the repository, pointed to by the `master` branch.\n\n![Git Detached HEAD State](/images/cc858a78-1.webp)\n\n## Creating a New Branch from a Past Commit\n\nTo replicate the Mercurial `hg update -r <revision>` behavior where you can commit from that point and have your changes on a new branch, you should create a new branch immediately:\n\n```bash\n# Assuming you are currently on 'master'\ngit checkout -b new_feature_branch 724a493\n```\n\nThis command does two things:\n1.  It creates a new branch named `new_feature_branch` pointing to commit `724a493`.\n2.  It checks out this new branch, so your `HEAD` is now attached to `new_feature_branch`.\n\nNow, any new commits you make will be added to `new_feature_branch`, and your `master` branch remains untouched, still pointing to the \"4. commit\". You can easily switch back to `master` with `git checkout master` and then merge `new_feature_branch` later if desired.\n\n## Viewing All Commits (Mercurial `hg log` vs. Git `git log`)\n\nAnother key difference is how `git log` behaves by default compared to `hg log`.\n\n*   **`hg log`**: By default, Mercurial's `hg log` shows all commits in the repository, regardless of the current working copy's revision.\n*   **`git log`**: By default, `git log` only shows commits that are ancestors of the currently checked-out commit (i.e., reachable from `HEAD`). This is why, in the detached HEAD state, the \"4. commit\" seemed to disappear.\n\nTo see all commits in Git, similar to `hg log`, you need to use the `--all` flag:\n\n```bash\ngit log --all --graph --pretty=format:'%h -%d %s (%cr) <%an>'\n```\n\nThis command will display all commits across all branches and references, giving you a complete picture of your repository's history.\n\n![Git Log All vs Default](/images/cc858a78-2.webp)\n\n## Git Alias for \"Restore\" (Advanced)\n\nFor users who frequently need to jump back one commit and potentially discard changes, an alias can be created. The original question's author provided an advanced alias that attempts to revert to the state of the previous commit, including deleted files.\n\n```gitconfig\n[alias]\n    restore = \"!f() { git checkout $(git rev-list -n 1 HEAD -- $1)~1 -- $(git diff --name-status $(git rev-list -n 1 HEAD -- $1)~1 | grep ^D | cut -f 2); }; f\"\n```\n\nThis alias is complex and specifically designed to restore the state of a file from the *previous* commit, including re-adding deleted files. A simpler approach to go back one commit and discard changes is `git checkout HEAD^` or `git reset --hard HEAD^`.\n\n*   `git checkout HEAD^`: Checks out the parent of the current commit, putting you in a detached HEAD state.\n*   `git reset --hard HEAD^`: Moves the current branch pointer back one commit and discards all changes in the working directory and staging area. **Use with caution as this is destructive.**\n\n## Common Problems & Solutions\n\n### Problem: Lost Commits after Detached HEAD\n**Issue**: You made commits in a detached HEAD state, then checked out a branch, and now your new commits are gone from `git log`.\n**Solution**: Your commits are likely still in the reflog. Use `git reflog` to find the commit hash of your \"lost\" commits, then create a new branch from it:\n```bash\ngit reflog # Find the commit hash, e.g., 'abc1234'\ngit branch my-lost-work abc1234\ngit checkout my-lost-work\n```\n\n### Problem: Want to bring a \"future\" commit onto my new branch\n**Issue**: You're on a new branch created from an older commit, but you want to incorporate a commit that was originally on `master` (e.g., the \"4. commit\" in our example).\n**Solution**: You can use `git cherry-pick` or `git merge`.\n*   **`git cherry-pick <commit-hash>`**: Applies a specific commit from another branch onto your current branch.\n    ```bash\n    git checkout new_feature_branch\n    git cherry-pick 57bb375 # The hash of the \"4. commit\"\n    ```\n*   **`git merge master`**: If you want to bring all changes from `master` into your `new_feature_branch`.\n\n## Summary\n\nThe key to understanding the Git equivalent of `hg update` lies in Git's concept of `HEAD` and how it relates to branches. While `git checkout <commit-hash>` provides the basic functionality of moving to a past state, it's crucial to be aware of the detached HEAD state. For a workflow similar to Mercurial's, where you intend to continue development from that point, always create a new branch immediately using `git checkout -b <new-branch-name> <commit-hash>`. Remember to use `git log --all` to see your full repository history, as `git log` by default only shows reachable commits.\n\n---\n\n## Image Generation Prompts\n\n**PLACEHOLDER-1:** A clear, simple diagram illustrating the \"detached HEAD\" state in Git. Show a series of commits (C1, C2, C3, C4) on a `master` branch. Then, show `HEAD` pointing directly to C2, with an arrow indicating it's \"detached\" from `master`. The `master` branch pointer should still be on C4. Include a small text box explaining that new commits made here would not be on `master`. Use a clean, modern vector art style.\n\n**PLACEHOLDER-2:** A comparison diagram showing the output of `git log` vs. `git log --all`. On the left, show a simplified commit graph with `master` pointing to C4, and `HEAD` detached at C2. Below it, show the output of `git log` only displaying C1 and C2. On the right, show the same commit graph, but below it, show the output of `git log --all` displaying C1, C2, C3, and C4, with `master` clearly visible. Use distinct colors for `HEAD` and branch pointers.",
+  "originalFormat": {
+    "image_prompts": {
+      "prompts": {
+        "PLACEHOLDER-1": "A clear, simple diagram illustrating the \"detached HEAD\" state in Git. Show a series of commits (C1, C2, C3, C4) on a `master` branch. Then, show `HEAD` pointing directly to C2, with an arrow indicating it's \"detached\" from `master`. The `master` branch pointer should still be on C4. Include a small text box explaining that new commits made here would not be on `master`. Use a clean, modern vector art style.",
+        "PLACEHOLDER-2": "A comparison diagram showing the output of `git log` vs. `git log --all`. On the left, show a simplified commit graph with `master` pointing to C4, and `HEAD` detached at C2. Below it, show the output of `git log` only displaying C1 and C2. On the right, show the same commit graph, but below it, show the output of `git log --all` displaying C1, C2, C3, and C4, with `master` clearly visible. Use distinct colors for `HEAD` and branch pointers."
+      },
+      "titles": {
+        "PLACEHOLDER-1": "Git Detached HEAD State",
+        "PLACEHOLDER-2": "Git Log All vs Default"
+      },
+      "count": 2,
+      "placeholder_list": [
+        [
+          "Git Detached HEAD State",
+          "1"
+        ],
+        [
+          "Git Log All vs Default",
+          "2"
+        ]
+      ]
+    },
+    "generated_images": [
+      {
+        "placeholder": "PLACEHOLDER-1",
+        "filename": "cc858a78-1.webp",
+        "title": "Git Detached HEAD State",
+        "path": "staging/images/cc858a78-1.png"
+      },
+      {
+        "placeholder": "PLACEHOLDER-2",
+        "filename": "cc858a78-2.webp",
+        "title": "Git Log All vs Default",
+        "path": "staging/images/cc858a78-2.png"
+      }
+    ],
+    "source_file": "/Users/thaddeus/Documents/on-going projects/deepv-stackoverflow-workflow-complete/data/crawled_data/20505176.json",
+    "workflow_version": "deepv_stackoverflow_v2.0_schema_compliant",
+    "generated_at": "2025-09-22T23:19:47.559266",
+    "word_count": 1524,
+    "code_blocks": 20
+  }
+}

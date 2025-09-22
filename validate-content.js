@@ -76,7 +76,7 @@ class ContentValidator {
 
     // Informational note for display optimization (not an error)
     if (frontmatter.title && frontmatter.title.length > 60) {
-      this.warnings.push(`${filename}: Title is ${frontmatter.title.length} characters - may be truncated in SERP display (~60 char limit), but full title still provides SEO value`);
+      warnings.push(`Title is ${frontmatter.title.length} characters - may be truncated in SERP display (~60 char limit), but full title still provides SEO value`);
     }
 
     if (frontmatter.slug && !/^[a-z0-9-]+$/.test(frontmatter.slug)) {
@@ -130,27 +130,28 @@ class ContentValidator {
   }
 
   validateContent(content, filename) {
+    const warnings = [];
 
     // Check for minimum content length
     if (content.length < 100) {
-      this.warnings.push(`${filename}: Content is very short (< 100 characters)`);
+      warnings.push('Content is very short (< 100 characters)');
     }
 
     // Check for proper heading structure
     if (!content.match(/^#[^#]/m)) {
-      this.warnings.push(`${filename}: Missing main heading (# Title)`);
+      warnings.push('Missing main heading (# Title)');
     }
 
     // Check for code blocks without language specification
     const codeBlocksWithoutLang = content.match(/```\s*\n/g);
     if (codeBlocksWithoutLang && codeBlocksWithoutLang.length > 0) {
-      this.warnings.push(`${filename}: Found ${codeBlocksWithoutLang.length} code block(s) without language specification - use \`\`\`javascript, \`\`\`sql, \`\`\`mermaid, or \`\`\`text for generic content`);
+      warnings.push(`Found ${codeBlocksWithoutLang.length} code block(s) without language specification - use \`\`\`javascript, \`\`\`sql, \`\`\`mermaid, or \`\`\`text for generic content`);
     }
 
     // Check for Mermaid diagrams that might be missing proper language tag
     const potentialMermaidBlocks = content.match(/```\s*\n\s*(flowchart|graph|sequenceDiagram)/gm);
     if (potentialMermaidBlocks && potentialMermaidBlocks.length > 0) {
-      this.warnings.push(`${filename}: Found ${potentialMermaidBlocks.length} potential Mermaid diagram(s) without 'mermaid' language tag - use \`\`\`mermaid`);
+      warnings.push(`Found ${potentialMermaidBlocks.length} potential Mermaid diagram(s) without 'mermaid' language tag - use \`\`\`mermaid`);
     }
 
     // Check for common language specification mistakes
@@ -166,7 +167,7 @@ class ContentValidator {
     commonMistakes.forEach(mistake => {
       const matches = content.match(mistake.pattern);
       if (matches && matches.length > 0) {
-        this.warnings.push(`${filename}: Found ${matches.length} code block(s) using '${mistake.wrong}' - use '${mistake.correct}' instead for better syntax highlighting`);
+        warnings.push(`Found ${matches.length} code block(s) using '${mistake.wrong}' - use '${mistake.correct}' instead for better syntax highlighting`);
       }
     });
 
@@ -177,41 +178,41 @@ class ContentValidator {
       const uniqueLangs = [...new Set(allCodeBlocks.map(block => block.replace('```', '')))];
       // This is actually good - just for info
       if (langCount >= 3) {
-        this.warnings.push(`${filename}: ✅ Good: Found ${langCount} properly tagged code blocks with ${uniqueLangs.length} different languages`);
+        warnings.push(`✅ Good: Found ${langCount} properly tagged code blocks with ${uniqueLangs.length} different languages`);
       }
     }
 
-    // Check for image placeholders and validate format
-    const imagePlaceholders = content.match(/!\[([^\]]+)\]\(PLACEHOLDER:\s*([^)]+)\)/g);
-    if (imagePlaceholders && imagePlaceholders.length > 0) {
-      imagePlaceholders.forEach(placeholder => {
-        const match = placeholder.match(/!\[([^\]]+)\]\(PLACEHOLDER:\s*([^)]+)\)/);
+    // Check for image references and validate format
+    const imageReferences = content.match(/!\[([^\]]+)\]\(\/images\/([^)]+\.png)\)/g);
+    if (imageReferences && imageReferences.length > 0) {
+      imageReferences.forEach(imageRef => {
+        const match = imageRef.match(/!\[([^\]]+)\]\(\/images\/([^)]+\.png)\)/);
         if (match) {
           const title = match[1];
-          const description = match[2];
+          const filename = match[2];
           
           // Check if title is descriptive enough
           if (title.length < 5) {
-            this.warnings.push(`${filename}: Image placeholder title too short: "${title}" - should be more descriptive`);
+            warnings.push(`Image title too short: "${title}" - should be more descriptive`);
           }
           
-          // Check if description is detailed enough
-          if (description.length < 20) {
-            this.warnings.push(`${filename}: Image placeholder description too short: "${description}" - should explain what the image shows`);
+          // Check filename format
+          if (!filename.match(/^[a-f0-9]{8}-\d+\.png$/)) {
+            warnings.push(`Image filename format incorrect: "${filename}" - should be {8-char-hex-id}-{number}.png`);
           }
         }
       });
       
-      this.warnings.push(`${filename}: ✅ Found ${imagePlaceholders.length} properly formatted image placeholder(s)`);
+      warnings.push(`✅ Found ${imageReferences.length} properly formatted image reference(s)`);
     }
 
-    // Check for standard markdown images (should use placeholders instead)
-    const standardImages = content.match(/!\[([^\]]*)\]\((?!PLACEHOLDER:)([^)]+)\)/g);
-    if (standardImages && standardImages.length > 0) {
-      this.warnings.push(`${filename}: Found ${standardImages.length} standard markdown image(s) - consider using PLACEHOLDER format for upstream generation`);
+    // Check for old PLACEHOLDER format (should now use direct /images/ references)
+    const oldPlaceholders = content.match(/!\[([^\]]*)\]\(PLACEHOLDER:\s*([^)]+)\)/g);
+    if (oldPlaceholders && oldPlaceholders.length > 0) {
+      warnings.push(`Found ${oldPlaceholders.length} old PLACEHOLDER format image(s) - schema now expects direct /images/filename.png references`);
     }
 
-    return []; // Warnings are added to this.warnings
+    return warnings;
   }
 
   isValidISODate(dateString) {

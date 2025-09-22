@@ -1,0 +1,232 @@
+---
+title: "Understanding CSS Selector: a[href*=#]:not([href=#])"
+slug: "understanding-css-selector-a-href-not-href"
+category: "web-frontend"
+subcategory: "css"
+description: "Demystify the CSS selector a[href*=#]:not([href=#]) to target anchor links that point to specific page sections, excluding generic '#' links."
+tags: ["css","css-selectors","html","attribute-selectors","web-development"]
+difficulty: "beginner"
+readTime: 5
+lastUpdated: "2025-09-22T16:16:54.246Z"
+featured: false
+---
+
+# Understanding CSS Selector: `a[href*=#]:not([href=#])`
+
+## Quick Answer
+
+The CSS selector `a[href*=#]:not([href=#])` targets all `<a>` (anchor) elements whose `href` attribute contains the `#` character, but specifically excludes those where the `href` attribute is *exactly* `#`. This is commonly used to select internal page links (like `#section1` or `page.html#section2`) while ignoring generic "scroll to top" or placeholder links (`href="#"`).
+
+## Concept Explanation
+
+This selector combines two powerful CSS attribute selectors and a pseudo-class:
+
+1.  **`a`**: This is the basic type selector, targeting all `<a>` elements.
+2.  **`[href*=#]`**: This is an attribute selector.
+    *   `href` specifies the attribute to check.
+    *   `*=` is the "contains" operator. It means "the attribute value contains this substring."
+    *   `#` is the substring being looked for.
+    *   So, `a[href*=#]` selects all `<a>` elements where the `href` attribute's value contains `#` anywhere within it.
+3.  **`:not([href=#])`**: This is a negation pseudo-class combined with another attribute selector.
+    *   `:not()` excludes elements that match the selector inside its parentheses.
+    *   `[href=#]` is an attribute selector that means "the `href` attribute's value is *exactly* `#`."
+    *   Therefore, `:not([href=#])` excludes any `<a>` element whose `href` attribute is precisely `#`.
+
+When combined, the selector `a[href*=#]:not([href=#])` effectively targets links that point to a specific fragment identifier (a section on the page) but are not just a generic, non-functional hash link.
+
+![CSS Selector Breakdown](PLACEHOLDER: CSS Selector Breakdown - /images/be4e7844-1.webp)
+
+## Real-World Examples
+
+This selector is particularly useful for styling or applying JavaScript behavior to "jump links" or "smooth scroll" links, without affecting placeholder links that might be used for other purposes (e.g., in navigation menus where a parent item might have `href="#"` to prevent navigation).
+
+### Example 1: Styling Internal Page Links
+
+You might want to give a distinct style to links that navigate within the current page.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Selector Example</title>
+    <style>
+        body { font-family: sans-serif; }
+        .container { margin: 20px; }
+        section {
+            height: 300px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        /* The selector in action */
+        a[href*="#"]:not([href="#"]) {
+            color: #007bff; /* Blue color */
+            font-weight: bold;
+            text-decoration: underline wavy;
+        }
+        /* Generic links */
+        a {
+            color: #333;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Understanding `a[href*=#]:not([href=#])`</h1>
+        <nav>
+            <p>Navigation:</p>
+            <a href="#section1">Go to Section 1</a>
+            <a href="#section2">Go to Section 2</a>
+            <a href="#section3">Go to Section 3</a>
+            <a href="#">Generic Placeholder Link</a>
+            <a href="https://example.com">External Link</a>
+            <a href="another-page.html#top">Link to another page section</a>
+        </nav>
+
+        <section id="section1">
+            <h2>Section 1</h2>
+            <p>Content for section 1.</p>
+        </section>
+        <section id="section2">
+            <h2>Section 2</h2>
+            <p>Content for section 2.</p>
+        </section>
+        <section id="section3">
+            <h2>Section 3</h2>
+            <p>Content for section 3.</p>
+        </section>
+    </div>
+</body>
+</html>
+```
+
+In this example, "Go to Section 1", "Go to Section 2", "Go to Section 3", and "Link to another page section" will be styled with blue, bold, wavy underlined text, while "Generic Placeholder Link" and "External Link" will retain the default `<a>` styling.
+
+### Example 2: Applying Smooth Scrolling with JavaScript
+
+This selector is frequently used in JavaScript to target specific links for smooth scrolling behavior.
+
+```javascript
+document.querySelectorAll('a[href*="#"]:not([href="#"])').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault(); // Prevent default jump behavior
+
+        const targetId = this.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+
+        if (targetElement) {
+            targetElement.scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+    });
+});
+```
+
+This JavaScript snippet would apply smooth scrolling to all the internal page links, but would ignore any `href="#"` links, preventing unintended behavior.
+
+## Common Problems & Solutions
+
+### Issue 1: jQuery Compatibility (Older Versions)
+
+In older versions of jQuery (specifically 2.2.4 onwards), the unquoted `#` in attribute selectors could cause issues.
+
+**Problematic Selector (Older jQuery):**
+`a[href*=#]:not([href=#])`
+
+**Solution:**
+Always quote the hash character within attribute selectors, especially when using jQuery. This is also good practice for standard CSS.
+
+```css
+a[href*="#"]:not([href="#"])
+```
+
+Or, if escaping for specific contexts (less common in modern CSS/JS):
+
+```css
+a[href*=\\#]:not([href=\\#])
+```
+
+### Issue 2: Excluding More Specific Hashes
+
+Sometimes you might have a specific `href="#"` link that you *do* want to target, or other hash links you want to exclude (e.g., for a carousel).
+
+**Solution:**
+Extend the `:not()` pseudo-class or use more specific selectors.
+
+To exclude `href="#myCarousel"` in addition to `href="#"`:
+
+```css
+a[href*="#"]:not([href="#"]):not([href="#myCarousel"])
+```
+
+Or, for jQuery:
+
+```javascript
+$('a[href*="#"]:not([href="#"],[href="#myCarousel"])').click(...)
+```
+
+### Issue 3: Misunderstanding `*=` vs `=`
+
+It's crucial to understand the difference between `*=` (contains) and `=` (exactly equals).
+
+*   `[href*="#"]`: Matches `href="#section"`, `href="page.html#section"`, `href="something#else"`.
+*   `[href="#"]`: Matches *only* `href="#"`.
+
+The combination `a[href*="#"]:not([href="#"])` ensures you get links that point to *something specific* after the hash, not just the generic hash itself.
+
+## Related: Other CSS Attribute Selectors
+
+Understanding this selector opens the door to other powerful attribute selectors:
+
+*   **`[attribute]`**: Selects elements with the specified attribute.
+    *   Example: `a[href]` (selects all `<a>` elements with an `href` attribute)
+*   **`[attribute=value]`**: Selects elements where the attribute's value is *exactly* `value`.
+    *   Example: `input[type="text"]`
+*   **`[attribute~=value]`**: Selects elements where the attribute's value is a space-separated list of words, one of which is *exactly* `value`.
+    *   Example: `img[alt~="logo"]` (matches `alt="company logo"` but not `alt="logotype"`)
+*   **`[attribute|=value]`**: Selects elements where the attribute's value begins with `value` *followed immediately by a hyphen* (`-`) or is *exactly* `value`.
+    *   Example: `[lang|="en"]` (matches `lang="en"` or `lang="en-US"`)
+*   **`[attribute^=value]`**: Selects elements where the attribute's value *begins with* `value`.
+    *   Example: `a[href^="https://"]` (selects secure external links)
+*   **`[attribute$=value]`**: Selects elements where the attribute's value *ends with* `value`.
+    *   Example: `a[href$=".pdf"]` (selects links to PDF files)
+
+![CSS Attribute Selectors Cheatsheet](PLACEHOLDER: CSS Attribute Selectors Cheatsheet - /images/be4e7844-2.webp)
+
+## Summary
+
+The CSS selector `a[href*=#]:not([href=#])` is a precise tool for targeting anchor links that navigate to specific sections within a page or document, while deliberately excluding generic placeholder links. It leverages the "contains" attribute selector (`*=`) and the negation pseudo-class (`:not()`) to achieve this specificity. Understanding this pattern is key for fine-grained control over link styling and behavior in web development.
+
+---
+
+## Image Generation Prompts
+
+**PLACEHOLDER-1:** A clear, modern infographic breaking down the CSS selector `a[href*=#]:not([href=#])`. Use a clean, minimalist design with distinct sections for each part of the selector.
+- **Section 1: `a`**: Show a simple `<a>` tag icon or text, with an arrow pointing to "Selects all anchor elements".
+- **Section 2: `[href*=#]`**: Show an `<a>` tag with `href="page.html#section"` and `href="#top"`. Highlight the `*=` operator and `#` symbol. Text: "Selects `<a>` elements where `href` attribute *contains* `#`."
+- **Section 3: `:not([href=#])`**: Show an `<a>` tag with `href="#"`. Highlight `:not()` and the `=` operator. Text: "Excludes `<a>` elements where `href` attribute is *exactly* `#`."
+- **Combined Result**: Show examples of matched links (`<a href="#section1">`, `<a href="page.html#section2">`) and unmatched links (`<a href="#">`, `<a href="https://example.com">`). Use checkmarks for matched, crosses for unmatched.
+- Overall style: Flat design, clear typography, use blue/green for positive matches, red for exclusions.
+
+**PLACEHOLDER-2:** A cheatsheet-style infographic for common CSS attribute selectors.
+- Title: "CSS Attribute Selectors Cheatsheet"
+- Each selector should have its own box/card with:
+    - **Selector:** e.g., `[attribute]`
+    - **Description:** e.g., "Elements with the specified attribute"
+    - **Example:** e.g., `a[href]`
+    - **Matches:** e.g., `<a href="...">`
+- Include the following selectors:
+    - `[attribute]`
+    - `[attribute=value]`
+    - `[attribute~=value]`
+    - `[attribute|=value]`
+    - `[attribute^=value]`
+    - `[attribute$=value]`
+    - `[attribute*=value]`
+- Use distinct icons or colors for each selector type. Keep it visually clean and easy to read.

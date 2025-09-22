@@ -1,0 +1,131 @@
+---
+title: "Understanding Real, Effective, and Saved UIDs in Unix/Linux"
+slug: "understanding-real-effective-saved-uids-unix-linux"
+category: "system-devops"
+subcategory: "linux"
+description: "Explore the purpose of Real, Effective, and Saved User IDs (UIDs) in Unix/Linux processes, crucial for understanding security and privilege management."
+tags: ["linux","security","unix","uid","privileges","setuid"]
+difficulty: "intermediate"
+readTime: 8
+lastUpdated: "2025-09-22T16:16:54.236Z"
+featured: false
+---
+
+# Understanding Real, Effective, and Saved UIDs in Unix/Linux
+
+In Unix-like operating systems, processes operate under specific user identities, which dictate their permissions and access rights. Beyond a single "user ID," processes can have multiple UIDs, each serving a distinct security purpose. Understanding these different UIDs—Real UID, Effective UID, and Saved UID—is fundamental to comprehending how privilege escalation and security mechanisms work in Linux and Unix.
+
+## Quick Answer
+
+A process in Unix/Linux typically has three primary UIDs:
+
+*   **Real UID (RUID):** Identifies the actual user who started the process. It's primarily for accounting and auditing.
+*   **Effective UID (EUID):** Determines the process's current privileges and resource access. This is the UID checked for permissions.
+*   **Saved UID (SUID):** Stores the EUID that a process had when it started, especially for `setuid` executables, allowing it to temporarily drop privileges and then regain them.
+
+These UIDs work together to manage process permissions, particularly when dealing with `setuid` programs that need elevated privileges for specific tasks but should otherwise run with the user's normal permissions.
+
+## Concept Explanation
+
+Each process on a Unix-like system is associated with a set of user identifiers that govern its permissions. These UIDs are crucial for the operating system's security model, ensuring that processes can only access resources they are authorized to.
+
+### Real UID (RUID)
+
+The Real UID represents the actual user who initiated the process. It remains constant throughout the process's lifetime, unless explicitly changed by a privileged process (EUID=0). Its primary roles are:
+
+*   **Identification:** It tells the system *who* started the process.
+*   **Auditing:** Used for logging and tracking which user is responsible for a process's actions.
+*   **Signal Handling:** Signals are often sent based on the RUID.
+
+### Effective UID (EUID)
+
+The Effective UID is the most important UID for privilege checking. When a process attempts to access a file, execute a command, or perform any privileged operation, the operating system checks the EUID to determine if the process has the necessary permissions.
+
+*   **Privilege Evaluation:** This is the UID that the kernel uses to decide if a process can perform an action (e.g., read a file, write to a directory).
+*   **Dynamic Changes:** The EUID can change during a process's execution, especially with `setuid` programs.
+
+### Saved UID (SUID)
+
+The Saved UID is a special UID that comes into play primarily with `setuid` executables. When a `setuid` program starts, its EUID is set to the owner of the executable file (e.g., root for `passwd`), while its RUID remains the user who ran it. The original EUID (which was the owner of the executable) is stored in the Saved UID.
+
+*   **Privilege Management:** It allows a `setuid` process to temporarily drop its elevated privileges (by setting EUID to RUID) and then later regain them (by setting EUID back to SUID) without needing to be root again. This is a critical security feature, as it allows programs to perform privileged operations only when necessary, reducing the window of vulnerability.
+*   **Security Context:** If the `setuid` bit is not set on an executable, the SUID will typically be the same as the RUID.
+
+![UIDs in a Process](PLACEHOLDER: UIDs in a Process - /images/3b19dbae-1.webp)
+
+### Audit UID (AUID)
+
+Some Unix systems with auditing enabled also feature an Audit UID (AUID). This UID identifies the user who originally logged in and started the session, and it remains constant for all processes within that session, even if `setuid` or `sudo` changes other UIDs. Its purpose is purely for auditing, ensuring that audit logs always trace actions back to the original user, regardless of privilege changes.
+
+## How UIDs Interact with `setuid` Programs
+
+The interaction between these UIDs is best understood in the context of `setuid` programs. A `setuid` program is an executable file that has a special permission bit set, causing it to run with the privileges of the file's owner, rather than the user who executes it. A classic example is the `passwd` command, which needs root privileges to write to `/etc/shadow` (where passwords are stored) but is run by ordinary users.
+
+Here's a typical flow for a `setuid` program:
+
+1.  **User executes `passwd`:**
+    *   RUID = User's UID (e.g., 1000)
+    *   EUID = Root's UID (0) (because `passwd` is `setuid` root)
+    *   SUID = Root's UID (0) (the EUID at program start)
+
+2.  **`passwd` performs privileged operation (e.g., reads `/etc/shadow`):** It uses its EUID (0) to gain root access.
+
+3.  **`passwd` drops privileges:** For security, it might temporarily change its EUID to the RUID (1000) while interacting with user input or performing non-privileged tasks.
+    *   RUID = 1000
+    *   EUID = 1000
+    *   SUID = 0 (still holds the original root privilege)
+
+4.  **`passwd` regains privileges:** When it needs to write to `/etc/shadow` again, it can change its EUID back to the SUID (0) to regain root privileges.
+    *   RUID = 1000
+    *   EUID = 0
+    *   SUID = 0
+
+This mechanism allows `setuid` programs to operate securely by only holding elevated privileges for the shortest possible time.
+
+## Changing UIDs with System Calls
+
+Unix-like systems provide system calls to manipulate these UIDs:
+
+*   **`setuid(uid_t uid)`:** This call attempts to set the RUID, EUID, and SUID to `uid`.
+    *   If the calling process has EUID=0 (root), all three UIDs are set to `uid`.
+    *   If the calling process is not root:
+        *   It can set its EUID to its RUID or SUID.
+        *   It can set its RUID to its RUID (no change).
+        *   It cannot change its RUID or SUID to arbitrary values.
+*   **`seteuid(uid_t euid)`:** This call specifically sets the Effective UID to `euid`.
+    *   If the calling process has EUID=0, it can set EUID to any `euid`.
+    *   If not root, it can only set EUID to its RUID or SUID. This is often preferred over `setuid()` for temporarily dropping/regaining privileges because it doesn't affect RUID or SUID, preserving the ability to switch back.
+*   **`setresuid(uid_t ruid, uid_t euid, uid_t suid)`:** This call allows setting all three UIDs (Real, Effective, and Saved) independently.
+    *   If EUID=0, any of the three can be set to any value.
+    *   If not root, `ruid`, `euid`, and `suid` can only be set to the current RUID, EUID, or SUID.
+
+## Common Problems & Solutions
+
+Understanding these UIDs helps in debugging permission issues and writing secure applications.
+
+*   **Problem:** A `setuid` program fails to perform a privileged action.
+    *   **Solution:** Check if the program correctly switched its EUID to the privileged SUID before attempting the action. Ensure it's not running with the RUID when it needs elevated permissions.
+*   **Problem:** A process needs to temporarily drop privileges and then regain them, but `setuid()` makes it a one-way street.
+    *   **Solution:** Use `seteuid()` to change only the Effective UID. This preserves the SUID, allowing the process to switch back to its original elevated privileges.
+*   **Problem:** Auditing shows actions performed by `root`, but you need to know which user initiated the `sudo` or `setuid` process.
+    *   **Solution:** Check the Audit UID (AUID) if your system supports it and auditing is enabled. This UID is designed to remain constant for the original user.
+
+## Summary
+
+The Real, Effective, and Saved UIDs are fundamental components of the Unix/Linux security model. The RUID identifies the user, the EUID dictates current permissions, and the SUID provides a mechanism for `setuid` programs to safely drop and regain privileges. Mastering these concepts is essential for anyone working with system security, privilege management, and understanding how applications interact with the operating system's access controls.
+
+---
+
+## Image Generation Prompts
+
+**PLACEHOLDER-1:** A clear, simple diagram illustrating the three UIDs (Real UID, Effective UID, Saved UID) associated with a process. Show arrows indicating how they relate to the "User" and "Executable File Owner" and how the EUID is used for "Permission Checks". Use distinct colors for each UID.
+**Visual Style:** Clean, modern, infographic style with clear labels.
+**Elements:**
+- A box labeled "Process" in the center.
+- Three smaller boxes inside the "Process" box, labeled "Real UID", "Effective UID", "Saved UID".
+- An arrow from "User" (outside the process box) pointing to "Real UID".
+- An arrow from "Executable File Owner" (outside the process box) pointing to "Effective UID" (with a note "on setuid exec").
+- An arrow from "Effective UID" pointing to "Saved UID" (with a note "on setuid exec").
+- An arrow from "Effective UID" pointing to a box labeled "Permission Checks (Kernel)".
+- A bidirectional arrow between "Effective UID" and "Real UID" (labeled "drop privileges").
+- A bidirectional arrow between "Effective UID" and "Saved UID" (labeled "regain privileges").

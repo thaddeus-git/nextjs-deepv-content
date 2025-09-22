@@ -1,8 +1,8 @@
 {
   "_metadata": {
-    "version": "3.4.0",
+    "version": "4.0.0",
     "lastUpdated": "2025-09-18",
-    "description": "DeepV Code Content Schema - Complete upstream integration API with Mermaid, code language, image support, text/config blocks, and accurate SEO guidelines",
+    "description": "DeepV Code Content Schema - Complete upstream integration API with direct image paths, Mermaid diagrams, code language support, text/config blocks, and accurate SEO guidelines",
     "api_urls": {
       "schema": "https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/config/content-schema.json",
       "categories": "https://raw.githubusercontent.com/thaddeus-git/nextjs-deepv-docs/main/content/config/categories.json",
@@ -101,16 +101,16 @@
       "min_length": 100,
       "required_heading": "# Main Title",
       "images": {
-        "placeholder_format": {
-          "syntax": "![Image Title](PLACEHOLDER: Detailed description)",
+        "final_format": {
+          "syntax": "![Image Title](/images/filename.png)",
           "examples": [
-            "![Dependency Resolution Process](PLACEHOLDER: A technical diagram illustrating the RPM dependency resolution process)",
-            "![Command Line Workflow](PLACEHOLDER: Three terminal windows showing step-by-step commands)"
+            "![Dependency Resolution Process](/images/abc12345-dependency-resolution-process.png)",
+            "![Command Line Workflow](/images/def67890-command-line-workflow.png)"
           ],
           "requirements": [
-            "Image Title must be descriptive (used for filename generation)",
-            "PLACEHOLDER: prefix is mandatory for automated conversion",
-            "Detailed description explains what image should show"
+            "Image Title must be descriptive and match generated_images title",
+            "Path must be /images/{id}-{kebab-case-title}.png format",
+            "Filename must match generated_images filename"
           ]
         },
         "file_naming": {
@@ -135,11 +135,11 @@
           "file_size": "< 500KB per image for optimal loading",
           "accessibility": "Alt text required for screen readers"
         },
-        "conversion_process": {
-          "step_1": "Upstream generates placeholder: ![Title](PLACEHOLDER: description)",
-          "step_2": "Upstream generates image file: {id}-{title}.png in staging/images/",
-          "step_3": "Script converts placeholder → <Image src=\"/images/{filename}\" alt=\"Title\" />",
-          "step_4": "Promotion script moves images: staging/images/ → images/"
+        "integration_process": {
+          "step_1": "Upstream generates image file: {id}-{title}.png",
+          "step_2": "Upstream generates content: ![Title](/images/{filename})",
+          "step_3": "JSON contains generated_images metadata for validation",
+          "step_4": "Direct conversion: JSON → MDX (no placeholder processing needed)"
         },
         "next_js_image_component": {
           "width": 800,
@@ -237,6 +237,15 @@
               "Plain text that doesn't fit specific languages"
             ],
             "note": "Preferred over unlabeled blocks - follows Next.js documentation patterns"
+          }
+        },
+        "image_metadata_validation": {
+          "generated_images_array": {
+            "purpose": "Maps image titles to filenames for validation",
+            "required_fields": ["title", "filename"],
+            "title_matching": "Must match image alt text in content",
+            "filename_format": "{8-char-hex-id}-{number}.png",
+            "path_validation": "Content must reference /images/{filename}"
           }
         }
       }

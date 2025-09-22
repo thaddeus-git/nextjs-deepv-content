@@ -46,17 +46,23 @@
     {
       "id": "programming-languages",
       "title": "Programming Languages",
-      "description": "Comprehensive programming language guides",
+      "description": "Comprehensive programming language guides - 15 languages supported",
       "subcategories": [
         { "id": "c", "title": "C", "color": "#A8B9CC" },
         { "id": "cpp", "title": "C++", "color": "#00599C" },
         { "id": "csharp", "title": "C#", "color": "#239120" },
+        { "id": "dart", "title": "Dart", "color": "#0175C2" },
         { "id": "go", "title": "Go", "color": "#00ADD8" },
         { "id": "java", "title": "Java", "color": "#ED8B00" },
+        { "id": "kotlin", "title": "Kotlin", "color": "#7F52FF" },
+        { "id": "matlab", "title": "MATLAB", "color": "#0076A8" },
         { "id": "php", "title": "PHP", "color": "#777BB4" },
         { "id": "python", "title": "Python", "color": "#3776AB" },
+        { "id": "r", "title": "R", "color": "#276DC3" },
         { "id": "ruby", "title": "Ruby", "color": "#CC342D" },
-        { "id": "rust", "title": "Rust", "color": "#000000" }
+        { "id": "rust", "title": "Rust", "color": "#000000" },
+        { "id": "swift", "title": "Swift", "color": "#FA7343" },
+        { "id": "typescript", "title": "TypeScript", "color": "#3178C6" }
       ]
     }
   ]

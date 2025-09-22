@@ -1,0 +1,340 @@
+---
+title: "Android EditText Height Resize Based on Keyboard Visibility"
+slug: "android-edittext-height-resize-based-on-keyboard"
+category: "mobile"
+subcategory: "android"
+description: "Learn how to dynamically resize an Android EditText to fill available screen space when the soft keyboard is hidden, using layout weights and windowSoftInputMode."
+tags: ["android","android-layout","edittext","keyboard","dynamic-layout","xml"]
+difficulty: "intermediate"
+readTime: 7
+lastUpdated: "2025-09-22T16:16:54.231Z"
+featured: false
+---
+
+# Android EditText Height Resize Based on Keyboard Visibility
+
+When developing Android applications, managing screen real estate, especially in the presence of the soft keyboard, is a common challenge. This guide addresses how to make an `EditText` dynamically resize to occupy the full screen when the keyboard is dismissed, providing a seamless user experience.
+
+## Quick Answer
+
+To make an `EditText` resize when the keyboard is dismissed, set its `layout_height` to `0dp` and `layout_weight` to `1` within a `LinearLayout` with `fill_parent` height. Additionally, configure the activity's `windowSoftInputMode` to `adjustResize` in the `AndroidManifest.xml`.
+
+```xml
+<!-- In your activity's layout XML -->
+<LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/EditMessage"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        <!-- Other EditText attributes -->
+    />
+
+    <!-- Other views, like buttons -->
+
+</LinearLayout>
+```
+
+```xml
+<!-- In your AndroidManifest.xml for the specific activity -->
+<activity
+    android:name=".YourActivity"
+    android:windowSoftInputMode="adjustResize" />
+```
+
+## Choose Your Method
+
+Deciding how to handle keyboard visibility and layout resizing depends on your specific UI requirements.
+
+```mermaid
+graph TD
+    A[Start] --> B{Need EditText to fill remaining space when keyboard hides?};
+    B -- Yes --> C{Are there other fixed-size elements (e.g., buttons) at the bottom?};
+    C -- Yes --> D[Use LinearLayout with layout_weight="1" for EditText];
+    D --> E[Set activity windowSoftInputMode="adjustResize"];
+    E --> F[End];
+    C -- No --> G[Consider simpler layout_height="fill_parent" for EditText];
+    G --> E;
+    B -- No --> H{Do you want the layout to pan, not resize?};
+    H -- Yes --> I[Set activity windowSoftInputMode="adjustPan"];
+    H -- No --> J[Default behavior or other custom handling];
+    J --> F;
+```
+![Decision Tree for EditText Keyboard Behavior](PLACEHOLDER: Decision Tree for EditText Keyboard Behavior - /images/ef5636d3-1.webp)
+
+## Ready-to-Use Code
+
+Here are the most effective code snippets to achieve dynamic `EditText` resizing.
+
+### 1. Using `layout_weight` and `adjustResize` (Recommended)
+
+This approach ensures that the `EditText` expands to fill the available vertical space when the keyboard is hidden, while other elements (like buttons) remain visible and correctly positioned.
+
+**Layout XML (`activity_main.xml`):**
+
+```xml
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#FFFFFF" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+
+        <EditText
+            android:id="@+id/EditMessage"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/newback"
+            android:gravity="top"
+            android:imeOptions="actionDone"
+            android:inputType="textMultiLine|textFilter|textVisiblePassword|textNoSuggestions"
+            android:maxLength="200"
+            android:padding="5dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#000000" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/PostMessage"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:layout_weight="1"
+                android:layout_marginRight="0.2dp"
+                android:background="@drawable/newbutton_corner"
+                android:text="@string/SubmitMessage"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/CancelMessage"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:layout_weight="1"
+                android:layout_marginRight="0.2dp"
+                android:background="@drawable/newbutton_corner"
+                android:text="@string/CancelMessage"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/DeleteMessage"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:layout_weight="1"
+                android:background="@drawable/newbutton_corner"
+                android:text="@string/DeleteMessage"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>
+```
+
+**`AndroidManifest.xml`:**
+
+```xml
+<activity
+    android:name=".YourActivity"
+    android:windowSoftInputMode="stateVisible|adjustResize" />
+```
+
+### 2. Using `adjustPan` (Alternative, with caveats)
+
+While `adjustPan` can also be used, it pans the content rather than resizing the window. This might hide your buttons when the keyboard is active, which is often undesirable.
+
+**Layout XML (similar to above, but `EditText` can have `layout_height="fill_parent"` if it's the only element):**
+
+```xml
+<EditText
+    android:id="@+id/EditMessage"
+    android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:background="#696969"
+    android:gravity="top"
+    android:imeOptions="actionDone"
+    android:inputType="textMultiLine|textFilter|textVisiblePassword|textNoSuggestions"
+    android:maxLength="200"
+    android:padding="5dp"
+    android:textAppearance="?android:attr/textAppearanceMedium"
+    android:textColor="#000000" >
+    <requestFocus />
+</EditText>
+```
+
+**`AndroidManifest.xml`:**
+
+```xml
+<activity
+    android:name=".YourActivity"
+    android:windowSoftInputMode="adjustPan" />
+```
+
+## Method 1: Dynamic Resizing with `adjustResize`
+
+The most robust and user-friendly way to handle `EditText` resizing in response to the soft keyboard is by combining `LinearLayout`'s `layout_weight` attribute with the `windowSoftInputMode="adjustResize"` setting in your `AndroidManifest.xml`.
+
+### How it Works
+
+1.  **`LinearLayout` with `orientation="vertical"`**: This container arranges its children vertically.
+2.  **`EditText` with `android:layout_height="0dp"` and `android:layout_weight="1"`**:
+    *   Setting `layout_height` to `0dp` tells the `LinearLayout` that the `EditText` initially has no fixed height.
+    *   `layout_weight="1"` then instructs the `LinearLayout` to distribute the *remaining* available vertical space to this `EditText`. If there are other weighted views, the space is distributed proportionally. In this case, with only one weighted view, it takes all remaining space.
+3.  **Other views with `android:layout_height="wrap_content"`**: Views like your buttons should have `wrap_content` for their height (or a fixed `dp` value) so they occupy only the space they need, leaving the rest for the `EditText`.
+4.  **`android:windowSoftInputMode="adjustResize"`**: This crucial setting in the `AndroidManifest.xml` tells the Android system to resize the activity's main window when the soft keyboard appears or disappears. When the keyboard is visible, the window shrinks, and the `LinearLayout` recalculates its available space, shrinking the `EditText`. When the keyboard hides, the window expands, and the `EditText` expands with it.
+
+### Implementation Steps
+
+1.  **Modify your Layout XML:**
+    *   Ensure your `EditText` and the container for your buttons are both direct children of a `LinearLayout` with `android:orientation="vertical"` and `android:layout_height="fill_parent"`.
+    *   Set the `EditText`'s `android:layout_height` to `0dp` and `android:layout_weight` to `1`.
+    *   Set the buttons' container `android:layout_height` to `wrap_content`.
+
+    ```xml
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/EditMessage"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp" <!-- Key change -->
+            android:layout_weight="1"   <!-- Key change -->
+            android:gravity="top"
+            android:inputType="textMultiLine"
+            android:padding="5dp"
+            android:hint="Type your message here..." />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+            <!-- Your buttons here -->
+        </LinearLayout>
+    </LinearLayout>
+    ```
+
+2.  **Update `AndroidManifest.xml`:**
+    *   Locate the `<activity>` tag for the activity containing this layout.
+    *   Add or modify the `android:windowSoftInputMode` attribute to include `adjustResize`. `stateVisible` is optional but ensures the keyboard is visible by default.
+
+    ```xml
+    <activity
+        android:name=".YourActivity"
+        android:windowSoftInputMode="stateVisible|adjustResize" />
+    ```
+
+This setup provides a responsive UI where the `EditText` intelligently adapts to the presence or absence of the soft keyboard.
+![EditText Resizing with Keyboard](PLACEHOLDER: EditText Resizing with Keyboard - /images/ef5636d3-2.webp)
+
+## Method 2: Using `adjustPan` (Consider with Caution)
+
+The `adjustPan` mode is an alternative, but it behaves differently and might not be suitable for all layouts, especially those with fixed elements at the bottom.
+
+### How it Works
+
+When `android:windowSoftInputMode="adjustPan"` is set, the activity's main window is *not* resized. Instead, the system automatically pans the contents of the window so that the currently focused input field (your `EditText`) is never obscured by the keyboard.
+
+### Caveats
+
+*   **Obscured Content**: If you have elements at the bottom of your screen (like the buttons in the original question) that are not the focused input, they might be pushed off-screen and become inaccessible while the keyboard is open. Users would need to dismiss the keyboard to interact with them.
+*   **No Resizing**: The `EditText` itself will not change its height to fill the screen when the keyboard is dismissed, as the window size remains constant. It will simply be panned into view.
+
+### Implementation Steps
+
+1.  **Modify your Layout XML:**
+    *   You can keep your `EditText` with `android:layout_height="0dp"` and `android:layout_weight="1"` if it's within a `LinearLayout` that fills the parent. This will make it fill the *initial* available space.
+    *   Alternatively, if the `EditText` is the primary content and you don't have other elements that need to remain visible, you could set `android:layout_height="fill_parent"`.
+
+    ```xml
+    <EditText
+        android:id="@+id/EditMessage"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="top"
+        android:inputType="textMultiLine"
+        android:hint="Type here..." >
+        <requestFocus /> <!-- Optional: to give focus on launch -->
+    </EditText>
+    ```
+
+2.  **Update `AndroidManifest.xml`:**
+    *   Set `android:windowSoftInputMode` to `adjustPan`.
+
+    ```xml
+    <activity
+        android:name=".YourActivity"
+        android:windowSoftInputMode="adjustPan" />
+    ```
+
+This method is generally less desirable for layouts where all elements need to be accessible regardless of keyboard state.
+
+## Common Problems & Solutions
+
+### 1. `EditText` doesn't resize, or buttons get hidden.
+
+*   **Problem**: You're likely using `adjustPan` when `adjustResize` is needed, or your layout weights are incorrect.
+*   **Solution**:
+    *   Ensure your activity's `windowSoftInputMode` is set to `adjustResize` in `AndroidManifest.xml`.
+    *   Verify that your `EditText` has `android:layout_height="0dp"` and `android:layout_weight="1"` within a `LinearLayout` with `android:orientation="vertical"` and `android:layout_height="fill_parent"`.
+    *   Make sure other fixed elements (like buttons) have `android:layout_height="wrap_content"` or a fixed `dp` value.
+
+### 2. Keyboard doesn't appear by default.
+
+*   **Problem**: The `EditText` might not be focused, or the `windowSoftInputMode` doesn't include `stateVisible`.
+*   **Solution**:
+    *   Add `<requestFocus />` inside your `EditText` in the XML to give it initial focus.
+    *   Include `stateVisible` in your `windowSoftInputMode`: `android:windowSoftInputMode="stateVisible|adjustResize"`.
+
+### 3. `EditText` is too small or too large initially.
+
+*   **Problem**: Hardcoded `dp` values for `EditText` height are overriding the `layout_weight` behavior.
+*   **Solution**: Remove any fixed `android:layout_height` values (e.g., `150dp`) from the `EditText` and rely solely on `android:layout_height="0dp"` and `android:layout_weight="1"` for dynamic sizing.
+
+## Related: Other Android Layout Operations
+
+Understanding how `layout_weight` and `windowSoftInputMode` work is fundamental for creating flexible Android UIs. Here are some related concepts:
+
+*   **`ConstraintLayout`**: A powerful and flexible layout manager that can achieve similar dynamic resizing effects using constraints and guidelines, often providing better performance than nested `LinearLayout`s.
+*   **`CoordinatorLayout`**: Used for more complex interactions between views, especially with scrolling and AppBarLayouts, allowing for advanced UI behaviors like collapsing toolbars.
+*   **`android:imeOptions`**: Controls the action button on the soft keyboard (e.g., `actionDone`, `actionSend`).
+*   **`android:inputType`**: Defines the type of input expected, influencing the keyboard layout (e.g., `textMultiLine`, `number`, `textPassword`).
+
+## Summary
+
+Dynamically resizing an `EditText` based on keyboard visibility in Android is best achieved by combining `LinearLayout`'s `layout_weight` attribute with the `adjustResize` `windowSoftInputMode`. This ensures that your `EditText` intelligently expands to fill available space when the keyboard is hidden, while other UI elements remain correctly positioned and accessible. Avoid `adjustPan` if you need all elements to be visible when the keyboard is active.
+
+---
+
+## Image Generation Prompts
+
+**PLACEHOLDER-1:** A decision tree flowchart illustrating the choice between `adjustResize` and `adjustPan`.
+- **Node 1 (Start):** "Need EditText to fill remaining space when keyboard hides?"
+- **Branch 1 (Yes):** "Are there other fixed-size elements (e.g., buttons) at the bottom?"
+- **Sub-branch 1.1 (Yes):** "Use LinearLayout with layout_weight='1' for EditText" -> "Set activity windowSoftInputMode='adjustResize'" -> "End (Recommended)"
+- **Sub-branch 1.2 (No):** "Consider simpler layout_height='fill_parent' for EditText" -> "Set activity windowSoftInputMode='adjustResize'" -> "End (Recommended)"
+- **Branch 2 (No):** "Do you want the layout to pan, not resize?"
+- **Sub-branch 2.1 (Yes):** "Set activity windowSoftInputMode='adjustPan'" -> "End (Caution: May hide content)"
+- **Sub-branch 2.2 (No):** "Default behavior or other custom handling" -> "End"
+Use a clean, modern flowchart style with distinct colors for nodes and arrows.
+
+**PLACEHOLDER-2:** A two-panel image showing an Android screen with an EditText and three buttons at the bottom.
+- **Panel 1 (Left):** Title "Keyboard Visible (adjustResize)". Show the soft keyboard at the bottom, occupying about 40% of the screen height. The EditText above it is visibly compressed, taking up the remaining space above the keyboard and below the top of the screen. The three buttons are visible just above the keyboard.
+- **Panel 2 (Right):** Title "Keyboard Hidden (adjustResize)". Show the same screen but without the soft keyboard. The EditText now expands to fill the entire vertical space between the top of the screen and the three buttons at the bottom. The three buttons remain in their original position at the bottom.
+Use a clean Android UI style, clearly showing the EditText, buttons, and the keyboard (or its absence). The EditText should have a light background, and the buttons should be distinct.

@@ -1,0 +1,66 @@
+{
+  "metadata": {
+    "title": "How to Use the MOSS Plagiarism Detection Script on macOS",
+    "slug": "how-to-use-moss-script-macos",
+    "uniqueId": "575e6743",
+    "category": "programming-languages",
+    "subcategory": "python",
+    "description": "Learn how to properly set up and use the MOSS (Measure Of Software Similarity) script for plagiarism detection on your macOS system, including registration and execution.",
+    "tags": [
+      "macos",
+      "moss",
+      "plagiarism-detection",
+      "perl",
+      "scripting",
+      "education"
+    ],
+    "difficulty": "intermediate",
+    "readTime": 5,
+    "lastUpdated": "2024-09-21T12:30:00.000Z",
+    "sourceStackOverflowId": "20905330",
+    "votes": 9
+  },
+  "content": "# How to Use the MOSS Plagiarism Detection Script on macOS\n\nThe MOSS (Measure Of Software Similarity) script is a powerful tool for detecting plagiarism in programming assignments. This guide will walk you through the steps to properly set up and use MOSS on your macOS system, addressing common issues like registration and script execution.\n\n## Quick Answer\n\nTo use MOSS, you must first register by sending an email to `moss@moss.stanford.edu` with `registeruser` and your email in the body. Once registered, you'll receive a personalized `moss.pl` script. Ensure `perl` is in your system's PATH, give the script execute permissions (`chmod ug+x moss.pl`), and then run it with your files, e.g., `./moss.pl -l python file1.py file2.py`.\n\n## Choose Your Method\n\nUsing the MOSS script primarily involves two stages: registration and execution. The main challenge often lies in ensuring the script is correctly set up and that you are a registered user.\n\n```mermaid\ngraph TD\n    A[Start] --> B{Have you registered for MOSS?};\n    B -- No --> C[Send Registration Email];\n    C --> D[Receive moss.pl script];\n    B -- Yes --> D;\n    D --> E{Is perl in your PATH?};\n    E -- No --> F[Adjust perl path in moss.pl];\n    E -- Yes --> G[Give moss.pl execute permissions];\n    G --> H[Run moss.pl with your files];\n    H --> I[Check MOSS results URL];\n    I --> J[End];\n\n    subgraph Registration\n        C\n    end\n\n    subgraph Setup\n        D --> E\n        E --> F\n        F --> G\n    end\n\n    subgraph Execution\n        G --> H\n        H --> I\n    end\n```\n\n## Ready-to-Use Code\n\nHere are the essential commands you'll need for setting up and running MOSS.\n\n### 1. Registering for MOSS\n\nSend an email to `moss@moss.stanford.edu` with the following body:\n\n```text\nregisteruser\nmail \"your_email@example.com\"\n```\n\nReplace `\"your_email@example.com\"` with your actual email address. You will receive a `moss.pl` script in response.\n\n### 2. Giving Execute Permissions\n\nOnce you have your `moss.pl` script, navigate to its directory in your terminal and run:\n\n```bash\nchmod ug+x moss.pl\n```\n\n### 3. Running the MOSS Script\n\nTo analyze Python files, for example:\n\n```bash\n./moss.pl -l python file_1.py file_2.py file_3.py\n```\n\nTo analyze a directory (if your script supports it, check comments in `moss.pl`):\n\n```bash\n./moss.pl -l python -d assignment1/\n```\n\n## Method 1: Proper MOSS Registration and Script Acquisition\n\nThe most critical step often overlooked is proper registration. MOSS requires you to register your email address to receive a personalized script (`moss.pl`) that contains your unique user ID. Without this, the service will not process your submissions correctly.\n\n1.  **Send Registration Email**: Compose an email to `moss@moss.stanford.edu`. The body of the email should contain:\n    ```text\n    registeruser\n    mail \"your_email@example.com\"\n    ```\n    Replace `\"your_email@example.com\"` with the email address you wish to register.\n    ![MOSS Registration Email Example](/images/575e6743-1.webp)\n2.  **Receive `moss.pl` Script**: After sending the registration email, you should receive a reply containing the `moss.pl` script. Save this file to a convenient location on your macOS system. This script will have your unique user ID embedded within it.\n\n## Method 2: Script Setup and Permissions on macOS\n\nOnce you have the `moss.pl` script, you need to ensure it's executable and that your system can find the `perl` interpreter.\n\n1.  **Verify Perl Path**: The `moss.pl` script is written in Perl. The very first line of the script typically specifies the path to the Perl interpreter (e.g., `#!/usr/bin/perl`). On macOS, `perl` is usually located at `/usr/bin/perl`. If your `perl` installation is in a different location, you might need to edit the first line of `moss.pl` to reflect the correct path.\n    ```perl\n    #!/usr/bin/perl\n    # The rest of the MOSS script follows\n    ```\n    You can check your Perl path by typing `which perl` in your terminal.\n2.  **Grant Execute Permissions**: Navigate to the directory where you saved `moss.pl` using your terminal. Then, grant execute permissions to the script:\n    ```bash\n    chmod ug+x moss.pl\n    ```\n    This command makes the script executable for the user and group, allowing you to run it directly.\n\n## Method 3: Executing the MOSS Script and Interpreting Results\n\nWith the script registered and set up, you can now submit your files for plagiarism detection.\n\n1.  **Submitting Files**:\n    *   **Individual Files**: The most common way to submit files is by listing them directly after the language flag. For Python files:\n        ```bash\n        ./moss.pl -l python file_1.py file_2.py file_3.py file_4.py\n        ```\n    *   **Directories**: Some versions of the `moss.pl` script (or specific configurations) might support submitting an entire directory. Check the comments within your `moss.pl` script for usage instructions, especially regarding the `-d` flag. If supported, it might look like this:\n        ```bash\n        ./moss.pl -l python -d assignment1/\n        ```\n        The original question's attempt to use `-d` might have failed if the specific `moss.pl` version didn't support it or if the directory structure wasn't as expected by the script.\n2.  **Understanding the Output**: When you run the script, you should see output similar to this:\n    ```output\n    Checking files . . .\n    OK\n    Uploading file_1.py ...done.\n    Uploading file_2.py ...done.\n    Query submitted.  Waiting for the server's response.\n    http://moss.stanford.edu/results/123456789.\n    ```\n    The crucial part is the `http://moss.stanford.edu/results/` URL. This is where your plagiarism report will be available. If you only get \"Checking files . . . OK\" and no URL, it usually indicates a registration issue or an incorrect script.\n    ![MOSS Script Successful Output](/images/575e6743-2.webp)\n3.  **Reviewing Results**: Open the provided URL in your web browser to view the detailed MOSS report, which highlights similarities between submitted files.\n\n## Common Problems & Solutions\n\n### Problem 1: \"Checking files . . . OK\" but no URL\n*   **Cause**: This is the most common symptom of not being properly registered or using a generic script without your user ID. The MOSS server rejects submissions from unregistered users.\n*   **Solution**: Ensure you have followed Method 1 precisely. You *must* receive the `moss.pl` script directly from Stanford after registration. The script you download from a public repository might not contain your user ID.\n\n### Problem 2: Permission Denied when running `./moss.pl`\n*   **Cause**: The script does not have execute permissions.\n*   **Solution**: Run `chmod ug+x moss.pl` in your terminal from the directory where the script is located (as described in Method 2).\n\n### Problem 3: `perl: command not found` or similar errors\n*   **Cause**: The `perl` interpreter is not in your system's PATH, or the shebang line (`#!/usr/bin/perl`) in `moss.pl` points to an incorrect location.\n*   **Solution**:\n    1.  Check your Perl installation: `which perl`.\n    2.  If `perl` is installed but in a different location (e.g., `/usr/local/bin/perl`), edit the first line of `moss.pl` to reflect the correct path.\n    3.  If `perl` is not installed, you'll need to install it (though it's usually pre-installed on macOS).\n\n### Problem 4: MOSS not detecting similarities even with identical files\n*   **Cause**: This is almost always due to an issue with registration or the script not being correctly processed by the MOSS server. The \"Checking files . . . OK\" message can be misleading if no actual submission occurs.\n*   **Solution**: Re-verify your registration and ensure you are using the `moss.pl` script provided by Stanford after your registration email. The problem description indicates this was the original issue, resolved by the user after receiving their official script.\n\n## Summary\n\nSuccessfully using the MOSS script on macOS involves a few critical steps:\n1.  **Register** your email with Stanford to obtain your personalized `moss.pl` script.\n2.  **Configure** the script by ensuring the correct Perl path and granting execute permissions.\n3.  **Execute** the script with your target files, paying attention to the output for the results URL.\n\nAlways prioritize using the `moss.pl` script you receive directly from Stanford after registration, as it contains your unique identifier necessary for the service to function correctly.\n\n---\n\n## Image Generation Prompts\n\n**PLACEHOLDER-1:** A screenshot of an email client (like Gmail or Outlook) showing a new email being composed. The recipient field should be `moss@moss.stanford.edu`. The subject line can be empty or \"MOSS Registration\". The email body should clearly display two lines of text: `registeruser` and `mail \"your_email@example.com\"` (with \"your_email@example.com\" highlighted or in a distinct color). The overall style should be clean and professional, resembling a modern email interface.\n\n**PLACEHOLDER-2:** A terminal window on a macOS system. The window should show the output of a successful MOSS script execution. The output should include lines like:\n`Checking files . . .`\n`OK`\n`Uploading file_1.py ...done.`\n`Uploading file_2.py ...done.`\n`Query submitted. Waiting for the server's response.`\n`http://moss.stanford.edu/results/123456789.`\nThe URL should be clearly visible and highlighted. The terminal prompt should be visible before and after the command. The background of the terminal should be dark, with light text.",
+  "originalFormat": {
+    "image_prompts": {
+      "prompts": {
+        "PLACEHOLDER-1": "A screenshot of an email client (like Gmail or Outlook) showing a new email being composed. The recipient field should be `moss@moss.stanford.edu`. The subject line can be empty or \"MOSS Registration\". The email body should clearly display two lines of text: `registeruser` and `mail \"your_email@example.com\"` (with \"your_email@example.com\" highlighted or in a distinct color). The overall style should be clean and professional, resembling a modern email interface.",
+        "PLACEHOLDER-2": "A terminal window on a macOS system. The window should show the output of a successful MOSS script execution. The output should include lines like:\n`Checking files . . .`\n`OK`\n`Uploading file_1.py ...done.`\n`Uploading file_2.py ...done.`\n`Query submitted. Waiting for the server's response.`\n`http://moss.stanford.edu/results/123456789.`\nThe URL should be clearly visible and highlighted. The terminal prompt should be visible before and after the command. The background of the terminal should be dark, with light text."
+      },
+      "titles": {
+        "PLACEHOLDER-1": "MOSS Registration Email Example",
+        "PLACEHOLDER-2": "MOSS Script Successful Output"
+      },
+      "count": 2,
+      "placeholder_list": [
+        [
+          "MOSS Registration Email Example",
+          "1"
+        ],
+        [
+          "MOSS Script Successful Output",
+          "2"
+        ]
+      ]
+    },
+    "generated_images": [
+      {
+        "placeholder": "PLACEHOLDER-1",
+        "filename": "575e6743-1.webp",
+        "title": "MOSS Registration Email Example",
+        "path": "staging/images/575e6743-1.png"
+      },
+      {
+        "placeholder": "PLACEHOLDER-2",
+        "filename": "575e6743-2.webp",
+        "title": "MOSS Script Successful Output",
+        "path": "staging/images/575e6743-2.png"
+      }
+    ],
+    "source_file": "/Users/thaddeus/Documents/on-going projects/deepv-stackoverflow-workflow-complete/data/crawled_data/20905330.json",
+    "workflow_version": "deepv_stackoverflow_v2.0_schema_compliant",
+    "generated_at": "2025-09-22T22:59:37.834978",
+    "word_count": 1399,
+    "code_blocks": 22
+  }
+}
